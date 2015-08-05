@@ -20,7 +20,7 @@
 
         
         <!-- MongoBD Database configuration host and port -->
-        <mongo:mongo host="#{ systemProperties['OPENSHIFT_MONGODB_DB_HOST'] }" port="#{ systemProperties['OPENSHIFT_MONGODB_DB_PORT'] }" />
+        <mongo:mongo host="127.6.155.130" port="27017" />
         
         <!-- Define the mongoDbFactory with your database Name  -->
 		<mongo:db-factory dbname="acoes" />
