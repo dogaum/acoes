@@ -20,10 +20,10 @@
 
         
         <!-- MongoBD Database configuration host and port -->
-        <mongo:mongo host="${OPENSHIFT_MONGODB_DB_HOST}" port="${OPENSHIFT_MONGODB_DB_PORT}" />
+        <mongo:mongo id="mongo" host="${OPENSHIFT_MONGODB_DB_HOST}" port="${OPENSHIFT_MONGODB_DB_PORT}" />
         
         <!-- Define the mongoDbFactory with your database Name  -->
-		<mongo:db-factory dbname="acoes" />
+		<mongo:db-factory dbname="acoes" mongo-ref="mongo"/>
  
  		<!-- Define the MongoTemplate  -->
 		<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
