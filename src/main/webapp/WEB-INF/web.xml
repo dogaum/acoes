@@ -81,7 +81,12 @@
 	<listener>
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	 </listener>
-  
+ 
+ 	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>springapp.root</param-value>
+	</context-param>
+ 
 	<!-- Log4j configuration -->
 	<context-param>
 	    <param-name>log4jConfigLocation</param-name>
