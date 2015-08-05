@@ -20,10 +20,15 @@
 
         
         <!-- MongoBD Database configuration host and port -->
-        <mongo:mongo host="127.0.0.1" port="27017" />
+        <mongo:mongo id="mongo" host="#{ systemProperties['OPENSHIFT_MONGODB_DB_HOST'] }" port="27017" />
         
         <!-- Define the mongoDbFactory with your database Name  -->
-		<mongo:db-factory dbname="acoes" />
+		<mongo:db-factory dbname="acoes"
+						  mongo-ref="mongo"
+						  host="#{ systemProperties['OPENSHIFT_MONGODB_DB_HOST'] }"
+						  port="27017" 
+						  username="admin"
+						  password="1AITjmHDZC2U" />
  
  		<!-- Define the MongoTemplate  -->
 		<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
