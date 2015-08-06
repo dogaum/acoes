@@ -261,7 +261,7 @@ public class ConfigView extends BasicView implements Serializable {
 	}
 
 	public void refreshQuoteCache() {
-		getQuotation.refreshQuoteCache();
+		getQuotation.cleanQuoteCache();
 	}
 
 	public List<StockTypeTO> getStockTypes() {

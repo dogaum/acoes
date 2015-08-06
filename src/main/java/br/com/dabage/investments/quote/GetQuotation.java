@@ -89,6 +89,16 @@ public class GetQuotation {
 		return 0D;
 	}
 
+	public void renewCache() {
+		if (quoteCache == null) {
+			for(Quote quote : quoteCache.values()) {
+				if ((quote.getLastUpdate().getTime() + 13*60*1000) < new Date().getTime()) {
+					getQuoteForCache(quote.getStock(), quote);
+				}
+			}
+		}
+	}
+	
 	public Double getLastQuoteCache(String stock) {
 		if (quoteCache == null) {
 			quoteCache = new HashMap<String, Quote>();
@@ -101,32 +111,7 @@ public class GetQuotation {
 		}
 
 		if (quote == null || (quote.getLastUpdate().getTime() + 15*60*1000) < new Date().getTime()) {
-			try {
-				Document doc = Jsoup.connect(cmaQuoteUrl + stock).get();
-				String[] lines = doc.body().text().split(" ");
-				if (lines.length < 2) {
-					return 0D;
-				}
-				String lastLine = lines[lines.length - 1];
-				String[] lineValues = lastLine.split(",");
-
-				Date date = preFormatDate.parse(lineValues[0]); //Date;
-				quote = new Quote();
-				quote.setDate(date);
-				quote.setLastUpdate(new Date());
-
-				quote.setOpen(Double.valueOf(lineValues[1])); //Opean value
-				quote.setLow(Double.valueOf(lineValues[3])); //Min value
-				quote.setHigh(Double.valueOf(lineValues[2])); //Max value
-				quote.setClose(Double.valueOf(lineValues[4])); //Last value 
-				quote.setStock(stock);
-
-				quoteCache.put(stock, quote);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}			
+			getQuoteForCache(stock, quote);
 		}
 
 		if (quote == null) {
@@ -136,10 +121,40 @@ public class GetQuotation {
 		}
 	}
 
+	private void getQuoteForCache(String stock, Quote quote) {
+		try {
+			Document doc = Jsoup.connect(cmaQuoteUrl + stock).get();
+			String[] lines = doc.body().text().split(" ");
+			if (lines.length < 2) {
+				return;
+			}
+			String lastLine = lines[lines.length - 1];
+			String[] lineValues = lastLine.split(",");
+
+			Date date = preFormatDate.parse(lineValues[0]); //Date;
+			quote = new Quote();
+			quote.setDate(date);
+			quote.setLastUpdate(new Date());
+
+			quote.setOpen(Double.valueOf(lineValues[1])); //Opean value
+			quote.setLow(Double.valueOf(lineValues[3])); //Min value
+			quote.setHigh(Double.valueOf(lineValues[2])); //Max value
+			quote.setClose(Double.valueOf(lineValues[4])); //Last value 
+			quote.setStock(stock);
+
+			quoteCache.put(stock, quote);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	/**
 	 * Refresh the Quote Cache
 	 */
-	public void refreshQuoteCache() {
+	public void cleanQuoteCache() {
 		quoteCache = new HashMap<String, Quote>();
 	}
 
@@ -192,7 +207,6 @@ public class GetQuotation {
 				obj.put("labels", datesArray);
 				return obj;
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} catch (IOException e) {
