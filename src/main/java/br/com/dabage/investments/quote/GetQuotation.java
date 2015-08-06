@@ -90,7 +90,7 @@ public class GetQuotation {
 	}
 
 	public void renewCache() {
-		if (quoteCache == null) {
+		if (quoteCache != null) {
 			for(Quote quote : quoteCache.values()) {
 				if ((quote.getLastUpdate().getTime() + 13*60*1000) < new Date().getTime()) {
 					getQuoteForCache(quote.getStock(), quote);

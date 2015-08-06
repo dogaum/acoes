@@ -54,10 +54,7 @@ public class InsertTickers {
 						companyTO.setStockType(stockType);
 						companyRepository.save(companyTO);
 						System.out.println(companyTO);						
-					} else {
-						System.out.println(obj.getTicker());
 					}
-
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
