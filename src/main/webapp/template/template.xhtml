@@ -186,13 +186,19 @@
 		                <li class="dropdown">
 
 		                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> <h:outputText value=" #{templateView.userName}" /> <b class="caret"></b></a>
-		                    <ul class="dropdown-menu">
+		                    <ul class="dropdown-menu" style="width: 200px;">
+			                    <li id="home">
+			                    	<a href="home.jsf"><i class="fa fa-fw fa-money"></i>
+				                    	<h:outputText value=" #{msg['app.menu.home']}" />
+			                    	</a>
+			                    </li>
+
 			                    <li id="graph">
 			                    	<a href="graph.jsf"><i class="fa fa-fw fa-bar-chart-o"></i>
 				                    	<h:outputText value=" #{msg['app.menu.graph']}" />
 			                    	</a>
 			                    </li>
-			                    
+
 			                    <li id="portfolio">
 		                    		<h:commandLink action="#{carteiraView.init}">
 		                    			<i class="fa fa-fw fa-table"></i>

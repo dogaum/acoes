@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>  
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  
+    xmlns:h="http://java.sun.com/jsf/html"  
+    xmlns:f="http://java.sun.com/jsf/core"  
+    xmlns:ui="http://java.sun.com/jsf/facelets"  
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:pe="http://primefaces.org/ui/extensions"  
+    template="../template/template.xhtml">
+
+    <ui:define name="title">
+    	<h:outputText value="#{msg['app.graph.title']}"/>
+    </ui:define>
+
+    <ui:define name="body">
+            <!-- Page Heading -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <ol class="breadcrumb">
+                        <li class="active">
+                            <i class="fa fa-fw fa-bar-chart-o"></i> <h:outputText value="#{msg['app.graph.title']}"/>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-12">
+					    <h:panelGrid columns="3" cellpadding="10" style="margin-left:25px">
+					        <p:outputLabel value="#{msg['app.graph.stock']}:" for="acMinLength" />
+					        <p:autoComplete id="acMinLength" minQueryLength="3" value="#{chartView.stock}" completeMethod="#{chartView.completeStock}" effect="fade" />
+
+					    	<p:commandButton value="#{msg['btn.send']}" id="btnSend" ajax="false" actionListener="#{chartView.createGrafico}" styleClass="ui-priority-primary" />
+					    </h:panelGrid>
+						<h:panelGrid id="graph" style="margin-left:20px">
+							<p:chart type="ohlc" model="#{chartView.grafico}" style="width:1024px;height:540px">
+								<p:ajax event="itemSelect" listener="#{chartView.itemSelect}"/>
+							</p:chart>
+						</h:panelGrid>
+                </div>
+            </div>
+    </ui:define>
+</ui:composition>

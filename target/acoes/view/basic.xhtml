@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>  
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  
+    xmlns:h="http://java.sun.com/jsf/html"  
+    xmlns:f="http://java.sun.com/jsf/core"  
+    xmlns:ui="http://java.sun.com/jsf/facelets"  
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:pe="http://primefaces.org/ui/extensions"  
+    template="../template/template.xhtml">
+
+    <ui:define name="title">
+    	<h:outputText value="#{msg['app.fr.title']}"/>
+    </ui:define>
+
+    <ui:define name="body">
+    	<style type="text/css">
+	    	.panel-heading a:after {
+	    	    font-family: 'Glyphicons Halflings';
+	    	    content: "\e114";    
+	    	    float: right; 
+	    	    color: #fff;
+	    	}
+	    	.panel-heading a.collapsed:after {
+	    	    content: "\e080";
+	    	}
+	    	.ui-toolbar.ui-widget-header {
+			  background-image: none;
+			  color: #fff;
+			  background-color: #428bca;
+	    	}
+
+			.panel-green .panel-heading a {
+			    font-weight: bold;
+			    color: #fff;
+			}
+    	</style>
+    	<h:form id="form">
+            <!-- Page Heading -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <ol class="breadcrumb">
+                        <li class="active">
+                            <i class="fa fa-fw fa-bar-chart-o"></i> <h:outputText value="#{msg['app.fr.title']}"/>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-12">
+					  <div class="panel panel-green">
+					    <div class="panel-heading">
+					      <h4 class="panel-title">
+					        <a data-toggle="collapse" href="#collapseFilter" class="panel-title">
+					          <h:outputText value="#{msg['app.fr.lbl.filter']}"/>
+					        </a>
+					      </h4>
+					    </div>
+					    <div id="collapseFilter" class="panel-collapse collapse in">
+					      <div class="panel-body">
+					      </div>
+					    </div>
+					  </div>
+					</div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><h:outputLabel value="#{msg['app.fr.title']}"/></h3>
+                        </div>
+                        <div class="panel-body">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><h:outputLabel value="#{msg['app.fr.lbl.content']}"/></h3>
+                        </div>
+                        <div class="panel-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</h:form>
+    </ui:define>
+</ui:composition>

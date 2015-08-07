@@ -14,17 +14,18 @@
 	<global-method-security pre-post-annotations="enabled" />
 
 	<!-- secure the application´s urls with the specific Role --> 
-	<http auto-config="false" use-expressions="true" access-denied-page="/denied" >
+	<http auto-config="false" use-expressions="true">
 		<intercept-url pattern="/denied" access="permitAll" />
 		<intercept-url pattern="/view/**" access="hasAnyRole('ROLE_ADMIN','ROLE_USUARIO')" />
 		<intercept-url pattern="/services/**" access="hasAnyRole('ROLE_ADMIN','ROLE_USUARIO')" />
 
-        <form-login login-page="/index.jsf" default-target-url="/view/graph.jsf" authentication-failure-url="/index.jsf?erro=true"  />
-		<logout logout-success-url="/index.jsf" />
+        <form-login login-page="/index.jsf" always-use-default-target="true" default-target-url="/view/home.jsf" authentication-failure-url="/index.jsf?erro=true"  />
+		<logout logout-success-url="/index.jsf" invalidate-session="true" logout-url="/index.jsf"/>
 		<session-management>
 		  <concurrency-control
 		       max-sessions="1"
-		       expired-url="/index.jsf" />
+		       expired-url="/index.jsf"
+		        />
 		</session-management>
 	</http>
 

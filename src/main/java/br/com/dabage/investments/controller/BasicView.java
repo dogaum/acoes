@@ -1,6 +1,8 @@
 package br.com.dabage.investments.controller;
 
 import java.io.Serializable;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.annotation.Resource;
 import javax.faces.application.FacesMessage;
@@ -43,5 +45,15 @@ public class BasicView implements Serializable {
 	public UserTO getUserLoggedIn() {
 		UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return userRepository.findByUsername(userDetails.getUsername());
+	}
+
+	public String getMessage(String key) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		Locale locale = context .getViewRoot().getLocale();
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		ResourceBundle bundle = ResourceBundle.getBundle("messages", locale, loader);
+		String msg = bundle.getString(key);
+
+		return msg;
 	}
 }
