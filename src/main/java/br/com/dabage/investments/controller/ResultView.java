@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.faces.bean.RequestScoped;
 import javax.faces.event.ActionEvent;
 
@@ -48,10 +47,10 @@ public class ResultView extends BasicView implements Serializable {
 
 	private static final DateFormat format = new SimpleDateFormat("yyyyMM");
 
-    @Resource
+	@Autowired
     CarteiraRepository carteiraRepository;
 
-	@Resource
+	@Autowired
 	NegotiationRepository negotiationRepository;
 
 	@Autowired

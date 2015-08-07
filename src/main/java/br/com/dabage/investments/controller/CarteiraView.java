@@ -3,13 +3,11 @@ package br.com.dabage.investments.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.faces.bean.RequestScoped;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
@@ -26,8 +24,8 @@ import br.com.dabage.investments.carteira.IncomeTO;
 import br.com.dabage.investments.carteira.IncomeTypes;
 import br.com.dabage.investments.carteira.NegotiationTO;
 import br.com.dabage.investments.carteira.NegotiationType;
+import br.com.dabage.investments.carteira.PortfolioService;
 import br.com.dabage.investments.company.CompanyTO;
-import br.com.dabage.investments.company.IncomeCompanyTO;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
 import br.com.dabage.investments.repositories.CompanyRepository;
@@ -66,24 +64,27 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	private boolean emptyPosition;
 
-	@Resource
+	@Autowired
     CarteiraRepository carteiraRepository;
 
-	@Resource
+	@Autowired
 	CompanyRepository companyRepository;
 
-	@Resource
+	@Autowired
 	NegotiationRepository negotiationRepository;
 
-	@Resource
+	@Autowired
 	IncomeRepository incomeRepository;
 
-	@Resource
+	@Autowired
 	IncomeCompanyRepository incomeCompanyRepository;
 	
 	@Autowired
 	GetQuotation getQuotation;
-	
+
+	@Autowired
+	PortfolioService portfolioService;
+
 	@PostConstruct
 	public void prepare() {
 		incomeTypes = IncomeTypes.incomeTypes();
@@ -160,79 +161,8 @@ public class CarteiraView extends BasicView implements Serializable {
 			// Seta qual o Ring vai ficar selecionado no refresh da tela.
 			firstCarteiraRing = carteiras.indexOf(selectedCarteira);
 
-			selectedCarteira = carteiraRepository.findOne(selectedCarteira.getId());
-			if (selectedCarteira.getNegotiations() == null) {
-				selectedCarteira.setNegotiations(new ArrayList<NegotiationTO>());
-			}
-
-			carteiraItens = new ArrayList<CarteiraItemTO>();
-			for (NegotiationTO neg : selectedCarteira.getNegotiations()) {
-				if (neg == null || neg.getRemoveDate() != null) {
-					continue;
-				}
-				CarteiraItemTO item = new CarteiraItemTO(neg.getStock());
-				if (carteiraItens.contains(item)) {
-					int idx = carteiraItens.indexOf(item);
-					item = carteiraItens.get(idx);
-				} else {
-					carteiraItens.add(item);
-				}
-				item.addNegotiation(neg);
-			}
-
-			if (selectedCarteira.getIncomes() == null) {
-				selectedCarteira.setIncomes(new ArrayList<IncomeTO>());
-			}
-			selectedCarteira.setTotalPortfolioIncome(0D);
-			for (IncomeTO inc : selectedCarteira.getIncomes()) {
-				CarteiraItemTO item = new CarteiraItemTO(inc.getStock());
-				if (carteiraItens.contains(item)) {
-					int idx = carteiraItens.indexOf(item);
-					item = carteiraItens.get(idx);
-				} else {
-					carteiraItens.add(item);
-				}
-				item.addIncome(inc);
-				selectedCarteira.setTotalPortfolioIncome(selectedCarteira.getTotalPortfolioIncome() + inc.getValue());
-			}
-
-			selectedCarteira.setTotalPortfolio(0D);
-			selectedCarteira.setTotalPortfolioActual(0D);
-			selectedCarteira.setTotalCalculateResult(0D);
-			for (CarteiraItemTO item : carteiraItens) {
-				selectedCarteira.setTotalPortfolio(selectedCarteira.getTotalPortfolio() + item.getTotalValue());
-				item.setActualValue(getQuotation.getLastQuoteCache(item.getStock()));
-				IncomeCompanyTO lastIncomeCompany = incomeCompanyRepository.findTopByStockOrderByIncomeDateDesc(item.getStock());
-				item.setLastIncomeCompany(lastIncomeCompany);
-				if (lastIncomeCompany != null) {
-					Double actualDY = (lastIncomeCompany.getValue() / item.getActualValue());
-					item.setActualDY(actualDY);					
-
-					Double buyDY = (lastIncomeCompany.getValue() / item.getAvgValue());
-					item.setBuyDY(buyDY);
-				}
-
-				selectedCarteira.setTotalPortfolioActual(selectedCarteira.getTotalPortfolioActual() + item.getTotalActual());
-				selectedCarteira.setTotalCalculateResult(selectedCarteira.getTotalCalculateResult() + item.getTotalCalculateResult());
-			}
-			selectedCarteira.setTotalPortfolioActualPlusIncome(selectedCarteira.getTotalPortfolioIncome() + selectedCarteira.getTotalCalculateResult());
-			selectedCarteira.setPercentTotalActual((selectedCarteira.getTotalPortfolioActual() / selectedCarteira.getTotalPortfolio()) - 1);
-			selectedCarteira.setPercentTotalPos(((selectedCarteira
-					.getTotalPortfolioActual() + selectedCarteira
-					.getTotalPortfolioActualPlusIncome()) / selectedCarteira
-					.getTotalPortfolio()) - 1);
-
-			// Last Negotitation
-			if (!selectedCarteira.getNegotiations().isEmpty()) {
-				NegotiationTO lastNegotiation = selectedCarteira.getNegotiations().get(selectedCarteira.getNegotiations().size() - 1);
-				selectedCarteira.setLastNegotiation(lastNegotiation);				
-			}
-
-			// Last Income
-			IncomeTO lastIncome = incomeRepository.findTopByOrderByIncomeDateDescAddDateDesc();
-			selectedCarteira.setLastIncome(lastIncome);
-
-			Collections.sort(carteiraItens);
+			portfolioService.calculatePortfolio(selectedCarteira);
+			carteiraItens = selectedCarteira.getItens();
 			createPieCharts();
 			hideEmptyPosition();
 		}

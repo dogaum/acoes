@@ -86,7 +86,43 @@
 		                    <div class="col-lg-8 text-right">
 		                        <div class="panel panel-default">
 		                            <div class="panel-body">
-		                                .col-lg-4
+										<p:dataTable id="itemTable" var="result" value="#{homeView.carteiras}" emptyMessage="#{msg['pf.datatable.noresults']}">
+										    <p:column headerText="#{msg['app.home.portfolio.name']}" style="text-align:left" priority="1">
+										        <h:outputText value="#{result.name}" />
+										    </p:column>
+		
+										    <p:column headerText="#{msg['app.home.portfolio.total']}" style="text-align:right" priority="2">
+										        <h:outputText value="#{result.totalPortfolio}">
+										        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+										        </h:outputText>
+										    </p:column>
+		
+										    <p:column headerText="#{msg['app.home.portfolio.total.actual']}" style="text-align:right" priority="3">
+										        <h:outputText value="#{result.totalPortfolioActual}">
+										        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+										        </h:outputText>
+										    </p:column>
+		
+											<p:columnGroup type="footer">
+									            <p:row>
+									                <p:column style="text-align:right" footerText="#{msg['app.home.portfolio.total.amount']}:" />
+									                <p:column style="text-align:right">
+											            <f:facet name="footer">
+													        <h:outputText value="#{homeView.totalCarteiras}">
+													        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+													        </h:outputText>
+											            </f:facet>
+									                </p:column>
+									                <p:column style="text-align:right">
+											            <f:facet name="footer">
+													        <h:outputText value="#{homeView.totalActualCarteiras}">
+													        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+													        </h:outputText>
+											            </f:facet>
+									                </p:column>
+									            </p:row>
+									        </p:columnGroup>
+										</p:dataTable>
 		                            </div>
 		                        </div>
 		                    </div>							

@@ -2,13 +2,18 @@ package br.com.dabage.investments.carteira;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.dabage.investments.company.IncomeCompanyTO;
+import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
+import br.com.dabage.investments.repositories.IncomeCompanyRepository;
+import br.com.dabage.investments.repositories.IncomeRepository;
 import br.com.dabage.investments.repositories.NegotiationRepository;
 
 @Service
@@ -19,6 +24,15 @@ public class PortfolioService {
 
 	@Autowired
 	NegotiationRepository negotiationRepository;
+
+	@Autowired
+	IncomeCompanyRepository incomeCompanyRepository;
+
+	@Autowired
+	IncomeRepository incomeRepository;
+
+	@Autowired
+	GetQuotation getQuotation;
 
 	/**
 	 * Rerturn all sell negotiations from a portfolio
@@ -111,4 +125,79 @@ public class PortfolioService {
 		return totalPortfolioResult;
 	}
 
+	public void calculatePortfolio(CarteiraTO carteira) {
+		if (carteira.getNegotiations() == null) {
+			carteira.setNegotiations(new ArrayList<NegotiationTO>());
+		}
+
+		List<CarteiraItemTO> itens = new ArrayList<CarteiraItemTO>();
+		for (NegotiationTO neg : carteira.getNegotiations()) {
+			if (neg == null || neg.getRemoveDate() != null) {
+				continue;
+			}
+			CarteiraItemTO item = new CarteiraItemTO(neg.getStock());
+			if (itens.contains(item)) {
+				int idx = itens.indexOf(item);
+				item = itens.get(idx);
+			} else {
+				itens.add(item);
+			}
+			item.addNegotiation(neg);
+		}
+
+		if (carteira.getIncomes() == null) {
+			carteira.setIncomes(new ArrayList<IncomeTO>());
+		}
+		carteira.setTotalPortfolioIncome(0D);
+		for (IncomeTO inc : carteira.getIncomes()) {
+			CarteiraItemTO item = new CarteiraItemTO(inc.getStock());
+			if (itens.contains(item)) {
+				int idx = itens.indexOf(item);
+				item = itens.get(idx);
+			} else {
+				itens.add(item);
+			}
+			item.addIncome(inc);
+			carteira.setTotalPortfolioIncome(carteira.getTotalPortfolioIncome() + inc.getValue());
+		}
+
+		carteira.setTotalPortfolio(0D);
+		carteira.setTotalPortfolioActual(0D);
+		carteira.setTotalCalculateResult(0D);
+		for (CarteiraItemTO item : itens) {
+			carteira.setTotalPortfolio(carteira.getTotalPortfolio() + item.getTotalValue());
+			item.setActualValue(getQuotation.getLastQuoteCache(item.getStock()));
+			IncomeCompanyTO lastIncomeCompany = incomeCompanyRepository.findTopByStockOrderByIncomeDateDesc(item.getStock());
+			item.setLastIncomeCompany(lastIncomeCompany);
+			if (lastIncomeCompany != null) {
+				Double actualDY = (lastIncomeCompany.getValue() / item.getActualValue());
+				item.setActualDY(actualDY);					
+
+				Double buyDY = (lastIncomeCompany.getValue() / item.getAvgValue());
+				item.setBuyDY(buyDY);
+			}
+
+			carteira.setTotalPortfolioActual(carteira.getTotalPortfolioActual() + item.getTotalActual());
+			carteira.setTotalCalculateResult(carteira.getTotalCalculateResult() + item.getTotalCalculateResult());
+		}
+		carteira.setTotalPortfolioActualPlusIncome(carteira.getTotalPortfolioIncome() + carteira.getTotalCalculateResult());
+		carteira.setPercentTotalActual((carteira.getTotalPortfolioActual() / carteira.getTotalPortfolio()) - 1);
+		carteira.setPercentTotalPos(((carteira
+				.getTotalPortfolioActual() + carteira
+				.getTotalPortfolioActualPlusIncome()) / carteira
+				.getTotalPortfolio()) - 1);
+
+		// Last Negotitation
+		if (!carteira.getNegotiations().isEmpty()) {
+			NegotiationTO lastNegotiation = carteira.getNegotiations().get(carteira.getNegotiations().size() - 1);
+			carteira.setLastNegotiation(lastNegotiation);				
+		}
+
+		// Last Income
+		IncomeTO lastIncome = incomeRepository.findTopByOrderByIncomeDateDescAddDateDesc();
+		carteira.setLastIncome(lastIncome);
+
+		Collections.sort(itens);
+		carteira.setItens(itens);
+	}
 }

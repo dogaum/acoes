@@ -60,7 +60,10 @@ public class CarteiraTO extends AbstractDocument {
 	private NegotiationTO lastNegotiation;
 	@Transient
 	private IncomeTO lastIncome;
-
+	@Transient
+	private List<CarteiraItemTO> itens;
+	
+	
 	public UserTO getUser() {
 		return user;
 	}
@@ -188,6 +191,14 @@ public class CarteiraTO extends AbstractDocument {
 
 	public void setLastIncome(IncomeTO lastIncome) {
 		this.lastIncome = lastIncome;
+	}
+
+	public List<CarteiraItemTO> getItens() {
+		return itens;
+	}
+
+	public void setItens(List<CarteiraItemTO> itens) {
+		this.itens = itens;
 	}
 
 }
