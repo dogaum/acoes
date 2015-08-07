@@ -14,7 +14,7 @@
 	<global-method-security pre-post-annotations="enabled" />
 
 	<!-- secure the application´s urls with the specific Role --> 
-	<http auto-config="false" use-expressions="true">
+	<http auto-config="false" use-expressions="true" access-denied-page="/denied">
 		<intercept-url pattern="/denied" access="permitAll" />
 		<intercept-url pattern="/view/**" access="hasAnyRole('ROLE_ADMIN','ROLE_USUARIO')" />
 		<intercept-url pattern="/services/**" access="hasAnyRole('ROLE_ADMIN','ROLE_USUARIO')" />
