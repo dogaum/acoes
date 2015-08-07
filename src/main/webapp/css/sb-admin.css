@@ -241,16 +241,16 @@ ul.alert-dropdown {
 
 .panel-black .panel-heading {
     border-color: #0F0F0F;
-    color: #000;
+    color: #fff;
     background-color: #1C1A1A;
 }
 
 .panel-black .panel-heading a {
-    color: #0F0F0F;
+    color: #fff;
 }
 
 .panel-black .panel-heading a:hoover {
-    color: #0F0F0F;
+    color: #fff;
 }
 
 .panel-black a {

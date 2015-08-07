@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"  xmlns="http://www.w3.org/1999/xhtml"
+											xmlns:h="http://java.sun.com/jsf/html"
+											xmlns:f="http://java.sun.com/jsf/core"
+											xmlns:ui="http://java.sun.com/jsf/facelets"
+											xmlns:p="http://primefaces.org/ui"> <!--<![endif]-->
+    <h:head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <meta name="description" content=""/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <link rel="stylesheet" href="../../css/bootstrap.min.css"/>
+        <style>
+            body {
+                padding-top: 30px;
+                padding-bottom: 20px;
+            }
+        </style>
+        <link rel="stylesheet" href="../../css/bootstrap-theme.min.css"/>
+        <link rel="stylesheet" href="../../css/main.css"/>
+
+	    <title>Dabage - Real Time Graph</title>
+	
+	    <script src="../../rgraph/js/RGraph.common.core.js" ></script>
+	    <script src="../../rgraph/js/RGraph.common.dynamic.js" ></script>
+	    <script src="../../rgraph/js/RGraph.common.tooltips.js" ></script>
+	    <script src="../../rgraph/js/RGraph.common.effects.js" ></script>
+	    <script src="../../rgraph/js/RGraph.common.context.js" ></script>
+	    <script src="../../rgraph/js/RGraph.drawing.text.js" ></script>
+	    <script src="../../rgraph/js/RGraph.line.js" ></script>
+	    <script src="../../jquery/1.10.2/jquery.min.js"></script>
+	    <!--[if lt IE 9]><script src="../../rgraph/excanvas/excanvas.js"></script><![endif]-->
+        <script src="../../js/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+    </h:head>
+    <h:body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+	    <div id="buttons">
+	      <input type="text" id="stock" ></input><button onclick="showGraph()">Enviar</button>
+	      <input type="button" id="clear" value="Clear"/>
+	    </div>
+	    <style>
+	        span#png_link {
+	            position: absolute;
+	            left: 803px;
+	            top: 30px;
+	            border: 1px black solid;
+	            padding: 1px;
+	            background-color: white;
+	            cursor: pointer;
+	            color: black;
+	            font-size: 10pt;
+	            border: 2px solid gray;
+	            border-radius: 5px;
+	            font-weight: bold;
+	            font-family: Arial;
+	        }
+	    </style>
+	    <div style="position: relative">
+	        <span id="png_link" style="display:none" onclick="RGraph.showPNG(document.getElementById('cvs'), event);">Download</span>
+	        <canvas id="cvs" width="900" height="400">Não há dados a serem exibidos.</canvas>    
+	    </div>
+	
+	    <script>
+	        /**
+	        * Ths window.onload function initiates the AJAX request. The AJAX page is: http://www.rgraph.net/getdata.html?json
+	        * If you view this in your browser you'll see that all it does is output a JSON object (a JavaScript object).
+	        */
+	        function showGraph() {
+	            $(document).ready(function () {
+	                RGraph.AJAX.getJSON('/investments/stockGraph/' + document.getElementById("stock").value + '', drawGraph);
+	            })        	
+	        }
+	
+	        /**
+	        * This is the AJAX callback function. It splits up the response, converts it to numbers and then creates the chart.
+	        */
+	        function drawGraph(json) {
+	
+	            // Clear the canvas
+	            var canvas = document.getElementById('cvs');
+	            canvas.width = canvas.width;
+	            var context = canvas.getContext('2d');
+	            context.beginPath();
+	            RGraph.ObjectRegistry.Clear(canvas);
+	            RGraph.Clear(canvas);
+	
+	            var min = 1000000;
+	            var max = 0;
+	            for(var i=0; i < json.data.length; i++){
+	                if (json.data[i] < min) {
+	                  min = json.data[i];
+	                }
+	                if (json.data[i] > max) {
+	                  max = json.data[i];
+	                }
+	            }
+	
+	            var line = new RGraph.Line('cvs', json.dataMin, json.dataMax)
+	                .set('filled', true)
+	                .set('fillstyle', '#66f')
+	                .set('filled.range', true)
+	                .set('colors', ['rgba(0,0,0,0)'])
+	                .set('hmargin',10)
+	                .set('linewidth', 1)
+	                .set('ymax', max + (max * 0.05))
+	                .set('ymin', min - (min * 0.05))
+	                //.set('numxticks', 25)
+	                .draw();
+	            line.Set('background.grid.dotted', true);
+	            // Now draw the chart
+	            var line = new RGraph.Line('cvs', json.data)
+	                .set('hmargin',10)
+	                .set('linewidth', 1)
+	                .set('ymax', max + (max * 0.05))
+	                .set('ymin', min - (min * 0.05))
+	                .set('labels', json.labels)
+	                .set('colors', ['black'])
+	                .draw();
+	            line.Set('background.grid.dotted', true);
+	            var x = line.canvas.width /2;
+	            var y = line.get('gutter.top') - 5;
+	            var stock = document.getElementById("stock").value;
+	            var text = new RGraph.Drawing.Text('cvs', x, y, stock.toUpperCase())
+	                .set('valign', 'bottom')
+	                .set('halign', 'center')
+	                .set('size', 14)
+	                .set('highlight.stroke', 'rgba(0,0,0,0)')
+	                .draw();
+	            context.closePath();
+	            // bind event handler to clear button
+	            document.getElementById('clear').addEventListener('click', function() {
+	              context.clearRect(0, 0, canvas.width, canvas.height);
+	            }, false);
+	            document.getElementById('png_link').style.display = 'block';
+	        }
+	    </script>
+	</h:body>
+</html>
