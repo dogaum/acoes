@@ -19,7 +19,6 @@ import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import br.com.dabage.investments.carteira.IncomeTO;
 import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.company.IncomeCompanyTO;
 import br.com.dabage.investments.company.IncomeLabel;

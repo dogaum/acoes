@@ -2,15 +2,16 @@ package br.com.dabage.investments.controller;
 
 
 import java.io.Serializable;
-import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.RequestScoped;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import br.com.dabage.investments.carteira.CarteiraTO;
 import br.com.dabage.investments.carteira.PortfolioService;
+import br.com.dabage.investments.home.HomeService;
+import br.com.dabage.investments.home.HomeVO;
 import br.com.dabage.investments.repositories.CarteiraRepository;
 import br.com.dabage.investments.user.UserTO;
 
@@ -27,33 +28,22 @@ public class HomeView extends BasicView implements Serializable {
 	@Autowired
 	PortfolioService portfolioService;
 
-	private List<CarteiraTO> carteiras;
+	@Autowired
+	HomeService homeService;
+
+	private HomeVO home;
 
 	private String credits;
 
-	private Double totalCarteiras;
-	private Double totalActualCarteiras;
+	@PostConstruct
+	public void initHome() {
+		credits = getMessage("app.home.credits");
+		homeService.loadHomeCache();
+	}
 
 	public void init() {
 		UserTO user = getUserLoggedIn();
-		carteiras = carteiraRepository.findByUser(user);
-		totalCarteiras = 0D;
-		totalActualCarteiras = 0D;
-		for (CarteiraTO carteira : carteiras) {
-			portfolioService.calculatePortfolio(carteira);
-			totalCarteiras += carteira.getTotalPortfolio();
-			totalActualCarteiras += carteira.getTotalPortfolioActual();
-		}
-
-		credits = getMessage("app.home.credits");
-	}
-
-	public List<CarteiraTO> getCarteiras() {
-		return carteiras;
-	}
-
-	public void setCarteiras(List<CarteiraTO> carteiras) {
-		this.carteiras = carteiras;
+		home = homeService.getHomeFromUser(user);
 	}
 
 	public String getCredits() {
@@ -64,20 +54,12 @@ public class HomeView extends BasicView implements Serializable {
 		this.credits = credits;
 	}
 
-	public Double getTotalCarteiras() {
-		return totalCarteiras;
+	public HomeVO getHome() {
+		return home;
 	}
 
-	public void setTotalCarteiras(Double totalCarteiras) {
-		this.totalCarteiras = totalCarteiras;
-	}
-
-	public Double getTotalActualCarteiras() {
-		return totalActualCarteiras;
-	}
-
-	public void setTotalActualCarteiras(Double totalActualCarteiras) {
-		this.totalActualCarteiras = totalActualCarteiras;
+	public void setHome(HomeVO home) {
+		this.home = home;
 	}
 
 }
