@@ -27,8 +27,8 @@
 						  mongo-ref="mongo"
 						  host="127.6.155.130"
 						  port="27017" 
-						  username=""
-						  password="" />
+						  username="admin"
+						  password="1AITjmHDZC2U" />
  
  		<!-- Define the MongoTemplate  -->
 		<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
