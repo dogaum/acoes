@@ -73,7 +73,7 @@
 	        */
 	        function showGraph() {
 	            $(document).ready(function () {
-	                RGraph.AJAX.getJSON('/investments/stockGraph/' + document.getElementById("stock").value + '', drawGraph);
+	                RGraph.AJAX.getJSON('/stockGraph/' + document.getElementById("stock").value + '', drawGraph);
 	            })        	
 	        }
 	

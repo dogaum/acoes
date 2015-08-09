@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +19,8 @@ import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
 import org.primefaces.json.JSONObject;
 import org.springframework.stereotype.Component;
+
+import br.com.dabage.investments.utils.DateUtils;
 
 @Component
 public class GetQuotation {
@@ -92,11 +95,36 @@ public class GetQuotation {
 	public void renewCache() {
 		if (quoteCache != null) {
 			for(Quote quote : quoteCache.values()) {
-				if ((quote.getLastUpdate().getTime() + 13*60*1000) < new Date().getTime()) {
+				if (isCacheInvalidate(quote.getLastUpdate())) {
 					getQuoteForCache(quote.getStock(), quote);
 				}
 			}
 		}
+	}
+	
+	private boolean isCacheInvalidate(Date lastUpdate) {
+		Calendar cal = Calendar.getInstance();
+		if (DateUtils.isWorkingDay(cal) && isWorkHour(cal)
+				&& (lastUpdate.getTime() + 13*60*1000) < cal.getTimeInMillis()) {
+			return true;
+		}
+		return false;
+	}
+
+	private static boolean isWorkHour(Calendar cal) {
+		Calendar calIni = Calendar.getInstance();
+		calIni.set(Calendar.HOUR_OF_DAY, 9);
+		calIni.set(Calendar.MINUTE, 0);
+
+		Calendar calEnd = Calendar.getInstance();
+		calEnd.set(Calendar.HOUR_OF_DAY, 18);
+		calEnd.set(Calendar.MINUTE, 30);
+
+		if (cal.before(calIni) || cal.after(calEnd)) {
+			return false;
+		}
+
+		return true;
 	}
 	
 	public Double getLastQuoteCache(String stock) {
@@ -110,7 +138,7 @@ public class GetQuotation {
 			quote = quoteCache.get(stock);
 		}
 
-		if (quote == null || (quote.getLastUpdate().getTime() + 15*60*1000) < new Date().getTime()) {
+		if (quote == null || isCacheInvalidate(quote.getLastUpdate())) {
 			getQuoteForCache(stock, quote);
 		}
 

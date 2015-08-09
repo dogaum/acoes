@@ -6,7 +6,8 @@
 											xmlns:h="http://java.sun.com/jsf/html"
 											xmlns:f="http://java.sun.com/jsf/core"
 											xmlns:ui="http://java.sun.com/jsf/facelets"
-											xmlns:p="http://primefaces.org/ui"> <!--<![endif]-->
+											xmlns:sec="http://www.springframework.org/security/tags"
+											xmlns:p="http://primefaces.org/ui "> <!--<![endif]-->
     <h:head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
@@ -25,6 +26,10 @@
         <link rel="stylesheet" href="css/main.css"/>
 
         <script src="js/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+
+		<sec:authorize access="isAuthenticated()">
+		    <meta http-equiv="refresh" content="0;url=/view/home.jsf" /> 
+		</sec:authorize>
     </h:head>
     <h:body>
 		<f:view>

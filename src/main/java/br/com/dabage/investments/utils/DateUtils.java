@@ -3,6 +3,7 @@ package br.com.dabage.investments.utils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.springframework.stereotype.Component;
@@ -36,4 +37,16 @@ public class DateUtils {
 
 		return result;
 	}
+
+	/**
+	 * 
+	 * @param cal
+	 * @return
+	 */
+	public static boolean isWorkingDay(Calendar cal) {
+        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek == Calendar.SUNDAY || dayOfWeek == Calendar.SATURDAY)
+            return false;
+        return true;
+    }
 }
