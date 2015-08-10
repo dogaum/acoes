@@ -38,6 +38,7 @@
   <classpathentry kind="var" path="M2_REPO/org/springframework/security/spring-security-acl/3.2.4.RELEASE/spring-security-acl-3.2.4.RELEASE.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-jdbc/3.2.8.RELEASE/spring-jdbc-3.2.8.RELEASE.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-tx/4.0.7.RELEASE/spring-tx-4.0.7.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/security/facelets-taglib-jsf20-spring-3/0.5/facelets-taglib-jsf20-spring-3-0.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/data/spring-data-mongodb/1.6.0.RELEASE/spring-data-mongodb-1.6.0.RELEASE.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/data/spring-data-commons/1.9.0.RELEASE/spring-data-commons-1.9.0.RELEASE.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar"/>

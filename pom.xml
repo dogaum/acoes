@@ -8,6 +8,10 @@
 	<name>Acoes By Dabage</name>
 	<repositories>
 		<repository>
+           <id>org.springframework.security.taglibs.facelets</id>
+           <url>http://spring-security-facelets-taglib.googlecode.com/svn/repo/</url>
+        </repository>
+		<repository>
 			<id>eap</id>
 			<url>http://maven.repository.redhat.com/techpreview/all</url>
 			<releases>
@@ -185,6 +189,12 @@
 			<version>${spring.security.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>facelets-taglib-jsf20-spring-3</artifactId>
+			<version>0.5</version>
+		</dependency>
+
 		<!-- Spring MongoDB -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
@@ -238,6 +248,7 @@
 	        <version>3.11-beta2</version>
 	        <scope>test</scope>
 		</dependency>
+
 	</dependencies>
 	<profiles>
 		<profile>
