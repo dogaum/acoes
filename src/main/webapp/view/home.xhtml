@@ -124,19 +124,20 @@
 									        </p:columnGroup>
 										</p:dataTable>
 										<ui:repeat var="carteira" value="#{homeView.home.carteiras}">
-											
-											<hf:chart type="column" title="#{msg['app.incomes.title']}: #{carteira.name}" credits="#{homeView.credits}" yaxisLabel="#{msg['app.home.portfolio.values']}">
-											    <hf:chartSerie name="#{msg['app.incomes.title']}" value="#{carteira.incomes}" type="column"
-											     			   var="point" point="#{point.value}" tickLabel="#{point.yearMonthFormatted}"
-											     			   dataLabel="&lt;b>{point.name}&lt;/b>&lt;i>&lt;/i>"/>
-											    <hf:chartTooltip  backgroundColor="#000000" shared="true">
-											        <f:facet name="header">
-											            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
-											        </f:facet>
-											        <f:facet name="body"><h:outputText value="&lt;span style='color:white'> &lt;b>{point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/></f:facet>
-											        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
-											    </hf:chartTooltip>
-											</hf:chart>
+											<p:panel id="pn#{carteira.name}" rendered="#{not empty carteira.incomes}">
+												<hf:chart type="column" title="#{msg['app.incomes.title']}: #{carteira.name}" credits="#{homeView.credits}" yaxisLabel="#{msg['app.home.portfolio.values']}">
+												    <hf:chartSerie name="#{msg['app.incomes.title']}" value="#{carteira.incomes}" type="column"
+												     			   var="point" point="#{point.value}" tickLabel="#{point.yearMonthFormatted}"
+												     			   dataLabel="&lt;b>{point.name}&lt;/b>&lt;i>&lt;/i>"/>
+												    <hf:chartTooltip  backgroundColor="#000000" shared="true">
+												        <f:facet name="header">
+												            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
+												        </f:facet>
+												        <f:facet name="body"><h:outputText value="&lt;span style='color:white'> &lt;b>R$ {point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/></f:facet>
+												        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
+												    </hf:chartTooltip>
+												</hf:chart>
+											</p:panel>
 										</ui:repeat>
 		                            </div>
 		                        </div>
