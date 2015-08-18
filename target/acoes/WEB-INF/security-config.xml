@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security.xsd ">
+	
+	<!-- Enable the method security to use the 
+	     @PreAuthorize, @PreFilter, @PostAuthorize and @PostFilter annotations
+	     in methods and secure it.
+	-->
+	<global-method-security pre-post-annotations="enabled" />
+
+	<!-- secure the application´s urls with the specific Role --> 
+	<http auto-config="false" use-expressions="true" access-denied-page="/denied">
+		<intercept-url pattern="/denied" access="permitAll" />
+		<intercept-url pattern="/view/**" access="hasAnyRole('ROLE_ADMIN','ROLE_USUARIO')" />
+		<intercept-url pattern="/services/**" access="hasAnyRole('ROLE_ADMIN','ROLE_USUARIO')" />
+
+        <form-login login-page="/index.jsf" always-use-default-target="true" default-target-url="/view/home.jsf" authentication-failure-url="/index.jsf?erro=true"  />
+		<logout logout-success-url="/index.jsf" invalidate-session="true" logout-url="/index.jsf"/>
+		<session-management>
+		  <concurrency-control
+		       max-sessions="1"
+		       expired-url="/index.jsf"
+		        />
+		</session-management>
+	</http>
+
+	<!-- Define the application authentication manager to use a custom Class (mongoUserDetailsService)
+	     to validate the user access, and the password enconding -->
+    <authentication-manager alias="authenticationManager">
+		<authentication-provider user-service-ref="mongoUserDetailsService">
+			<password-encoder hash="plaintext" />
+		</authentication-provider>
+	</authentication-manager>
+
+</beans:beans>

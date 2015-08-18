@@ -1,6 +1,7 @@
 package br.com.dabage.investments.home;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.dabage.investments.carteira.CarteiraTO;
+import br.com.dabage.investments.carteira.IncomeTO;
+import br.com.dabage.investments.carteira.IncomeTypes;
 import br.com.dabage.investments.carteira.PortfolioService;
 import br.com.dabage.investments.repositories.CarteiraRepository;
+import br.com.dabage.investments.repositories.IncomeRepository;
 import br.com.dabage.investments.repositories.UserRepository;
 import br.com.dabage.investments.user.UserTO;
+import br.com.dabage.investments.utils.DateUtils;
 
 @Service
 public class HomeService {
@@ -26,6 +31,9 @@ public class HomeService {
 	
 	@Autowired
 	PortfolioService portfolioService;
+
+	@Autowired
+	IncomeRepository incomeRepository;
 	
 	static Map<UserTO, HomeVO> homeCache;
 
@@ -69,6 +77,9 @@ public class HomeService {
 			totalCarteiras += carteiraVO.getTotalPortfolio();
 			totalActualCarteiras += carteiraVO.getTotalPortfolioActual();
 
+			// Load Incomes
+			carteiraVO.setIncomes(loadIncomes(carteira));
+
 			home.getCarteiras().add(carteiraVO);
 		}
 		home.setTotalCarteiras(totalCarteiras);
@@ -96,4 +107,35 @@ public class HomeService {
 		return home;
 	}
 
+	
+	private List<IncomeVO> loadIncomes(CarteiraTO carteira) {
+		List<IncomeVO> result = new ArrayList<IncomeVO>();
+
+		List<IncomeTO> incomes = incomeRepository.findByIdCarteiraAndType(carteira.getId(), IncomeTypes.INCOME);
+
+		if (incomes != null) {
+			for (IncomeTO incomeTO : incomes) {
+				IncomeVO income = new IncomeVO(DateUtils.getYearMonth(incomeTO.getIncomeDate()) + "");
+				if (result.contains(income)) {
+					int index = result.indexOf(income);
+					income = result.get(index);
+				} else {
+					result.add(income);
+				}
+				income.add(incomeTO.getValue());
+			}
+
+		}
+		
+		Collections.sort(result);
+		int total = result.size();
+		if (total > 13) {
+			int diff = (total - 13);
+			for (int i = 0; i < diff; i++) {
+				result.remove(0);
+			}
+		}
+
+		return result;
+	}
 }

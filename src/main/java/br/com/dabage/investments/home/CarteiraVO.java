@@ -34,6 +34,8 @@ public class CarteiraVO implements Serializable {
 	
 	private List<CarteiraItemTO> itens;
 
+	private List<IncomeVO> incomes;
+	
 	public String getName() {
 		return name;
 	}
@@ -121,6 +123,14 @@ public class CarteiraVO implements Serializable {
 
 	public void setItens(List<CarteiraItemTO> itens) {
 		this.itens = itens;
+	}
+
+	public List<IncomeVO> getIncomes() {
+		return incomes;
+	}
+
+	public void setIncomes(List<IncomeVO> incomes) {
+		this.incomes = incomes;
 	}
 
 }

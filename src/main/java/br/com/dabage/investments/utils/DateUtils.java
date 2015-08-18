@@ -13,6 +13,10 @@ public class DateUtils {
 
 	private static final DateFormat formatYearMonth = new SimpleDateFormat("yyyyMM");
 
+	private static final DateFormat formatMonthYear = new SimpleDateFormat("MM/yyyy");
+	
+	private static final DateFormat formatMonth = new SimpleDateFormat("MM");
+
 	/**
 	 * Get YearMonth in a Date
 	 * @param date
@@ -49,4 +53,21 @@ public class DateUtils {
             return false;
         return true;
     }
+
+	public static String getStringMonth(Date date) {
+		return formatMonth.format(date);
+	}
+
+	public static String formatToMonthYear(Integer yearMonth) {
+		String result = "";
+		if (yearMonth != null) {
+			try {
+				Date date = formatYearMonth.parse(yearMonth + "");
+				result = formatMonthYear.format(date);
+			} catch (ParseException e) {
+			}
+		}
+
+		return result;
+	}
 }

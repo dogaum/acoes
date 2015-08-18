@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 
 import br.com.dabage.investments.config.StockTypeTO;
+import br.com.dabage.investments.home.HomeService;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CompanyRepository;
 import br.com.dabage.investments.repositories.RoleRepository;
@@ -47,6 +48,9 @@ public class ConfigView extends BasicView implements Serializable {
 
 	@Resource
 	RoleRepository roleRepository;
+
+	@Autowired
+	HomeService homeService;
 	
 	private List<StockTypeTO> stockTypes = new ArrayList<StockTypeTO>();
 
@@ -262,6 +266,7 @@ public class ConfigView extends BasicView implements Serializable {
 
 	public void refreshQuoteCache() {
 		getQuotation.cleanQuoteCache();
+		homeService.loadHomeCache();
 	}
 
 	public List<StockTypeTO> getStockTypes() {
