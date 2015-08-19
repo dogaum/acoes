@@ -20,7 +20,7 @@
 		<intercept-url pattern="/services/**" access="hasAnyRole('ROLE_ADMIN','ROLE_USUARIO')" />
 
         <form-login login-page="/index.jsf" always-use-default-target="true" default-target-url="/view/home.jsf" authentication-failure-url="/index.jsf?erro=true"  />
-		<logout logout-success-url="/index.jsf" invalidate-session="true" logout-url="/index.jsf"/>
+		<logout logout-success-url="/index.jsf" invalidate-session="true" logout-url="/j_spring_security_logout"/>
 		<session-management>
 		  <concurrency-control
 		       max-sessions="1"

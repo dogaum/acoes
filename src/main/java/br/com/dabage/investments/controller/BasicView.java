@@ -49,7 +49,7 @@ public class BasicView implements Serializable {
 
 	public String getMessage(String key) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		Locale locale = context .getViewRoot().getLocale();
+		Locale locale = context.getViewRoot().getLocale();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		ResourceBundle bundle = ResourceBundle.getBundle("messages", locale, loader);
 		String msg = bundle.getString(key);
