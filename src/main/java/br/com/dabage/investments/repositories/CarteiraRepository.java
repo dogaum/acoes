@@ -16,4 +16,6 @@ public interface CarteiraRepository extends MongoRepository<CarteiraTO, BigInteg
 	CarteiraTO save (CarteiraTO carteiraTO);
 
 	List<CarteiraTO> findByUser(UserTO user);
+	
+	CarteiraTO findByUserAndName(UserTO user, String name);
 }

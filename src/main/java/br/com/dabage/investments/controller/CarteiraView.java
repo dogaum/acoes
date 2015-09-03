@@ -6,15 +6,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
-import org.primefaces.model.chart.PieChartModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -59,9 +60,6 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	private int firstCarteiraRing;
 
-	private PieChartModel pieModelPre;
-	private PieChartModel pieModelPos;
-
 	private boolean emptyPosition;
 
 	@Autowired
@@ -101,8 +99,16 @@ public class CarteiraView extends BasicView implements Serializable {
 		emptyPosition = false;
 		selectedCarteiraItem = null;
 		if (carteiras != null && !carteiras.isEmpty()) {
-			firstCarteiraRing = 0;
-			selectedCarteira = carteiras.get(firstCarteiraRing);
+
+			Map<String,String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+			String carteiraName = params.get("carteiraName");
+			if (carteiraName != null) {
+				selectedCarteira = carteiraRepository.findByUserAndName(user, carteiraName);	
+			} else {
+				firstCarteiraRing = 0;
+				selectedCarteira = carteiras.get(firstCarteiraRing);				
+			}
+
 			selectCarteira();
 			selectedCarteiraItemTotalValue = 0D;
 			showEmptyPosition();
@@ -163,39 +169,10 @@ public class CarteiraView extends BasicView implements Serializable {
 
 			portfolioService.calculatePortfolio(selectedCarteira);
 			carteiraItens = selectedCarteira.getItens();
-			createPieCharts();
 			hideEmptyPosition();
 		}
 	}
 
-	private void createPieCharts() {
-		pieModelPre = null;
-		pieModelPos = null;
-		if (carteiraItens != null && !carteiraItens.isEmpty()) {
-			pieModelPre = new PieChartModel();
-			pieModelPos = new PieChartModel();
-			for (CarteiraItemTO item : carteiraItens) {
-				if (item.getQuantity() > 0) {
-					pieModelPre.set(item.getStock(), item.getTotalValue());
-					pieModelPos.set(item.getStock(), item.getTotalActual());
-				}
-			}
-	        pieModelPre.setTitle("Alocacao de Compra");
-	        pieModelPre.setLegendPosition("w");
-	        pieModelPre.setFill(true);
-	        pieModelPre.setShowDataLabels(true);
-	        pieModelPre.setDiameter(450);
-	        pieModelPre.setLegendCols(2);
-
-	        pieModelPos.setTitle("Alocacao preco atual");
-	        pieModelPos.setLegendPosition("e");
-	        pieModelPos.setFill(true);
-	        pieModelPos.setShowDataLabels(true);
-	        pieModelPos.setDiameter(450);
-	        pieModelPos.setLegendCols(2);			
-		}
-	}
-	
 	/**
 	 * Prepara insercao de negociacao
 	 * @param event
@@ -443,14 +420,6 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	public void setIncomeTypes(List<SelectItem> incomeTypes) {
 		this.incomeTypes = incomeTypes;
-	}
-
-	public PieChartModel getPieModelPre() {
-		return pieModelPre;
-	}
-
-	public PieChartModel getPieModelPos() {
-		return pieModelPos;
 	}
 
 	public boolean isEmptyPosition() {

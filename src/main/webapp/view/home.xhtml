@@ -88,7 +88,10 @@
 		                            <div class="panel-body">
 										<p:dataTable id="itemTable" var="result" value="#{homeView.home.carteiras}" emptyMessage="#{msg['pf.datatable.noresults']}">
 										    <p:column headerText="#{msg['app.home.portfolio.name']}" style="text-align:left" priority="1">
-										        <h:outputText value="#{result.name}" />
+					                    		<h:commandLink action="#{carteiraView.init}" >
+					                    			<f:param name="carteiraName" value="#{result.name}" />
+													<h:outputText value="#{result.name}" style="font-weight: bold;"/>
+					                    		</h:commandLink>
 										    </p:column>
 		
 										    <p:column headerText="#{msg['app.home.portfolio.total']}" style="text-align:right" priority="2">

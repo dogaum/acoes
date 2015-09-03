@@ -5,13 +5,23 @@
     xmlns:f="http://java.sun.com/jsf/core"  
     xmlns:ui="http://java.sun.com/jsf/facelets"  
     xmlns:p="http://primefaces.org/ui"
-    xmlns:pe="http://primefaces.org/ui/extensions"  
+    xmlns:pe="http://primefaces.org/ui/extensions"
+    xmlns:hf="http://highfaces.org"
     template="../template/template.xhtml">
 
     <ui:define name="title">
     	<h:outputText value="#{msg['app.portfolio.title']}"/>
     </ui:define>
 	<ui:define name="body">
+	    	<script>
+		    	Highcharts.setOptions({
+		    	    lang: {
+		    	        decimalPoint: ',',
+		    	        thousandsSep: '.'
+		    	    }
+		    	});
+	    	</script>
+
             <!-- Page Heading -->
             <div class="row" id="divSubtitle">
                 <div class="col-lg-12">
@@ -83,9 +93,26 @@
                             <div class="panel-heading">
                                 <h3 class="panel-title"><i class="fa fa-long-arrow-right"></i><h:outputText value=" #{msg['app.portfolio.subtitle']} #{carteiraView.selectedCarteira.name}"/></h3>
                             </div>
+
                             <div class="panel-body">
+                            	<div class="col-lg-12">
+                            		<div class="col-lg-1">
+									    <p:commandLink id="clPre" onclick="PF('preChartDlg').show()" title="#{msg['app.portfolio.chart.pre']}">
+											<img src="/img/chart-pie_blue.png"/>
+									    </p:commandLink>
+                            		</div>
+                            		<div class="col-lg-1">
+									    <p:commandLink id="clPos" onclick="PF('posChartDlg').show()" title="#{msg['app.portfolio.chart.pos']}">
+									        <img src="/img/chart-pie_red.png"/>
+									    </p:commandLink>
+                            		</div>
+                            		<div class="col-lg-1">
+									    <p:commandLink id="clPosInc" onclick="PF('posIncChartDlg').show()" title="#{msg['app.portfolio.chart.posInc']}">
+									        <img src="/img/chart-pie_yellow.png"/>
+									    </p:commandLink>
+                            		</div>
+                            	</div>
 						        <p>
-						        	<b><h:outputText value="#{msg['app.portfolio.created']} " /></b> <h:outputText value="#{carteiraView.selectedCarteira.createDate}"><f:convertDateTime locale="#{msg['locale']}"  /></h:outputText><br/>
 						        	<p:panel rendered="#{not empty carteiraView.selectedCarteira.lastNegotiation}">
 							        	<b><h:outputText value="#{msg['app.portfolio.lastNegotiation']}: " /></b>
 							        	<h:outputText value="#{carteiraView.selectedCarteira.lastNegotiation.negotiationType} "/>
@@ -540,18 +567,61 @@
 							</p:dataTable>
 				        </p:panel>
 				    </p:dialog>
-                </div>
 
-            </div>
-            <div class="row">
-            	<div class="col-lg-12">
-					<p:chart type="pie" model="#{carteiraView.pieModelPre}" rendered="#{not empty carteiraView.pieModelPre}" style="width:800px;height:600px"/>
-            	</div>
-            </div>
-            <div class="row">
-            	<div class="col-lg-12">
-					<p:chart type="pie" model="#{carteiraView.pieModelPos}" rendered="#{not empty carteiraView.pieModelPos}" style="width:800px;height:600px" />
-            	</div>
+					<!-- Pre Chart -->
+			        <p:dialog id="preChart" widgetVar="preChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.pre']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
+						<p:panel id="panelPreChart">
+							<hf:chart type="pie" title="" credits="#{homeView.credits}">
+							    <hf:chartSerie name="Ativos Pre" value="#{carteiraView.carteiraItens}" type="pie"
+							     			   var="point" point="#{point.totalValue}" tickLabel="#{point.stock}"
+							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
+							    <hf:chartTooltip  backgroundColor="#000000" shared="true">
+							        <f:facet name="header">
+							            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
+							        </f:facet>
+							        <f:facet name="body"><h:outputText value="&lt;span style='color:white'> &lt;b>{point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/></f:facet>
+							        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
+							    </hf:chartTooltip>
+							</hf:chart>
+						</p:panel>
+			        </p:dialog>
+
+					<!-- Pos Chart -->
+			        <p:dialog widgetVar="posChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.pos']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
+						<p:panel id="panelPosChart">
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" >
+							    <hf:chartSerie name="Ativos Pos" value="#{carteiraView.carteiraItens}" type="pie"
+							     			   var="point2" point="#{point2.totalActual}" tickLabel="#{point2.stock}"
+							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
+							    <hf:chartTooltip  backgroundColor="#000000" shared="true">
+							        <f:facet name="header">
+							            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
+							        </f:facet>
+							        <f:facet name="body"><h:outputText value="&lt;span style='color:white'> &lt;b>{point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/></f:facet>
+							        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
+							    </hf:chartTooltip>
+							</hf:chart>
+						</p:panel>
+			        </p:dialog>
+
+					<!-- Pos + Income Chart -->
+			        <p:dialog widgetVar="posIncChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.posInc']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
+						<p:panel id="panelPosIncChart">
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" >
+							    <hf:chartSerie name="Ativos Pos Inc" value="#{carteiraView.carteiraItens}" type="pie"
+							     			   var="point3" point="#{point3.totalActual + point3.resultPlusIncome}" tickLabel="#{point3.stock}"
+							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
+							    <hf:chartTooltip  backgroundColor="#000000" shared="true">
+							        <f:facet name="header">
+							            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
+							        </f:facet>
+							        <f:facet name="body"><h:outputText value="&lt;span style='color:white'> &lt;b>{point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/></f:facet>
+							        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
+							    </hf:chartTooltip>
+							</hf:chart>
+						</p:panel>
+			        </p:dialog>
+                </div>
             </div>
     </ui:define>
 </ui:composition>
