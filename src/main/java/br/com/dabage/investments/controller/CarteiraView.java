@@ -62,6 +62,8 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	private boolean emptyPosition;
 
+	private String selectedPoint;
+	
 	@Autowired
     CarteiraRepository carteiraRepository;
 
@@ -135,8 +137,10 @@ public class CarteiraView extends BasicView implements Serializable {
 		if (carteiraItens != null) {
 			if (emptyPosition) {
 				selectCarteira();
+				emptyPosition = false;
 			} else {
 				hideEmptyPosition();
+				emptyPosition = true;
 			}
 		}
 	}
@@ -349,7 +353,10 @@ public class CarteiraView extends BasicView implements Serializable {
 		RequestContext rc = RequestContext.getCurrentInstance();
 	    rc.execute("PF('addIncomeDlg').hide()");
 	}
-	
+
+	public void clicked() {
+    }
+
 	public List<CarteiraTO> getCarteiras() {
 		return carteiras;
 	}
@@ -422,7 +429,7 @@ public class CarteiraView extends BasicView implements Serializable {
 		this.incomeTypes = incomeTypes;
 	}
 
-	public boolean isEmptyPosition() {
+	public boolean getEmptyPosition() {
 		return emptyPosition;
 	}
 
@@ -451,6 +458,14 @@ public class CarteiraView extends BasicView implements Serializable {
 	public void setSelectedCarteiraItemTotalValue(
 			Double selectedCarteiraItemTotalValue) {
 		this.selectedCarteiraItemTotalValue = selectedCarteiraItemTotalValue;
+	}
+
+	public String getSelectedPoint() {
+		return selectedPoint;
+	}
+
+	public void setSelectedPoint(String selectedPoint) {
+		this.selectedPoint = selectedPoint;
 	}
 
 }

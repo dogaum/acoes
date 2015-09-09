@@ -74,9 +74,10 @@
 	                        </div>
 	                        <div class="panel-footer">
 	                            <span class="pull-left">
-							        <p:commandLink value="#{msg['app.portfolio.lbl.detail']}" title="#{msg['app.portfolio.link.detail']}" action="#{carteiraView.selectCarteira}" update=":form"
-							        			  style="float:left;margin-right:10px">
+							        <p:commandLink value="#{msg['app.portfolio.lbl.detail']}" title="#{msg['app.portfolio.link.detail']}" action="#{carteiraView.selectCarteira}"
+							        			  style="float:left;margin-right:10px" update=":form" >
 							            <f:setPropertyActionListener value="#{portfolio}" target="#{carteiraView.selectedCarteira}" />
+							            <f:ajax render="@all"/>
 						        	</p:commandLink>
 	                            </span>
 	                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -111,9 +112,8 @@
 									        <img src="/img/chart-pie_yellow.png"/>
 									    </p:commandLink>
                             		</div>
-                            	</div>
-						        <p>
-						        	<p:panel rendered="#{not empty carteiraView.selectedCarteira.lastNegotiation}">
+                            		<div class="col-lg-9">
+                            		 	<br/>
 							        	<b><h:outputText value="#{msg['app.portfolio.lastNegotiation']}: " /></b>
 							        	<h:outputText value="#{carteiraView.selectedCarteira.lastNegotiation.negotiationType} "/>
 							        	<h:outputText value="#{msg['app.label.from']} " />
@@ -127,9 +127,9 @@
 								        <h:outputText value="#{carteiraView.selectedCarteira.lastNegotiation.value}">
 								        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
 								        </h:outputText>
-	
-										<br/>
-	
+								        
+								        <br/>
+
 							        	<b><h:outputText value="#{msg['app.portfolio.lastIncome']}: " /></b>
 							        	<h:outputText value="#{carteiraView.selectedCarteira.lastIncome.type} "/>
 							        	<h:outputText value=" #{msg['app.label.from']} " />
@@ -142,15 +142,19 @@
 							        	</h:outputText>
 							        	<h:outputText value=" #{msg['app.label.to']} " />
 										<h:outputText value="#{carteiraView.selectedCarteira.lastIncome.stock}"/>
-						        	</p:panel>
+										
+										<br/>
+										
+										<p:commandLink id="clSP"
+										 				actionListener="#{carteiraView.showEmptyPosition}" update=":form">
+										 		<h:outputText value="#{(!emptyPosition) ? msg['app.portfolio.btn.showAll'] : msg['app.portfolio.btn.hideAll']}" />
+										</p:commandLink>
+                            		</div>
+                            	</div>
 
-									<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
-								        <b><h:outputText value="#{msg['app.portfolio.btn.showAll']}" /></b>
-								        <p:inputSwitch value="#{carteiraView.emptyPosition}" onLabel="#{msg['app.label.yes']}" offLabel="#{msg['app.label.no']}">
-								            <p:ajax listener="#{carteiraView.showEmptyPosition}" update="itemTable" />
-								        </p:inputSwitch>
-									</h:panelGrid>
-						        </p>
+					        	<p:panel rendered="#{not empty carteiraView.selectedCarteira.lastNegotiation}">
+					 				<p:spacer width="10" height="2" />
+					        	</p:panel>
 
 				                <p:toolbar>
 				                	<f:facet name="left">
@@ -571,7 +575,8 @@
 					<!-- Pre Chart -->
 			        <p:dialog id="preChart" widgetVar="preChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.pre']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
 						<p:panel id="panelPreChart">
-							<hf:chart type="pie" title="" credits="#{homeView.credits}">
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" selectedPoint="#{carteiraView.selectedPoint}"  height="60%" width="60%">
+								<p:ajax event="select" listener="#{carteiraView.clicked}" />
 							    <hf:chartSerie name="Ativos Pre" value="#{carteiraView.carteiraItens}" type="pie"
 							     			   var="point" point="#{point.totalValue}" tickLabel="#{point.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
@@ -589,7 +594,8 @@
 					<!-- Pos Chart -->
 			        <p:dialog widgetVar="posChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.pos']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
 						<p:panel id="panelPosChart">
-							<hf:chart type="pie" title="" credits="#{homeView.credits}" >
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" selectedPoint="#{carteiraView.selectedPoint}"  height="60%" width="60%">
+								<p:ajax event="select" listener="#{carteiraView.clicked}" />
 							    <hf:chartSerie name="Ativos Pos" value="#{carteiraView.carteiraItens}" type="pie"
 							     			   var="point2" point="#{point2.totalActual}" tickLabel="#{point2.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
@@ -607,7 +613,8 @@
 					<!-- Pos + Income Chart -->
 			        <p:dialog widgetVar="posIncChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.posInc']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
 						<p:panel id="panelPosIncChart">
-							<hf:chart type="pie" title="" credits="#{homeView.credits}" >
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" selectedPoint="#{carteiraView.selectedPoint}" height="60%" width="60%">
+								<p:ajax event="select" listener="#{carteiraView.clicked}" />
 							    <hf:chartSerie name="Ativos Pos Inc" value="#{carteiraView.carteiraItens}" type="pie"
 							     			   var="point3" point="#{point3.totalActual + point3.resultPlusIncome}" tickLabel="#{point3.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
