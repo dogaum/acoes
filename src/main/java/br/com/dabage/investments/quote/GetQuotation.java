@@ -140,6 +140,7 @@ public class GetQuotation {
 
 		if (quote == null || isCacheInvalidate(quote.getLastUpdate())) {
 			getQuoteForCache(stock, quote);
+			quote = quoteCache.get(stock);
 		}
 
 		if (quote == null) {
@@ -160,7 +161,7 @@ public class GetQuotation {
 			String[] lineValues = lastLine.split(",");
 
 			Date date = preFormatDate.parse(lineValues[0]); //Date;
-			quote = new Quote();
+			if (quote == null) quote = new Quote();
 			quote.setDate(date);
 			quote.setLastUpdate(new Date());
 

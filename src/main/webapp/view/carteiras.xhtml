@@ -575,8 +575,7 @@
 					<!-- Pre Chart -->
 			        <p:dialog id="preChart" widgetVar="preChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.pre']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
 						<p:panel id="panelPreChart">
-							<hf:chart type="pie" title="" credits="#{homeView.credits}" selectedPoint="#{carteiraView.selectedPoint}"  height="60%" width="60%">
-								<p:ajax event="select" listener="#{carteiraView.clicked}" />
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" height="60%" width="60%">
 							    <hf:chartSerie name="Ativos Pre" value="#{carteiraView.carteiraItens}" type="pie"
 							     			   var="point" point="#{point.totalValue}" tickLabel="#{point.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
@@ -594,8 +593,7 @@
 					<!-- Pos Chart -->
 			        <p:dialog widgetVar="posChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.pos']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
 						<p:panel id="panelPosChart">
-							<hf:chart type="pie" title="" credits="#{homeView.credits}" selectedPoint="#{carteiraView.selectedPoint}"  height="60%" width="60%">
-								<p:ajax event="select" listener="#{carteiraView.clicked}" />
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" height="60%" width="60%">
 							    <hf:chartSerie name="Ativos Pos" value="#{carteiraView.carteiraItens}" type="pie"
 							     			   var="point2" point="#{point2.totalActual}" tickLabel="#{point2.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>

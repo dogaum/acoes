@@ -1,9 +1,11 @@
 package br.com.dabage.investments.home;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -78,26 +80,29 @@ public class HomeService {
 			totalActualCarteiras += carteiraVO.getTotalPortfolioActual();
 
 			// Load Incomes
-			carteiraVO.setIncomes(new HashMap<String, List<IncomeVO>> ());
-			List<IncomeVO> incs = loadIncomes(carteira, IncomeTypes.INCOME);
-			if (!incs.isEmpty()) {
-				carteiraVO.getIncomes().put("Rendimentos", incs);	
+			Map<String, List<IncomeVO>> incomes = new LinkedHashMap<String, List<IncomeVO>>();
+
+			List<IncomeVO> amorts = loadIncomes(carteira, IncomeTypes.AMORTIZATION);
+			if (!amorts.isEmpty()) {
+				incomes.put("Amortizacoes", amorts);
 			}
 
 			List<IncomeVO> divs = loadIncomes(carteira, IncomeTypes.DIVIDEND);
 			if (!divs.isEmpty()) {
-				carteiraVO.getIncomes().put("Dividendos", divs);
+				incomes.put("Dividendos", divs);
 			}
 
 			List<IncomeVO> jcps = loadIncomes(carteira, IncomeTypes.JCP);
 			if (!jcps.isEmpty()) {
-				carteiraVO.getIncomes().put("JCP", jcps);
+				incomes.put("JCP", jcps);
 			}
 
-			List<IncomeVO> amorts = loadIncomes(carteira, IncomeTypes.AMORTIZATION);
-			if (!amorts.isEmpty()) {
-				carteiraVO.getIncomes().put("Amortizacoes", amorts);
+			List<IncomeVO> incs = loadIncomes(carteira, IncomeTypes.INCOME);
+			if (!incs.isEmpty()) {
+				incomes.put("Rendimentos", incs);
 			}
+
+			carteiraVO.setIncomes(incomes);
 
 			home.getCarteiras().add(carteiraVO);
 		}
@@ -129,6 +134,13 @@ public class HomeService {
 	
 	private List<IncomeVO> loadIncomes(CarteiraTO carteira, String incomeType) {
 		List<IncomeVO> result = new ArrayList<IncomeVO>();
+		Calendar cal = Calendar.getInstance();
+		for (int i = 0; i < 12; i++) {
+			IncomeVO income = new IncomeVO(DateUtils.getYearMonth(cal.getTime()) + "");
+			income.add(0D);
+			result.add(income);
+			cal.add(Calendar.MONTH, -1);
+		}
 
 		List<IncomeTO> incomes = incomeRepository.findByIdCarteiraAndType(carteira.getId(), incomeType);
 
