@@ -78,7 +78,26 @@ public class HomeService {
 			totalActualCarteiras += carteiraVO.getTotalPortfolioActual();
 
 			// Load Incomes
-			carteiraVO.setIncomes(loadIncomes(carteira));
+			carteiraVO.setIncomes(new HashMap<String, List<IncomeVO>> ());
+			List<IncomeVO> incs = loadIncomes(carteira, IncomeTypes.INCOME);
+			if (!incs.isEmpty()) {
+				carteiraVO.getIncomes().put("Rendimentos", incs);	
+			}
+
+			List<IncomeVO> amorts = loadIncomes(carteira, IncomeTypes.AMORTIZATION);
+			if (!amorts.isEmpty()) {
+				carteiraVO.getIncomes().put("Amortizacoes", amorts);
+			}
+
+			List<IncomeVO> divs = loadIncomes(carteira, IncomeTypes.DIVIDEND);
+			if (!divs.isEmpty()) {
+				carteiraVO.getIncomes().put("Dividendos", divs);
+			}
+
+			List<IncomeVO> jcps = loadIncomes(carteira, IncomeTypes.JCP);
+			if (!jcps.isEmpty()) {
+				carteiraVO.getIncomes().put("JCP", jcps);
+			}
 
 			home.getCarteiras().add(carteiraVO);
 		}
@@ -108,10 +127,10 @@ public class HomeService {
 	}
 
 	
-	private List<IncomeVO> loadIncomes(CarteiraTO carteira) {
+	private List<IncomeVO> loadIncomes(CarteiraTO carteira, String incomeType) {
 		List<IncomeVO> result = new ArrayList<IncomeVO>();
 
-		List<IncomeTO> incomes = incomeRepository.findByIdCarteiraAndType(carteira.getId(), IncomeTypes.INCOME);
+		List<IncomeTO> incomes = incomeRepository.findByIdCarteiraAndType(carteira.getId(), incomeType);
 
 		if (incomes != null) {
 			for (IncomeTO incomeTO : incomes) {

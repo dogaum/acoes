@@ -613,8 +613,7 @@
 					<!-- Pos + Income Chart -->
 			        <p:dialog widgetVar="posIncChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.posInc']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
 						<p:panel id="panelPosIncChart">
-							<hf:chart type="pie" title="" credits="#{homeView.credits}" selectedPoint="#{carteiraView.selectedPoint}" height="60%" width="60%">
-								<p:ajax event="select" listener="#{carteiraView.clicked}" />
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" height="60%" width="60%">
 							    <hf:chartSerie name="Ativos Pos Inc" value="#{carteiraView.carteiraItens}" type="pie"
 							     			   var="point3" point="#{point3.totalActual + point3.resultPlusIncome}" tickLabel="#{point3.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>

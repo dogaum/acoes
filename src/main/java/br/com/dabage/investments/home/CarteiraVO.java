@@ -2,6 +2,7 @@ package br.com.dabage.investments.home;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import br.com.dabage.investments.carteira.CarteiraItemTO;
 import br.com.dabage.investments.carteira.IncomeTO;
@@ -34,7 +35,7 @@ public class CarteiraVO implements Serializable {
 	
 	private List<CarteiraItemTO> itens;
 
-	private List<IncomeVO> incomes;
+	private Map<String, List<IncomeVO>> incomes;
 	
 	public String getName() {
 		return name;
@@ -125,11 +126,11 @@ public class CarteiraVO implements Serializable {
 		this.itens = itens;
 	}
 
-	public List<IncomeVO> getIncomes() {
+	public Map<String, List<IncomeVO>> getIncomes() {
 		return incomes;
 	}
 
-	public void setIncomes(List<IncomeVO> incomes) {
+	public void setIncomes(Map<String, List<IncomeVO>> incomes) {
 		this.incomes = incomes;
 	}
 
