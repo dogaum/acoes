@@ -84,11 +84,6 @@ public class HomeService {
 				carteiraVO.getIncomes().put("Rendimentos", incs);	
 			}
 
-			List<IncomeVO> amorts = loadIncomes(carteira, IncomeTypes.AMORTIZATION);
-			if (!amorts.isEmpty()) {
-				carteiraVO.getIncomes().put("Amortizacoes", amorts);
-			}
-
 			List<IncomeVO> divs = loadIncomes(carteira, IncomeTypes.DIVIDEND);
 			if (!divs.isEmpty()) {
 				carteiraVO.getIncomes().put("Dividendos", divs);
@@ -97,6 +92,11 @@ public class HomeService {
 			List<IncomeVO> jcps = loadIncomes(carteira, IncomeTypes.JCP);
 			if (!jcps.isEmpty()) {
 				carteiraVO.getIncomes().put("JCP", jcps);
+			}
+
+			List<IncomeVO> amorts = loadIncomes(carteira, IncomeTypes.AMORTIZATION);
+			if (!amorts.isEmpty()) {
+				carteiraVO.getIncomes().put("Amortizacoes", amorts);
 			}
 
 			home.getCarteiras().add(carteiraVO);

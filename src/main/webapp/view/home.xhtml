@@ -129,7 +129,7 @@
 										<ui:repeat var="carteira" value="#{homeView.home.carteiras}">
 											<p:panel id="pn#{carteira.name}" rendered="#{not empty carteira.incomes}">
 												<hf:chart type="column" title="#{msg['app.incomes.title']}: #{carteira.name}" credits="#{homeView.credits}" yaxisLabel="#{msg['app.home.portfolio.values']}"
-															stacking="normal" value="#{carteira.incomes}" var="point" point="#{point.value}">
+															stacking="normal" value="#{carteira.incomes}" var="point" point="#{point.value}" tickLabel="#{point.yearMonthFormatted}" subTitle="#{point.yearMonthFormatted}">
 												    <hf:chartTooltip  backgroundColor="#000000" shared="true">
 												        <f:facet name="header">
 												            <h:outputText escape="false" value="&lt;table>"/>
