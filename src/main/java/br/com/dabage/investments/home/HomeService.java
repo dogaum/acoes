@@ -135,7 +135,7 @@ public class HomeService {
 	private List<IncomeVO> loadIncomes(CarteiraTO carteira, String incomeType) {
 		List<IncomeVO> result = new ArrayList<IncomeVO>();
 		Calendar cal = Calendar.getInstance();
-		for (int i = 0; i < 12; i++) {
+		for (int i = 0; i < 13; i++) {
 			IncomeVO income = new IncomeVO(DateUtils.getYearMonth(cal.getTime()) + "");
 			income.add(0D);
 			result.add(income);
