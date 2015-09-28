@@ -43,7 +43,7 @@ public class PortfolioService {
 		List<NegotiationTO> result = new ArrayList<NegotiationTO>();
 		if (portfolio.getNegotiations() != null) {
 			for (NegotiationTO negotiationTO : portfolio.getNegotiations()) {
-				if (negotiationTO.getNegotiationType().equals(NegotiationType.Venda)) {
+				if (negotiationTO.getNegotiationType().equals(NegotiationType.Venda) && negotiationTO.getRemoveDate() == null) {
 					result.add(negotiationTO);
 				}
 			}
@@ -98,7 +98,7 @@ public class PortfolioService {
 
 			if (all != null) {
 				for (NegotiationTO negotiationTO : all) {
-					if (negotiationTO.getNegotiationType().equals(NegotiationType.Venda)) {
+					if (negotiationTO.getNegotiationType().equals(NegotiationType.Venda) && negotiationTO.getRemoveDate() == null) {
 						result.add(negotiationTO);
 					}
 				}
