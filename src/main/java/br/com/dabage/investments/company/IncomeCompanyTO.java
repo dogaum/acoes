@@ -15,6 +15,10 @@ import br.com.dabage.investments.repositories.AbstractDocument;
 @Document(collection="incomescompanies")
 public class IncomeCompanyTO extends AbstractDocument implements Comparable<IncomeCompanyTO> {
 
+
+	/** */
+	private static final long serialVersionUID = 5651773930141591249L;
+
 	@Indexed
 	private String stock;
 

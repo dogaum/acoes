@@ -12,6 +12,9 @@ import br.com.dabage.investments.repositories.AbstractDocument;
 @Document(collection="negotiations")
 public class NegotiationTO extends AbstractDocument implements Comparable<NegotiationTO> {
 
+	/** */
+	private static final long serialVersionUID = 2954251960346356186L;
+
 	@Indexed
 	private String stock;
 
@@ -27,9 +30,6 @@ public class NegotiationTO extends AbstractDocument implements Comparable<Negoti
 
 	/** Object creation date */
 	private Date addDate;
-
-	/** Object remove date */
-	private Date removeDate;
 
 	/** Avg value considered for calcs */
 	private Double avgBuyValue;
@@ -115,14 +115,6 @@ public class NegotiationTO extends AbstractDocument implements Comparable<Negoti
 
 	public void setAddDate(Date addDate) {
 		this.addDate = addDate;
-	}
-
-	public Date getRemoveDate() {
-		return removeDate;
-	}
-
-	public void setRemoveDate(Date removeDate) {
-		this.removeDate = removeDate;
 	}
 
 	public StockTypeTO getStockType() {

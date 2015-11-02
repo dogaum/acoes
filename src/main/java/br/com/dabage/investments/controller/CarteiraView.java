@@ -25,6 +25,7 @@ import br.com.dabage.investments.carteira.IncomeTO;
 import br.com.dabage.investments.carteira.IncomeTypes;
 import br.com.dabage.investments.carteira.NegotiationTO;
 import br.com.dabage.investments.carteira.NegotiationType;
+import br.com.dabage.investments.carteira.PortfolioItemTO;
 import br.com.dabage.investments.carteira.PortfolioService;
 import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.quote.GetQuotation;
@@ -33,6 +34,7 @@ import br.com.dabage.investments.repositories.CompanyRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
 import br.com.dabage.investments.repositories.IncomeRepository;
 import br.com.dabage.investments.repositories.NegotiationRepository;
+import br.com.dabage.investments.repositories.PortfolioItemRepository;
 import br.com.dabage.investments.user.UserTO;
 
 @Controller(value="carteiraView")
@@ -84,6 +86,9 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	@Autowired
 	PortfolioService portfolioService;
+
+	@Autowired
+	PortfolioItemRepository portfolioItemRepository;
 
 	@PostConstruct
 	public void prepare() {
@@ -235,6 +240,18 @@ public class CarteiraView extends BasicView implements Serializable {
 			}
 		}
 
+		// Add PortfolioItem
+		PortfolioItemTO item = portfolioItemRepository.findByIdCarteiraAndStock(negotiation.getIdCarteira(), negotiation.getStock());
+		if (item ==null) {
+			item = new PortfolioItemTO(negotiation.getIdCarteira(), negotiation.getStock());
+		}
+		item.addNegotiation(negotiation);
+		portfolioItemRepository.save(item);
+
+		negotiation.setAvgBuyValue(item.getAvgPrice());
+		negotiation.setCalculateValue(item.getResult());
+		negotiation.setCalculated(Boolean.TRUE);
+		negotiation.setCalculateDate(new Date());
 		negotiationRepository.save(negotiation);
 		selectedCarteira.getNegotiations().add(negotiation);
 		carteiraRepository.save(selectedCarteira);
@@ -301,8 +318,8 @@ public class CarteiraView extends BasicView implements Serializable {
 	}
 
 	public void deleteNegotiation() {
-		negotiation.setRemoveDate(new Date());
-		negotiationRepository.save(negotiation);
+		negotiationRepository.delete(negotiation);
+		selectedCarteira.getNegotiations().remove(negotiation);
 		carteiraRepository.save(selectedCarteira);
 		selectCarteira();
 	}

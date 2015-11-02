@@ -2,6 +2,7 @@ package br.com.dabage.investments.repositories;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -17,6 +18,8 @@ public interface NegotiationRepository extends MongoRepository<NegotiationTO, Bi
 	NegotiationTO save (NegotiationTO negotiationTO);
 
 	List<NegotiationTO> findByIdCarteira(BigInteger idCarteira);
+
+	LinkedList<NegotiationTO> findByIdCarteiraAndStockOrderByDtNegotiationAsc(BigInteger idCarteira, String stock);
 
 	List<NegotiationTO> findByNegotiationType(NegotiationType negotiationType);
 

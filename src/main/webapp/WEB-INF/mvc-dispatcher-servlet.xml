@@ -16,6 +16,7 @@
     <context:component-scan annotation-config="true" base-package="br.com.dabage.investments.carteira" />
     <context:component-scan annotation-config="true" base-package="br.com.dabage.investments.company" />
     <context:component-scan annotation-config="true" base-package="br.com.dabage.investments.home" />
+    <context:component-scan annotation-config="true" base-package="br.com.dabage.investments.config" />
 
     <mvc:annotation-driven content-negotiation-manager="contentManager"/>
 	    <bean id="contentManager"

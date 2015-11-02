@@ -14,6 +14,10 @@ import br.com.dabage.investments.user.UserTO;
 @Document(collection="carteiras")
 public class CarteiraTO extends AbstractDocument {
 
+	/** */
+	private static final long serialVersionUID = -6643861330681392992L;
+
+
 	public CarteiraTO(String name) {
 		this.name = name;
 		this.createDate = new Date();

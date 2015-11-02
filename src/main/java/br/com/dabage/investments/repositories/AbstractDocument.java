@@ -1,5 +1,6 @@
 package br.com.dabage.investments.repositories;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 import org.springframework.data.annotation.Id;
@@ -8,7 +9,10 @@ import org.springframework.data.annotation.Id;
  * Base class for document classes.
  * 
  */
-public class AbstractDocument {
+public class AbstractDocument implements Serializable {
+
+	/** */
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	protected BigInteger id;

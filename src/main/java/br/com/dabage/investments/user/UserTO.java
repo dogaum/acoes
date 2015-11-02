@@ -14,6 +14,8 @@ import br.com.dabage.investments.repositories.AbstractDocument;
 @Document(collection="user")
 public class UserTO extends AbstractDocument {
 	
+	/** */
+	private static final long serialVersionUID = -7816471706905191142L;
 	private String name;
 	private String surname;
 	private String age;

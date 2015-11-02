@@ -7,6 +7,9 @@ import br.com.dabage.investments.repositories.AbstractDocument;
 @Document(collection="role")
 public class RoleTO extends AbstractDocument {
 
+	/** */
+	private static final long serialVersionUID = 1098226138027557732L;
+
 	String name;
 
 	String description;

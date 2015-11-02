@@ -11,6 +11,9 @@ import br.com.dabage.investments.repositories.AbstractDocument;
 @Document(collection="incomes")
 public class IncomeTO extends AbstractDocument {
 
+	/** */
+	private static final long serialVersionUID = 4935084307003225955L;
+
 	@Indexed
 	private String stock;
 

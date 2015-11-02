@@ -15,6 +15,7 @@ import br.com.dabage.investments.repositories.CarteiraRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
 import br.com.dabage.investments.repositories.IncomeRepository;
 import br.com.dabage.investments.repositories.NegotiationRepository;
+import br.com.dabage.investments.repositories.PortfolioItemRepository;
 
 @Service
 public class PortfolioService {
@@ -34,6 +35,9 @@ public class PortfolioService {
 	@Autowired
 	GetQuotation getQuotation;
 
+	@Autowired
+	PortfolioItemRepository portfolioItemRepository;
+
 	/**
 	 * Rerturn all sell negotiations from a portfolio
 	 * @param portfolio
@@ -43,7 +47,7 @@ public class PortfolioService {
 		List<NegotiationTO> result = new ArrayList<NegotiationTO>();
 		if (portfolio.getNegotiations() != null) {
 			for (NegotiationTO negotiationTO : portfolio.getNegotiations()) {
-				if (negotiationTO.getNegotiationType().equals(NegotiationType.Venda) && negotiationTO.getRemoveDate() == null) {
+				if (negotiationTO.getNegotiationType().equals(NegotiationType.Venda)) {
 					result.add(negotiationTO);
 				}
 			}
@@ -98,7 +102,7 @@ public class PortfolioService {
 
 			if (all != null) {
 				for (NegotiationTO negotiationTO : all) {
-					if (negotiationTO.getNegotiationType().equals(NegotiationType.Venda) && negotiationTO.getRemoveDate() == null) {
+					if (negotiationTO.getNegotiationType().equals(NegotiationType.Venda)) {
 						result.add(negotiationTO);
 					}
 				}
@@ -132,7 +136,7 @@ public class PortfolioService {
 
 		List<CarteiraItemTO> itens = new ArrayList<CarteiraItemTO>();
 		for (NegotiationTO neg : carteira.getNegotiations()) {
-			if (neg == null || neg.getRemoveDate() != null) {
+			if (neg == null) {
 				continue;
 			}
 			CarteiraItemTO item = new CarteiraItemTO(neg.getStock());
@@ -165,6 +169,15 @@ public class PortfolioService {
 		carteira.setTotalPortfolioActual(0D);
 		carteira.setTotalCalculateResult(0D);
 		for (CarteiraItemTO item : itens) {
+
+			PortfolioItemTO portItem = portfolioItemRepository.findByIdCarteiraAndStock(carteira.getId(), item.getStock());
+			if (portItem != null) {
+				item.setQuantity(portItem.getQuantity());
+				item.setAvgQuantity(portItem.getQuantity());
+				item.setAvgValue(portItem.getAvgPrice());
+				item.setTotalCalculateResult(portItem.getAccumulatedResult());				
+			}
+
 			carteira.setTotalPortfolio(carteira.getTotalPortfolio() + item.getTotalValue());
 			item.setActualValue(getQuotation.getLastQuoteCache(item.getStock()));
 			IncomeCompanyTO lastIncomeCompany = incomeCompanyRepository.findTopByStockOrderByIncomeDateDesc(item.getStock());
@@ -173,7 +186,10 @@ public class PortfolioService {
 				Double actualDY = (lastIncomeCompany.getValue() / item.getActualValue());
 				item.setActualDY(actualDY);					
 
-				Double buyDY = (lastIncomeCompany.getValue() / item.getAvgValue());
+				Double buyDY = 0D;
+				if (item.getAvgValue() != null && !item.getAvgValue().equals(0D)) {
+					buyDY = (lastIncomeCompany.getValue() / item.getAvgValue());
+				}
 				item.setBuyDY(buyDY);
 			}
 

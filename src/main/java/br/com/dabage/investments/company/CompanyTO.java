@@ -10,6 +10,9 @@ import br.com.dabage.investments.repositories.AbstractDocument;
 @Document(collection="companies")
 public class CompanyTO extends AbstractDocument {
 
+	/** */
+	private static final long serialVersionUID = 8161642320789086589L;
+
 	public CompanyTO() { }
 
 	public CompanyTO(String ticker, String name, String fullName) {

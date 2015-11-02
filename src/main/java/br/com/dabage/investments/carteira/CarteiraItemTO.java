@@ -1,7 +1,5 @@
 package br.com.dabage.investments.carteira;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +62,7 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 		// Add to the list
 		negotiations.add(neg);
 
-		// But if calculated, ignore to avg value
+/*		// But if calculated, ignore to avg value
 		if (neg.getCalculated()) {
 			if (neg.getCalculateValue() != null) {
 				totalCalculateResult += neg.getCalculateValue();	
@@ -89,7 +87,7 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 				avgQuantity -= neg.getQuantity();				
 			}
 			quantity -= neg.getQuantity();
-		}
+		}*/
 
 	}
 
@@ -170,6 +168,10 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 		return totalCalculateResult;
 	}
 
+	public void setTotalCalculateResult(Double totalCalculateResult) {
+		this.totalCalculateResult = totalCalculateResult;
+	}
+
 	public Long getAvgQuantity() {
 		return avgQuantity;
 	}
@@ -187,7 +189,11 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 	}
 
 	public Double getPercentActAvgValue() {
-		percentActAvgValue = (actualValue / avgValue) - 1;
+		if (avgValue == null || avgValue.equals(0D)) {
+			percentActAvgValue = 0D;
+		} else {
+			percentActAvgValue = (actualValue / avgValue) - 1;	
+		}
 
 		return percentActAvgValue;
 	}
@@ -197,7 +203,11 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 	}
 
 	public Double getTotalPercentPos() {
-		totalPercentPos = ((getTotalActual() + getTotalIncomeValue() + getTotalCalculateResult()) / getTotalValue()) - 1;
+		if (getTotalValue().equals(0D)) {
+			totalPercentPos = 0D;	
+		} else {
+			totalPercentPos = ((getTotalActual() + getTotalIncomeValue() + getTotalCalculateResult()) / getTotalValue()) - 1;	
+		}
 
 		return totalPercentPos;
 	}

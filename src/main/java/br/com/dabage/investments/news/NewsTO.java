@@ -14,6 +14,9 @@ import br.com.dabage.investments.repositories.AbstractDocument;
 })
 public class NewsTO extends AbstractDocument implements SelectableDataModel<NewsTO>{
 
+	/** */
+	private static final long serialVersionUID = -9113576166532046448L;
+
 	//@TextIndexed
 	@Indexed
 	private String newsHeader;

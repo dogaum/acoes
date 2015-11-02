@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.faces.bean.RequestScoped;
 import javax.faces.event.ActionEvent;
 
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 
+import br.com.dabage.investments.config.ConfigService;
 import br.com.dabage.investments.config.StockTypeTO;
 import br.com.dabage.investments.home.HomeService;
 import br.com.dabage.investments.quote.GetQuotation;
@@ -34,24 +34,27 @@ public class ConfigView extends BasicView implements Serializable {
 	/** */
 	private static final long serialVersionUID = -2524943863550149439L;
 
-	@Resource
+	@Autowired
 	CompanyRepository companyRepository;
 
-	@Resource
+	@Autowired
 	GetQuotation getQuotation;
 
-	@Resource
+	@Autowired
 	StockTypeRepository stockTypeRepository;
 
 	@Autowired
 	MongoTemplate template;
 
-	@Resource
+	@Autowired
 	RoleRepository roleRepository;
 
 	@Autowired
 	HomeService homeService;
-	
+
+	@Autowired
+	ConfigService configService;
+
 	private List<StockTypeTO> stockTypes = new ArrayList<StockTypeTO>();
 
 	private StockTypeTO stockType;
@@ -214,6 +217,10 @@ public class ConfigView extends BasicView implements Serializable {
 		users = userRepository.findAll();
 	}
 
+	public void calcPortfolioItems() {
+		configService.calcPortfolioItem();
+	}
+	
 	/**
 	 * Validates a new User
 	 * @param user
