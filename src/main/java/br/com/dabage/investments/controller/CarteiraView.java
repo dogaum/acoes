@@ -3,7 +3,10 @@ package br.com.dabage.investments.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,9 @@ import br.com.dabage.investments.carteira.NegotiationTO;
 import br.com.dabage.investments.carteira.NegotiationType;
 import br.com.dabage.investments.carteira.PortfolioItemTO;
 import br.com.dabage.investments.carteira.PortfolioService;
+import br.com.dabage.investments.company.CompanyService;
 import br.com.dabage.investments.company.CompanyTO;
+import br.com.dabage.investments.home.IncomeVO;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
 import br.com.dabage.investments.repositories.CompanyRepository;
@@ -48,6 +53,9 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	private CarteiraTO selectedCarteira;
 	private List<CarteiraItemTO> carteiraItens;
+	private List<CarteiraItemTO> carteiraItensPreChart;
+	private List<CarteiraItemTO> carteiraItensPosChart;
+	private List<CarteiraItemTO> carteiraItensPosIncomeChart;
 
 	private CarteiraItemTO selectedCarteiraItem;
 	private Double selectedCarteiraItemTotalValue;
@@ -66,6 +74,8 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	private String selectedPoint;
 	
+	private CompanyTO selectedCompany;
+
 	@Autowired
     CarteiraRepository carteiraRepository;
 
@@ -89,6 +99,9 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	@Autowired
 	PortfolioItemRepository portfolioItemRepository;
+
+	@Autowired
+	CompanyService companyService;
 
 	@PostConstruct
 	public void prepare() {
@@ -118,7 +131,6 @@ public class CarteiraView extends BasicView implements Serializable {
 
 			selectCarteira();
 			selectedCarteiraItemTotalValue = 0D;
-			showEmptyPosition();
 		}
 		return "carteiras";
 	}
@@ -140,13 +152,7 @@ public class CarteiraView extends BasicView implements Serializable {
 	 */
 	public void showEmptyPosition() {
 		if (carteiraItens != null) {
-			if (emptyPosition) {
-				selectCarteira();
-				emptyPosition = false;
-			} else {
-				hideEmptyPosition();
-				emptyPosition = true;
-			}
+			hideEmptyPosition();
 		}
 	}
 
@@ -162,6 +168,11 @@ public class CarteiraView extends BasicView implements Serializable {
 					iteItens.remove();
 				}
 			}
+			// Ordering carteira itens for charts
+			orderCarteiraItens();
+			emptyPosition = true;
+		} else if (carteiraItens != null) {
+			emptyPosition = false;
 		}
 	}
 	
@@ -178,8 +189,41 @@ public class CarteiraView extends BasicView implements Serializable {
 
 			portfolioService.calculatePortfolio(selectedCarteira);
 			carteiraItens = selectedCarteira.getItens();
+
+			// Ordering carteira itens for charts
+			orderCarteiraItens();
 			hideEmptyPosition();
 		}
+	}
+
+	public void orderCarteiraItens() {
+		// Charts Ordering
+		// Pre Chart
+		carteiraItensPreChart = new ArrayList<CarteiraItemTO>(carteiraItens);
+		Collections.sort(carteiraItensPreChart, new Comparator<CarteiraItemTO>() {
+			@Override
+			public int compare(CarteiraItemTO o1, CarteiraItemTO o2) {
+				return o2.getTotalValue().compareTo(o1.getTotalValue());
+			}
+		});
+
+		// Pos Chart
+		carteiraItensPosChart = new ArrayList<CarteiraItemTO>(carteiraItens);
+		Collections.sort(carteiraItensPosChart, new Comparator<CarteiraItemTO>() {
+			@Override
+			public int compare(CarteiraItemTO o1, CarteiraItemTO o2) {
+				return o2.getTotalActual().compareTo(o1.getTotalActual());
+			}
+		});
+		
+		// Pos + Income Chart
+		carteiraItensPosIncomeChart = new ArrayList<CarteiraItemTO>(carteiraItens);
+		Collections.sort(carteiraItensPosIncomeChart, new Comparator<CarteiraItemTO>() {
+			@Override
+			public int compare(CarteiraItemTO o1, CarteiraItemTO o2) {
+				return new Double(o2.getTotalActual() + o2.getResultPlusIncome()).compareTo(new Double(o1.getTotalActual() + o1.getResultPlusIncome()));
+			}
+		});
 	}
 
 	/**
@@ -371,6 +415,22 @@ public class CarteiraView extends BasicView implements Serializable {
 	    rc.execute("PF('addIncomeDlg').hide()");
 	}
 
+	/**
+	 * Select a Company Information
+	 * @param event
+	 */
+	public void selectCompany(ActionEvent event) {
+		Map<String,String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+		String stock = params.get("stock");
+		CompanyTO company = companyRepository.findByTicker(stock);
+		List<IncomeVO> lastIncomes = companyService.getLastYearIncomesByStock(stock);
+		Map<String, List<IncomeVO>> incomes = new HashMap<String, List<IncomeVO>>();
+		// Incomes
+		incomes.put(super.getMessage("app.incomes.title"), lastIncomes);
+		company.setLastIncomes(incomes);
+		selectedCompany = company;
+	}
+
 	public void clicked() {
     }
 
@@ -404,6 +464,31 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	public void setCarteiraItens(List<CarteiraItemTO> carteiraItens) {
 		this.carteiraItens = carteiraItens;
+	}
+
+	public List<CarteiraItemTO> getCarteiraItensPreChart() {
+		return carteiraItensPreChart;
+	}
+
+	public void setCarteiraItensPreChart(List<CarteiraItemTO> carteiraItensPreChart) {
+		this.carteiraItensPreChart = carteiraItensPreChart;
+	}
+
+	public List<CarteiraItemTO> getCarteiraItensPosChart() {
+		return carteiraItensPosChart;
+	}
+
+	public void setCarteiraItensPosChart(List<CarteiraItemTO> carteiraItensPosChart) {
+		this.carteiraItensPosChart = carteiraItensPosChart;
+	}
+
+	public List<CarteiraItemTO> getCarteiraItensPosIncomeChart() {
+		return carteiraItensPosIncomeChart;
+	}
+
+	public void setCarteiraItensPosIncomeChart(
+			List<CarteiraItemTO> carteiraItensPosIncomeChart) {
+		this.carteiraItensPosIncomeChart = carteiraItensPosIncomeChart;
 	}
 
 	public NegotiationTO getNegotiation() {
@@ -483,6 +568,14 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	public void setSelectedPoint(String selectedPoint) {
 		this.selectedPoint = selectedPoint;
+	}
+
+	public CompanyTO getSelectedCompany() {
+		return selectedCompany;
+	}
+
+	public void setSelectedCompany(CompanyTO selectedCompany) {
+		this.selectedCompany = selectedCompany;
 	}
 
 }

@@ -146,7 +146,7 @@
 										
 										<p:commandLink id="clSP"
 										 				actionListener="#{carteiraView.showEmptyPosition}" update=":form">
-										 		<h:outputText value="#{(!emptyPosition) ? msg['app.portfolio.btn.showAll'] : msg['app.portfolio.btn.hideAll']}" />
+										 		<h:outputText value="#{(carteiraView.emptyPosition) ? msg['app.portfolio.btn.showAll'] : msg['app.portfolio.btn.hideAll']}" />
 										</p:commandLink>
                             		</div>
                             	</div>
@@ -186,7 +186,10 @@
 							        </p:column>
 
 								    <p:column headerText="#{msg['app.portfolio.symbol']}" sortBy="#{item.stock}" style="text-align:center">
-								        <h:outputText value="#{item.stock}" />
+			                    		<p:commandLink update=":form:panelPosCompanyDlg" oncomplete="PF('posCompanyDlg').show()" actionListener="#{carteiraView.selectCompany}">
+			                    			<f:param name="stock" value="#{item.stock}" />
+											<h:outputText value="#{item.stock}" style="font-weight: bold;"/>
+			                    		</p:commandLink>
 								    </p:column>
 
 								    <p:column headerText="#{msg['app.portfolio.qty']}" style="text-align:right">
@@ -369,35 +372,35 @@
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalPortfolio}">
-											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalPortfolioIncome}">
-											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalCalculateResult}">
-											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalPortfolioActualPlusIncome}">
-											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalPortfolioActual}">
-											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
@@ -575,7 +578,7 @@
 			        <p:dialog id="preChart" widgetVar="preChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.pre']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
 						<p:panel id="panelPreChart">
 							<hf:chart type="pie" title="" credits="#{homeView.credits}" height="60%" width="60%">
-							    <hf:chartSerie name="Ativos Pre" value="#{carteiraView.carteiraItens}" type="pie"
+							    <hf:chartSerie name="Ativos Pre" value="#{carteiraView.carteiraItensPreChart}" type="pie"
 							     			   var="point" point="#{point.totalValue}" tickLabel="#{point.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
 							    <hf:chartTooltip  backgroundColor="#000000" shared="true">
@@ -593,7 +596,7 @@
 			        <p:dialog widgetVar="posChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.pos']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
 						<p:panel id="panelPosChart">
 							<hf:chart type="pie" title="" credits="#{homeView.credits}" height="60%" width="60%">
-							    <hf:chartSerie name="Ativos Pos" value="#{carteiraView.carteiraItens}" type="pie"
+							    <hf:chartSerie name="Ativos Pos" value="#{carteiraView.carteiraItensPosChart}" type="pie"
 							     			   var="point2" point="#{point2.totalActual}" tickLabel="#{point2.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
 							    <hf:chartTooltip  backgroundColor="#000000" shared="true">
@@ -611,7 +614,7 @@
 			        <p:dialog widgetVar="posIncChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.posInc']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
 						<p:panel id="panelPosIncChart">
 							<hf:chart type="pie" title="" credits="#{homeView.credits}" height="60%" width="60%">
-							    <hf:chartSerie name="Ativos Pos Inc" value="#{carteiraView.carteiraItens}" type="pie"
+							    <hf:chartSerie name="Ativos Pos Inc" value="#{carteiraView.carteiraItensPosIncomeChart}" type="pie"
 							     			   var="point3" point="#{point3.totalActual + point3.resultPlusIncome}" tickLabel="#{point3.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
 							    <hf:chartTooltip  backgroundColor="#000000" shared="true">
@@ -619,6 +622,26 @@
 							            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
 							        </f:facet>
 							        <f:facet name="body"><h:outputText value="&lt;span style='color:white'> &lt;b>{point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/></f:facet>
+							        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
+							    </hf:chartTooltip>
+							</hf:chart>
+						</p:panel>
+			        </p:dialog>
+
+					<!-- Company Panel -->
+			        <p:dialog widgetVar="posCompanyDlg" modal="true" position="center" header="#{msg['app.portfolio.company.header']}" width="650" showEffect="fade" hideEffect="fade" closeOnEscape="true">
+						<p:panel id="panelPosCompanyDlg">
+							<hf:chart type="line" title="#{msg['app.incomes.title']}: #{carteiraView.selectedCompany.name} (#{carteiraView.selectedCompany.ticker})" credits="#{homeView.credits}" yaxisLabel="#{msg['app.home.portfolio.values']}" 
+										stacking="normal" value="#{carteiraView.selectedCompany.lastIncomes}" var="point" point="#{point.value}" tickLabel="#{point.yearMonthFormatted}" subTitle="#{point.yearMonthFormatted}"
+										colors="#f45b5b,#434348,#90ed7d,#7cb5ec">
+							    <hf:chartTooltip  backgroundColor="#000000" shared="true">
+							        <f:facet name="header">
+							            <h:outputText escape="false" value="&lt;table>"/>
+							        </f:facet>
+							        <f:facet name="body">
+							        	<h:outputText escape="false" value="&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{series.name}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
+							        	<h:outputText value="&lt;span style='color:white'> &lt;b>R$ {point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/>
+							        </f:facet>
 							        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
 							    </hf:chartTooltip>
 							</hf:chart>

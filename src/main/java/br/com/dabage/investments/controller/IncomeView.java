@@ -92,7 +92,7 @@ public class IncomeView extends BasicView implements Serializable {
 			// Regrets a month per once
 			calNow.add(Calendar.MONTH, -1);
 			fieldNumber++;
-		} while (incomesCompany != null && !incomesCompany.isEmpty());
+		} while (fieldNumber < 25);
 
 		for (IncomeTotal inc : incomes) {
 			List<IncomeCompanyTO> incCompanies = inc.getIncomes();
@@ -209,8 +209,13 @@ public class IncomeView extends BasicView implements Serializable {
 		}
 		incomeCompany.setIdCompany(company.getId());
 
-		if (incomeCompanyRepository.findByStockAndYearMonth(incomeCompany.getStock(), incomeCompany.getYearMonth()) == null) {
-			incomeCompanyRepository.save(incomeCompany);	
+		IncomeCompanyTO old = incomeCompanyRepository.findByStockAndYearMonth(incomeCompany.getStock(), incomeCompany.getYearMonth());
+		if (old == null) {
+			incomeCompanyRepository.save(incomeCompany);		
+		} else {
+			old.setValue(incomeCompany.getValue());
+			old.setIncomeDate(incomeCompany.getIncomeDate());
+			incomeCompanyRepository.save(old);
 		}
 
 		incomeCompany = new IncomeCompanyTO();

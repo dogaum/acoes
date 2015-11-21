@@ -143,7 +143,7 @@ public class IncomeCompanyTO extends AbstractDocument implements Comparable<Inco
 
 		public int compare(IncomeCompanyTO inc1, IncomeCompanyTO inc2) {
 
-			// ascending order
+			// descending order
 			return inc2.getIncomeDate().compareTo(inc1.getIncomeDate());
 		}
 

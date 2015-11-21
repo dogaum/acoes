@@ -1,10 +1,15 @@
 package br.com.dabage.investments.company;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import br.com.dabage.investments.config.StockTypeTO;
+import br.com.dabage.investments.home.IncomeVO;
 import br.com.dabage.investments.repositories.AbstractDocument;
 
 @Document(collection="companies")
@@ -28,6 +33,9 @@ public class CompanyTO extends AbstractDocument {
 	private String ticker;
 	private String name;
 	private String fullName;
+
+	@Transient
+	private Map<String, List<IncomeVO>> lastIncomes;
 
 	@DBRef
 	private StockTypeTO stockType;
@@ -67,6 +75,14 @@ public class CompanyTO extends AbstractDocument {
 
 	public void setStockType(StockTypeTO stockType) {
 		this.stockType = stockType;
+	}
+
+	public Map<String, List<IncomeVO>> getLastIncomes() {
+		return lastIncomes;
+	}
+
+	public void setLastIncomes(Map<String, List<IncomeVO>> lastIncomes) {
+		this.lastIncomes = lastIncomes;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package br.com.dabage.investments.repositories;
 
 import java.math.BigInteger;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -23,4 +24,6 @@ public interface IncomeCompanyRepository extends MongoRepository<IncomeCompanyTO
 	IncomeCompanyTO findByStockAndYearMonth(String stock, Integer YearMonth);
 
 	List<IncomeCompanyTO> findByYearMonth(Integer YearMonth);
+
+	LinkedList<IncomeCompanyTO> findByStockOrderByIncomeDateDesc(String stock);
 }
