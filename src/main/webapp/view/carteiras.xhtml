@@ -209,9 +209,12 @@
 								    </p:column>
 
 								    <p:column headerText="#{msg['app.portfolio.lastIncome.s']}" style="text-align:right">
-								        <h:outputText value="#{item.lastIncomeCompany.value}" title="#{msg['app.portfolio.lastIncome']}">
-								        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-								        </h:outputText>
+			                    		<p:commandLink update=":form:panelNewIncome" oncomplete="PF('addIncomeDlg').show()" actionListener="#{carteiraView.prepareIncome}">
+			                    			<f:param name="stock" value="#{item.stock}" />
+									        <h:outputText value="#{item.lastIncomeCompany.value}" title="#{msg['app.portfolio.lastIncome']}" style="font-weight: bold;">
+									        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+									        </h:outputText>
+			                    		</p:commandLink>
 								    </p:column>
 
 								    <p:column headerText="#{msg['app.portfolio.dy.am.c']}" sortBy="#{item.buyDY}" style="text-align:right">
@@ -329,16 +332,22 @@
 									            </p:cellEditor>
 										    </p:column>
 
-										    <p:column headerText="#{msg['app.portfolio.avgValue']}" sortBy="#{negItem.calculateValue}">
-										        <h:outputText value="#{negItem.avgBuyValue}">
-										        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
-										        </h:outputText>
+										    <p:column headerText="#{msg['app.portfolio.avgValue']}" sortBy="#{negItem.avgBuyValue}">
+										        <f:facet name="output">
+											        <h:outputText value="#{negItem.avgBuyValue}">
+											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        </h:outputText>
+										        </f:facet>
+										        <f:facet name="input"><pe:inputNumber value="#{negItem.avgBuyValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
 										    </p:column>
 
 										    <p:column headerText="#{msg['app.portfolio.resultValue']}" sortBy="#{negItem.calculateValue}">
-										        <h:outputText value="#{negItem.calculateValue}">
-										        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
-										        </h:outputText>
+										        <f:facet name="output">
+											        <h:outputText value="#{negItem.calculateValue}">
+											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        </h:outputText>
+										        </f:facet>
+										        <f:facet name="input"><pe:inputNumber value="#{negItem.calculateValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
 										    </p:column>
 
 										    <p:column style="width:38px">
@@ -354,7 +363,15 @@
         							</p:rowExpansion>
 									<p:columnGroup type="footer">
 							            <p:row>
-							                <p:column colspan="9" style="text-align:right" footerText="#{msg['app.portfolio.total']}:" />
+							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
 										    <p:column style="text-align:right">
 											    <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.percentTotalActual}">

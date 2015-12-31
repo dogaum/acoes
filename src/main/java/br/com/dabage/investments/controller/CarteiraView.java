@@ -380,7 +380,14 @@ public class CarteiraView extends BasicView implements Serializable {
 	 * @param event
 	 */
 	public void prepareIncome(ActionEvent event) {
+		Map<String,String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+		String stock = params.get("stock");
 		income = new IncomeTO();
+		if (stock != null && !stock.isEmpty()) {
+			income.setStock(stock);
+			income.setIncomeDate(new Date());
+			income.setType(IncomeTypes.INCOME);
+		}
 	}
 
 	public void addIncome(ActionEvent event) {
