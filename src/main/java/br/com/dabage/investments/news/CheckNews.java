@@ -58,7 +58,7 @@ public class CheckNews {
 		cal.set(Calendar.MONTH, 3);
 
 		while(cal.getTime().before(new Date())) {
-			String endFII = "http://www.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=rendimento&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
+			String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=rendimento&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
 
 			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
 			String INICIO = dateFormatSearch.format(cal.getTime());
@@ -113,8 +113,8 @@ public class CheckNews {
 
 		int qtyNews = 0;
 
-		String endFII = "http://www.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=" + query + "&tipoFiltro=0";
-		String prefix = "http://www.bmfbovespa.com.br/Agencia-Noticias/";
+		String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=" + query + "&tipoFiltro=0";
+		String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
 
 		try {
 			Connection connection = Jsoup.connect(endFII);
