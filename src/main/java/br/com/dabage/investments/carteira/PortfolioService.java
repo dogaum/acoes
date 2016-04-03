@@ -168,6 +168,7 @@ public class PortfolioService {
 		carteira.setTotalPortfolio(0D);
 		carteira.setTotalPortfolioActual(0D);
 		carteira.setTotalCalculateResult(0D);
+		carteira.setTotalLastIncome(0D);
 		for (CarteiraItemTO item : itens) {
 
 			PortfolioItemTO portItem = portfolioItemRepository.findByIdCarteiraAndStock(carteira.getId(), item.getStock());
@@ -195,6 +196,10 @@ public class PortfolioService {
 
 			carteira.setTotalPortfolioActual(carteira.getTotalPortfolioActual() + item.getTotalActual());
 			carteira.setTotalCalculateResult(carteira.getTotalCalculateResult() + item.getTotalCalculateResult());
+			if (item.getQuantity() != null && item.getLastIncomeCompany() != null) {
+				carteira.setTotalLastIncome(carteira.getTotalLastIncome() + (item.getQuantity() * item.getLastIncomeCompany().getValue()));	
+			}
+
 		}
 		carteira.setTotalPortfolioActualPlusIncome(carteira.getTotalPortfolioIncome() + carteira.getTotalCalculateResult());
 		carteira.setPercentTotalActual((carteira.getTotalPortfolioActual() / carteira.getTotalPortfolio()) - 1);
@@ -202,6 +207,12 @@ public class PortfolioService {
 				.getTotalPortfolioActual() + carteira
 				.getTotalPortfolioActualPlusIncome()) / carteira
 				.getTotalPortfolio()) - 1);
+
+		// Total Buy and Actual DY
+		if (carteira.getTotalLastIncome() != null) {
+			carteira.setTotalBuyDY((carteira.getTotalLastIncome() / carteira.getTotalPortfolio()));
+			carteira.setTotalActualDY((carteira.getTotalLastIncome() / carteira.getTotalPortfolioActual()));
+		}
 
 		// Last Negotitation
 		if (!carteira.getNegotiations().isEmpty()) {

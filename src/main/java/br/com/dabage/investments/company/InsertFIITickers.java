@@ -27,7 +27,7 @@ public class InsertFIITickers {
 	 * @param args
 	 */
 	public void run() {
-			String bmfTickers = "http://bmfbovespa.com.br/Fundos-Listados/FundosListados.aspx?tipoFundo=imobiliario&Idioma=pt-br";
+			String bmfTickers = "http://www2.bmfbovespa.com.br/Fundos-Listados/FundosListados.aspx?tipoFundo=imobiliario&Idioma=pt-br";
 			boolean first = true;
 			StockTypeTO stockType = stockTypeRepository.findByName("FII");
 			try {

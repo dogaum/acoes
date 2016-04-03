@@ -369,9 +369,27 @@
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
-							                <p:column style="text-align:right"/>
-							                <p:column style="text-align:right"/>
-							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right">
+									            <f:facet name="footer">
+											        <h:outputText value="#{carteiraView.selectedCarteira.totalLastIncome}">
+											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        </h:outputText>
+									            </f:facet>
+							                </p:column>
+										    <p:column style="text-align:right">
+											    <f:facet name="footer">
+											        <h:outputText value="#{carteiraView.selectedCarteira.totalBuyDY}">
+											        	<f:convertNumber type="percent" minFractionDigits="2"/>
+											        </h:outputText>
+											    </f:facet>
+										    </p:column>
+										    <p:column style="text-align:right">
+											    <f:facet name="footer">
+											        <h:outputText value="#{carteiraView.selectedCarteira.totalActualDY}">
+											        	<f:convertNumber type="percent" minFractionDigits="2"/>
+											        </h:outputText>
+											    </f:facet>
+										    </p:column>
 										    <p:column style="text-align:right">
 											    <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.percentTotalActual}">

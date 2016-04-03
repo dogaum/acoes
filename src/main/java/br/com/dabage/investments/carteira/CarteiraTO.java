@@ -53,9 +53,15 @@ public class CarteiraTO extends AbstractDocument {
 	@Transient
 	private Double totalPortfolioIncome;
 	@Transient
+	private Double totalBuyDY;
+	@Transient
+	private Double totalActualDY;
+	@Transient
 	private Double totalCalculateResult;
 	@Transient
 	private Double totalPortfolioActualPlusIncome;
+	@Transient
+	private Double totalLastIncome;
 	@Transient
 	private Double percentTotalActual;
 	@Transient
@@ -203,6 +209,30 @@ public class CarteiraTO extends AbstractDocument {
 
 	public void setItens(List<CarteiraItemTO> itens) {
 		this.itens = itens;
+	}
+
+	public Double getTotalLastIncome() {
+		return totalLastIncome;
+	}
+
+	public void setTotalLastIncome(Double totalLastIncome) {
+		this.totalLastIncome = totalLastIncome;
+	}
+
+	public Double getTotalBuyDY() {
+		return totalBuyDY;
+	}
+
+	public void setTotalBuyDY(Double totalBuyDY) {
+		this.totalBuyDY = totalBuyDY;
+	}
+
+	public Double getTotalActualDY() {
+		return totalActualDY;
+	}
+
+	public void setTotalActualDY(Double totalActualDY) {
+		this.totalActualDY = totalActualDY;
 	}
 
 }
