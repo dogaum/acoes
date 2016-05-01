@@ -24,9 +24,6 @@ public class CheckFIINewsJob {
 			String query = "fii";
 			int qtyNews = checkNews.run(query);
 			System.out.println(qtyNews + " news found on " + new Date());			
-		} else {
-			System.out.println("Executing run2");
-			checkNews.run2();
 		}
 	}
 }

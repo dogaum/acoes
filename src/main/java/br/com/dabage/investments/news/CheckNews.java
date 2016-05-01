@@ -302,7 +302,6 @@ public class CheckNews {
 				incomeTO.setYearMonth(Integer.parseInt(yearMonth));
 
 				if (incomeCompanyRepository.findByStockAndYearMonth(incomeTO.getStock(), incomeTO.getYearMonth()) == null) {
-					SendMailSSL.send(newsTO.getNewsHeader(), getQuotationsByPrefix(company.getTicker(), income) + newsTO.getNews());
 					incomeCompanyRepository.save(incomeTO);	
 				}
 
