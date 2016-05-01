@@ -190,7 +190,8 @@ public class PortfolioItemTO extends AbstractDocument implements Comparable<Port
 	}
 	
 	@Transient
-	public void addAmortization() {
-		
+	public void addAmortization(IncomeTO income) {
+		avgPrice -= income.getValue() / quantity;
+		balance = avgPrice * quantity;
 	}
 }

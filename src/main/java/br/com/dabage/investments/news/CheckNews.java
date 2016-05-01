@@ -1,5 +1,6 @@
 package br.com.dabage.investments.news;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -29,6 +30,9 @@ import br.com.dabage.investments.repositories.CompanyRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
 import br.com.dabage.investments.repositories.NewsRepository;
 
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+
 @Component
 public class CheckNews {
 
@@ -51,14 +55,14 @@ public class CheckNews {
 	static DateFormat dateFormatSearch = new SimpleDateFormat("yyyy-MM-dd");
 
 	public void run2() {
-		String prefix = "http://www.bmfbovespa.com.br/Agencia-Noticias/";
+		String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
 
 		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, 2014);
+		cal.set(Calendar.YEAR, 2016);
 		cal.set(Calendar.MONTH, 3);
 
 		while(cal.getTime().before(new Date())) {
-			String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=rendimento&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
+			String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=fii&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
 
 			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
 			String INICIO = dateFormatSearch.format(cal.getTime());
@@ -95,7 +99,10 @@ public class CheckNews {
 							newsBean.setNews(news.text());
 							newsBean.setNewsHref(prefix + href);
 
-							checkIncome(newsBean);
+							Double income = checkIncome(newsBean);
+							if (income == null) {
+								System.out.println("Nao encontrou: " + newsBean.getTicker());
+							}
 						}
 					}
 
@@ -193,6 +200,11 @@ public class CheckNews {
 			company = companyRepository.findByTicker(prefix + "11B");
 		}
 
+		if (company == null) {
+			System.out.println("Nao achou a empresa de ticker" + prefix);
+			return result.toString();
+		}
+		
 		String ticker = company.getTicker();
 		Double lastQuote = getQuotation.getLastQuote(ticker);
 		if (lastQuote != null) {
@@ -200,10 +212,12 @@ public class CheckNews {
 			result.append(ticker);
 			result.append(" : ");
 			result.append("R$ " + numberFormat.format(lastQuote));
-			result.append("\n");			
+			result.append("\n");
 		}
 
 		if (income != null) {
+			result.append("Rendimento R$ " + numberFormat.format(income));
+			result.append("\n");
 			result.append("DY: ");
 			Double dy = (income / lastQuote) * 100;
 			result.append(numberFormat.format(dy) + " % a.m.");
@@ -242,17 +256,26 @@ public class CheckNews {
 	public Double checkIncome(NewsTO newsTO) {
 		Double income = null;
 		Double amortization = null;
-		if (newsTO.getNewsHeader().toUpperCase().contains("RENDIMENTO")) {
 
-			String[] array = newsTO.getNews().toUpperCase().split("\n");
-			for (int i = 0; i < array.length; i++) {
-				String linha = array[i];
-				if (linha.contains("R$") && !linha.contains("AMORTIZA")) {
-					income = getIncome(linha);
-				} else if (linha.contains("R$") && linha.contains("AMORTIZA")) {
-					amortization = getIncome(linha);
-				}
+		if (newsTO.getNews().contains("rendimento")) {
+
+			int indexIni = newsTO.getNews().indexOf("http");
+			int indexFin = newsTO.getNews().lastIndexOf("flnk");
+			String linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
+			linkPdf = linkPdf.replaceFirst("https", "http");
+			PdfReader reader;
+			IncomePdfParser parser = null;
+			try {
+				reader = new PdfReader(linkPdf);
+				String dados = PdfTextExtractor.getTextFromPage(reader, 1);
+				parser = new IncomePdfParser(dados);
+				reader.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+
+			income = parser.getValue();
 
 			if (income != null) {
 				CompanyTO company = companyRepository.findByTicker(newsTO.getTicker() + "11");
@@ -279,19 +302,13 @@ public class CheckNews {
 				incomeTO.setYearMonth(Integer.parseInt(yearMonth));
 
 				if (incomeCompanyRepository.findByStockAndYearMonth(incomeTO.getStock(), incomeTO.getYearMonth()) == null) {
+					SendMailSSL.send(newsTO.getNewsHeader(), getQuotationsByPrefix(company.getTicker(), income) + newsTO.getNews());
 					incomeCompanyRepository.save(incomeTO);	
 				}
 
-
-/*				if (company.getIncomes() == null) {
-					company.setIncomes(new ArrayList<IncomeCompanyTO>());
-				}
-
-				company.getIncomes().add(incomeTO);
-
-				companyRepository.save(company);*/
 			}
 		}
+
 		return income;
 	}
 }

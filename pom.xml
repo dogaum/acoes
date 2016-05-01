@@ -249,6 +249,13 @@
 	        <scope>test</scope>
 		</dependency>
 
+		<!-- iTextPDF  -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.5.9</version>
+		</dependency>
+
 	</dependencies>
 	<profiles>
 		<profile>

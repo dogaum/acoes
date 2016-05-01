@@ -39,6 +39,7 @@ public class ConfigService {
 			// Calcs all Stocks
 			for (String stock : stocks.keySet()) {
 				LinkedList<NegotiationTO> negotiations = negotiationRepository.findByIdCarteiraAndStockOrderByDtNegotiationAsc(carteira.getId(), stock);
+				// TODO Buscar as amortizacoes e converter para DateObject para fazer a ordenacao.
 				for (NegotiationTO negotiationTO : negotiations) {
 					PortfolioItemTO item = portfolioItemRepository.findByIdCarteiraAndStock(negotiationTO.getIdCarteira(), negotiationTO.getStock());
 					if (item == null) {
