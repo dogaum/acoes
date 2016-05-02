@@ -150,7 +150,7 @@ public class CheckNews {
 					if (insertNews(newsBean) && newsBean.getNewsHeader().toLowerCase().contains("fii")) {
 						qtyNews++;
 						Double income = checkIncome(newsBean);
-						SendMailSSL.send(newsName, getQuotationsByPrefix(newsBean.getTicker(), income) + news.text());
+						SendMailSSL.send(newsName, getQuotationsByPrefix(newsBean.getTicker(), income) + news.text() + "\n" + newsBean.getAttached());
 					}
 				}
 			}
@@ -268,6 +268,7 @@ public class CheckNews {
 			try {
 				reader = new PdfReader(linkPdf);
 				String dados = PdfTextExtractor.getTextFromPage(reader, 1);
+				newsTO.setAttached(dados);
 				parser = new IncomePdfParser(dados);
 				reader.close();
 			} catch (IOException e) {
@@ -305,6 +306,24 @@ public class CheckNews {
 					incomeCompanyRepository.save(incomeTO);	
 				}
 
+			}
+		} else {
+			// get attachment
+			if (newsTO.getNews().contains("https")) {
+
+				int indexIni = newsTO.getNews().indexOf("http");
+				int indexFin = newsTO.getNews().lastIndexOf("flnk");
+				String linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
+				linkPdf = linkPdf.replaceFirst("https", "http");
+				PdfReader reader;
+				try {
+					reader = new PdfReader(linkPdf);
+					String dados = PdfTextExtractor.getTextFromPage(reader, 1);
+					newsTO.setAttached(dados);
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
