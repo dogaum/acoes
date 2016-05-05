@@ -58,8 +58,8 @@ public class CheckNews {
 		String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
 
 		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, 2016);
-		cal.set(Calendar.MONTH, 3);
+		cal.set(Calendar.YEAR, 2015);
+		cal.set(Calendar.MONTH, 5);
 
 		while(cal.getTime().before(new Date())) {
 			String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=fii&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
@@ -328,5 +328,152 @@ public class CheckNews {
 		}
 
 		return income;
+	}
+
+	public void checkIncomes() {
+
+		String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=proventos%20dos%20emissores&tipoFiltro=0";
+
+		checkIncomes(endFII);
+
+	}
+
+	public void checkIncomesTemp() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, 2015);
+		cal.set(Calendar.MONTH, 5);
+
+		Calendar calNow = Calendar.getInstance();
+		calNow.add(Calendar.MONTH, 1);
+		
+		while(cal.getTime().before(calNow.getTime())) {
+			String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=proventos%20dos%20emissores&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+			String INICIO = dateFormatSearch.format(cal.getTime());
+			endFII = endFII.replaceFirst("INICIO", INICIO);
+
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+			String FIM = dateFormatSearch.format(cal.getTime());
+			endFII = endFII.replaceFirst("FIM", FIM);
+
+			int pages = 3;
+			for (int i = 1; i < pages; i++) {
+				checkIncomes(endFII + i);
+			}
+
+			cal.add(Calendar.MONTH, 1);
+		}
+	}
+
+	private void checkIncomes(String endFII) {
+		StringBuffer buffer = new StringBuffer();
+		try {
+			String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
+			Connection connection = Jsoup.connect(endFII);
+			connection.ignoreHttpErrors(true);
+			connection.timeout(30000);
+
+			Document doc = connection.get();
+			Element pagina = doc.getElementById("linksNoticias");
+			if (pagina != null) {
+				Elements links = pagina.getElementsByTag("li");
+				for (Element link : links) {
+					String href = link.getElementsByTag("a").get(0).attr("href");
+					String newsName = link.text();
+
+					doc = Jsoup.connect(prefix + href).get();
+					Element news = doc.getElementById("contentNoticia");
+
+					NewsTO newsBean = new NewsTO();
+					newsBean.setNewsHeader(newsName.substring(19));
+					newsBean.setNewsDate(getDateFromNews(newsName));
+					newsBean.setNews(news.text());
+					newsBean.setNewsHref(prefix + href);
+					
+					if (!insertNews(newsBean)) {
+						continue;
+					}
+
+					String total = news.text();
+					String[] companies = total.split("EMPRESA: ");
+					buffer = new StringBuffer();
+					for (int i = 1; i < companies.length; i++) {
+						String company = companies[i];
+
+						if (!company.contains("RENDIMENTO")) {
+							continue;
+						}
+
+						String[] lines = company.split("\r");
+						String ticker = lines[3].substring(14, 21).trim();
+						CompanyTO cmp = companyRepository.findByTicker(ticker);
+						// Company does not exist
+						if (cmp == null) {
+							continue;
+						}						
+						buffer.append(ticker);
+						buffer.append("\n");
+
+						String incomeDateStr = lines[3].substring(60, 70);
+						buffer.append(incomeDateStr);
+						buffer.append("\n");						
+
+						String income = lines[4].trim().substring(10, 23);
+						buffer.append(income);
+						buffer.append("\n");						
+
+						Double incomeValue = new Double(income.replace(".", "").replace(",", "."));
+
+						String paymentDateStr = lines[5].trim().substring(10, 20); 
+						buffer.append(paymentDateStr);
+						buffer.append("\n\n");
+
+						buffer.append(getQuotationsByPrefix(ticker.substring(0, 4), incomeValue));
+						buffer.append("========================= \n");
+
+						IncomeCompanyTO incomeTO = new IncomeCompanyTO();
+						Calendar cal = Calendar.getInstance();
+						Date incomeDate = null;
+						Date paymentDate = null;
+						try {
+							incomeDate = dateFormat.parse(incomeDateStr);
+							paymentDate = dateFormat.parse(paymentDateStr);
+						} catch (ParseException e) {
+							incomeDate = new Date();
+						}
+						cal.setTime(incomeDate);
+
+						incomeTO.setIncomeDate(cal.getTime());
+						incomeTO.setPaymentDate(paymentDate);
+						incomeTO.setValue(incomeValue);
+						incomeTO.setIdCompany(cmp.getId());
+						incomeTO.setStock(ticker);
+						int month = cal.get(Calendar.MONTH) + 1;
+						String yearMonth = cal.get(Calendar.YEAR) + StringUtils.leftPad(month + "", 2, "0") ;
+						incomeTO.setYearMonth(Integer.parseInt(yearMonth));
+
+						IncomeCompanyTO incTemp = incomeCompanyRepository.findByStockAndYearMonth(ticker, incomeTO.getYearMonth());
+						if (incTemp != null) {
+							incTemp.setPaymentDate(incomeTO.getPaymentDate());
+							incTemp.setIncomeDate(incomeTO.getIncomeDate());
+							incTemp.setValue(incomeTO.getValue());
+							incomeCompanyRepository.save(incTemp);
+						} else {
+							incomeCompanyRepository.save(incomeTO);	
+						}
+
+					}
+					
+					if (!buffer.toString().isEmpty()) {
+						// Send Email
+						SendMailSSL.send("Proventos Ex-" + dateFormat.format(new Date()), buffer.toString());
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			SendMailSSL.send("Erro: Proventos Ex-" + dateFormat.format(new Date()), buffer.toString() + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 }

@@ -21,6 +21,14 @@ public class CheckFIINewsJob {
 		Calendar cal = Calendar.getInstance();
 		if (DateUtils.isWorkingDay(cal)) {
 			System.out.println("Executing " + CheckFIINewsJob.class.getSimpleName() + " on " + new Date());
+
+			// Check Incomes
+			if (cal.get(Calendar.MONTH) == 4 && cal.get(Calendar.DAY_OF_MONTH) == 4) {
+				checkNews.checkIncomesTemp();	
+			}
+
+			checkNews.checkIncomes();
+
 			String query = "fii";
 			int qtyNews = checkNews.run(query);
 			System.out.println(qtyNews + " news found on " + new Date());			

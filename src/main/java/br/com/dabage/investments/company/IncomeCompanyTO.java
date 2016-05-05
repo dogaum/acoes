@@ -28,6 +28,8 @@ public class IncomeCompanyTO extends AbstractDocument implements Comparable<Inco
 
 	private Integer yearMonth;
 
+	private Date paymentDate;
+	
 	@Transient
 	private Date yearMonthDate;
 	
@@ -76,6 +78,14 @@ public class IncomeCompanyTO extends AbstractDocument implements Comparable<Inco
 
 	public Date getYearMonthDate() {
 		return yearMonthDate;
+	}
+
+	public Date getPaymentDate() {
+		return paymentDate;
+	}
+
+	public void setPaymentDate(Date paymentDate) {
+		this.paymentDate = paymentDate;
 	}
 
 	public void setYearMonthDate(Date yearMonthDate) {
