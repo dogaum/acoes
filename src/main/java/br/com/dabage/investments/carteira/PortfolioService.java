@@ -154,6 +154,9 @@ public class PortfolioService {
 		}
 		carteira.setTotalPortfolioIncome(0D);
 		for (IncomeTO inc : carteira.getIncomes()) {
+			if (inc == null) {
+				continue;
+			}
 			CarteiraItemTO item = new CarteiraItemTO(inc.getStock());
 			if (itens.contains(item)) {
 				int idx = itens.indexOf(item);

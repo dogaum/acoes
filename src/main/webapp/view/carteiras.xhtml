@@ -355,8 +355,8 @@
 										    </p:column>
 										    <p:column style="width:48px">
 										        <p:commandButton icon="ui-icon-close" action="#{carteiraView.deleteNegotiation}" update=":form:portfolioDetail" id="cbDeleteNegotiation">
-										        	<p:confirm header="#{msg['app.label.confirm']}" message="#{msg['app.portfolio.delete.dlg.msg']}" icon="ui-icon-alert" />
 										        	<f:setPropertyActionListener value="#{negItem}" target="#{carteiraView.negotiation}" for="cbDeleteNegotiation"/>
+										        	<p:confirm header="#{msg['app.label.confirm']}" message="#{msg['app.portfolio.delete.dlg.msg']}" icon="ui-icon-alert" />
 										        </p:commandButton>
 										    </p:column>
 										</p:dataTable>
@@ -586,10 +586,12 @@
 							    <p:column style="width:38px">
 							        <p:rowEditor />
 							    </p:column>
+
 							    <p:column style="width:50px; text-align: center">
-							        <p:commandButton icon="ui-icon-close" action="#{carteiraView.deleteIncome}" update=":form:portfolioDetail" id="cbDeleteIncome">
+							        <p:commandButton icon="ui-icon-close" actionListener="#{carteiraView.deleteIncome}" update=":form:incomeDetail" id="cbDeleteIncome">
+							        	<f:param name="incomeId" value="#{incItem.id}" />
+							        	<f:setPropertyActionListener value="#{incItem}" target="#{carteiraView.income}" for="cbDeleteIncome" />
 							        	<p:confirm header="#{msg['app.label.confirm']}" message="#{msg['app.portfolio.delete.dlg.msg']}" icon="ui-icon-alert" />
-							        	<f:setPropertyActionListener value="#{incItem}" target="#{carteiraView.income}" for="cbDeleteIncome"/>
 							        </p:commandButton>
 							    </p:column>
 

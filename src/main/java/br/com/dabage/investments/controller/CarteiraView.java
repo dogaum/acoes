@@ -2,6 +2,7 @@ package br.com.dabage.investments.controller;
 
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,6 +33,7 @@ import br.com.dabage.investments.carteira.PortfolioItemTO;
 import br.com.dabage.investments.carteira.PortfolioService;
 import br.com.dabage.investments.company.CompanyService;
 import br.com.dabage.investments.company.CompanyTO;
+import br.com.dabage.investments.config.ConfigService;
 import br.com.dabage.investments.home.IncomeVO;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
@@ -102,6 +104,9 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	@Autowired
 	CompanyService companyService;
+
+	@Autowired
+	ConfigService configService;
 
 	@PostConstruct
 	public void prepare() {
@@ -368,9 +373,14 @@ public class CarteiraView extends BasicView implements Serializable {
 		selectCarteira();
 	}
 
-	public void deleteIncome() {
-		incomeRepository.delete(income);
-		selectedCarteira.getIncomes().remove(income);
+	public void deleteIncome(ActionEvent event) {
+		Map<String,String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+		String incomeId = params.get("incomeId");
+
+		IncomeTO inc = incomeRepository.findOne(new BigInteger(incomeId));
+
+		incomeRepository.delete(inc);
+		selectedCarteira.getIncomes().remove(inc);
 		carteiraRepository.save(selectedCarteira);
 		selectCarteira();
 	}
@@ -413,14 +423,10 @@ public class CarteiraView extends BasicView implements Serializable {
 		selectedCarteira.getIncomes().add(income);
 		carteiraRepository.save(selectedCarteira);
 
-		// If amortization, reduce avg price
-		// Add PortfolioItem
-		PortfolioItemTO item = portfolioItemRepository.findByIdCarteiraAndStock(negotiation.getIdCarteira(), negotiation.getStock());
-		if (item == null) {
-			item = new PortfolioItemTO(negotiation.getIdCarteira(), negotiation.getStock());
+		// If amortization, calcs all negotiations
+		if (income.getType().equals(IncomeTypes.AMORTIZATION)) {
+			configService.calcPortfolioItem();
 		}
-		item.addAmortization(income);
-		portfolioItemRepository.save(item);
 		
 		income = new IncomeTO();
 		this.selectCarteira();

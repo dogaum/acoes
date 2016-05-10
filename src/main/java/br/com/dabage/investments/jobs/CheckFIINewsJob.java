@@ -22,11 +22,6 @@ public class CheckFIINewsJob {
 		if (DateUtils.isWorkingDay(cal)) {
 			System.out.println("Executing " + CheckFIINewsJob.class.getSimpleName() + " on " + new Date());
 
-			// Check Incomes
-			if (cal.get(Calendar.MONTH) == 4 && cal.get(Calendar.DAY_OF_MONTH) == 4) {
-				checkNews.checkIncomesTemp();	
-			}
-
 			checkNews.checkIncomes();
 
 			String query = "fii";

@@ -41,7 +41,7 @@ public class DateObject implements Comparable<DateObject> {
 		if (this.date == o.date)
 			return 0;
 
-		if (o.date.after(this.date))
+		if (o.date.before(this.date))
 			return 1;
 		else
 			return -1;
