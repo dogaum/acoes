@@ -35,7 +35,10 @@ public class NewsTO extends AbstractDocument implements SelectableDataModel<News
 
 	@Transient
 	private String attached;
-	
+
+	@Transient
+	private String newLink;
+
 	public String getNewsHeader() {
 		return newsHeader;
 	}
@@ -90,6 +93,14 @@ public class NewsTO extends AbstractDocument implements SelectableDataModel<News
 
 	public void setAttached(String attached) {
 		this.attached = attached;
+	}
+
+	public String getNewLink() {
+		return newLink;
+	}
+
+	public void setNewLink(String newLink) {
+		this.newLink = newLink;
 	}
 
 	@Override

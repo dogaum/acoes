@@ -11,20 +11,19 @@ import br.com.dabage.investments.news.CheckNews;
 import br.com.dabage.investments.utils.DateUtils;
 
 @Component
-public class CheckFIINewsJob {
+public class CheckIncomesJob {
 
 	@Autowired
 	public CheckNews checkNews;
 
-	@Scheduled(fixedDelay=60000)
+	@Scheduled(fixedDelay=3600000)
 	public void execute() {
 		Calendar cal = Calendar.getInstance();
-		if (DateUtils.isWorkingDay(cal)) {
-			System.out.println("Executing " + CheckFIINewsJob.class.getSimpleName() + " on " + new Date());
+		if (DateUtils.isWorkingDay(cal)
+				&& (cal.get(Calendar.HOUR_OF_DAY) > 8 && cal.get(Calendar.HOUR_OF_DAY) < 20)) {
+			System.out.println("Executing " + CheckIncomesJob.class.getSimpleName() + " on " + new Date());
 
-			String query = "fii";
-			int qtyNews = checkNews.run(query);
-			System.out.println(qtyNews + " news found on " + new Date());			
+			checkNews.checkIncomes();
 		}
 	}
 }

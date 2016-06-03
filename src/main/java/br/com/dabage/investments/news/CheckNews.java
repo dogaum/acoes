@@ -150,7 +150,15 @@ public class CheckNews {
 					if (insertNews(newsBean) && newsBean.getNewsHeader().toLowerCase().contains("fii")) {
 						qtyNews++;
 						Double income = checkIncome(newsBean);
-						SendMailSSL.send(newsName, getQuotationsByPrefix(newsBean.getTicker(), income) + news.text() + "\n" + newsBean.getAttached());
+						SendMailSSL.send(
+								newsName,
+								getQuotationsByPrefix(newsBean.getTicker(),
+										income)
+										+ news.text()
+										+ "\n\n"
+										+ newsBean.getNewLink()
+										+ "\n\n Dados do anexo: \n\n"
+										+ newsBean.getAttached());
 					}
 				}
 			}
@@ -263,6 +271,10 @@ public class CheckNews {
 			int indexFin = newsTO.getNews().lastIndexOf("flnk");
 			String linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
 			linkPdf = linkPdf.replaceFirst("https", "http");
+			linkPdf = linkPdf.replaceAll("visualizarDocumento", "exibirDocumento");
+			
+			newsTO.setNewLink(linkPdf);
+
 			PdfReader reader;
 			IncomePdfParser parser = null;
 			try {
@@ -315,6 +327,10 @@ public class CheckNews {
 				int indexFin = newsTO.getNews().lastIndexOf("flnk");
 				String linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
 				linkPdf = linkPdf.replaceFirst("https", "http");
+				linkPdf = linkPdf.replaceAll("visualizarDocumento", "exibirDocumento");
+
+				newsTO.setNewLink(linkPdf);
+
 				PdfReader reader;
 				try {
 					reader = new PdfReader(linkPdf);
