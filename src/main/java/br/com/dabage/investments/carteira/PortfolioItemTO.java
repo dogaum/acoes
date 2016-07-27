@@ -181,6 +181,12 @@ public class PortfolioItemTO extends AbstractDocument implements Comparable<Port
 
 				this.quantity = this.quantity - negotiation.getQuantity();
 
+				// Update NegotiationTO
+				negotiation.setCalculated(Boolean.TRUE);
+				negotiation.setAvgBuyValue(this.avgPrice);
+				negotiation.setCalculateDate(new Date());
+				negotiation.setCalculateValue(this.result);
+
 				// If Sell, does not change avg price or if quantity is 0, then avgPrice = 0
 				if (this.quantity.equals(0L)) {
 					this.avgPrice = 0D;
