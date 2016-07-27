@@ -5,11 +5,13 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import br.com.dabage.investments.repositories.AbstractDocument;
+import br.com.dabage.investments.repositories.NegotiationRepository;
 
 @Document(collection="portfolioitem")
 public class PortfolioItemTO extends AbstractDocument implements Comparable<PortfolioItemTO> {
@@ -186,7 +188,7 @@ public class PortfolioItemTO extends AbstractDocument implements Comparable<Port
 				negotiation.setAvgBuyValue(this.avgPrice);
 				negotiation.setCalculateDate(new Date());
 				negotiation.setCalculateValue(this.result);
-
+				saveNegotiation(negotiation);
 				// If Sell, does not change avg price or if quantity is 0, then avgPrice = 0
 				if (this.quantity.equals(0L)) {
 					this.avgPrice = 0D;
@@ -199,5 +201,13 @@ public class PortfolioItemTO extends AbstractDocument implements Comparable<Port
 	public void addAmortization(IncomeTO income) {
 		avgPrice -= income.getValue() / quantity;
 		balance = avgPrice * quantity;
+	}
+
+	@Autowired
+	NegotiationRepository negotiationRepository;
+
+	@Transient
+	private void saveNegotiation(NegotiationTO negotiation) {
+		negotiationRepository.save(negotiation);
 	}
 }
