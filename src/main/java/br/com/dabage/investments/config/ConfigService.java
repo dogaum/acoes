@@ -70,6 +70,7 @@ public class ConfigService {
 							item = new PortfolioItemTO(negotiationTO.getIdCarteira(), negotiationTO.getStock());
 						}
 						item.addNegotiation(negotiationTO);
+						negotiationRepository.save(negotiationTO);
 						portfolioItemRepository.save(item);
 					} else if (obj.getData() instanceof IncomeTO) {
 						IncomeTO incomeTO = (IncomeTO) obj.getData();
