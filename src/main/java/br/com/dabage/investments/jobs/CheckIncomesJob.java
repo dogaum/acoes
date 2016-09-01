@@ -20,7 +20,7 @@ public class CheckIncomesJob {
 	public void execute() {
 		Calendar cal = Calendar.getInstance();
 		if (DateUtils.isWorkingDay(cal)
-				&& (cal.get(Calendar.HOUR_OF_DAY) > 8 && cal.get(Calendar.HOUR_OF_DAY) < 20)) {
+				&& (cal.get(Calendar.HOUR_OF_DAY) > 8 && cal.get(Calendar.HOUR_OF_DAY) < 22)) {
 			System.out.println("Executing " + CheckIncomesJob.class.getSimpleName() + " on " + new Date());
 
 			checkNews.checkIncomes();

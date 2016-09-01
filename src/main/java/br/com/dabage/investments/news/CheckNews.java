@@ -434,6 +434,10 @@ public class CheckNews {
 						buffer.append(incomeDateStr);
 						buffer.append("\n");						
 
+						if (lines[4].trim().length() < 23) {
+							continue;
+						}
+
 						String income = lines[4].trim().substring(10, 23);
 						buffer.append(income);
 						buffer.append("\n");						
