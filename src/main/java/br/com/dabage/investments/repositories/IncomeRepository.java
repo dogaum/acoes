@@ -21,4 +21,6 @@ public interface IncomeRepository extends MongoRepository<IncomeTO, BigInteger> 
 	List<IncomeTO> findByIdCarteiraAndTypeAndStock(BigInteger idCarteira, String type, String stock);
 	
 	IncomeTO findTopByOrderByIncomeDateDescAddDateDesc();
+
+	List<IncomeTO> findByStockOrderByIncomeDateAsc(String stock);
 }

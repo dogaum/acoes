@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import br.com.dabage.investments.company.IncomeCompanyTO;
@@ -229,5 +230,53 @@ public class PortfolioService {
 
 		Collections.sort(itens);
 		carteira.setItens(itens);
+	}
+
+	public List<StatementVO> findStatementByFilter(StatementFilter filter) {
+		List<StatementVO> result = new ArrayList<StatementVO>();
+
+		if (filter.getType().equals(StatementType.Negotiation)) {
+			List<NegotiationTO> negotiations = null;
+			if (filter.getStock() != null && !filter.getStock().isEmpty()) {
+				negotiations = negotiationRepository.findByStockOrderByDtNegotiationAsc(filter.getStock());
+			} else {
+				negotiations = negotiationRepository.findAll(new Sort(Sort.Direction.ASC, "dtNegotiation"));
+			}
+
+			for (NegotiationTO negotiationTO : negotiations) {
+				StatementVO st = new StatementVO();
+				st.setDate(negotiationTO.getDtNegotiation());
+				st.setStock(negotiationTO.getStock());
+				st.setValue(negotiationTO.getValue());
+				st.setQuantity(negotiationTO.getQuantity());
+				st.setAmount(negotiationTO.getQuantity() * negotiationTO.getValue());
+				st.setStatementType(negotiationTO.getNegotiationType().name());
+
+				result.add(st);
+			}			
+		} else {
+			
+			List<IncomeTO> incomes = null;
+			
+			if (filter.getStock() != null && !filter.getStock().isEmpty()) {
+				incomes = incomeRepository.findByStockOrderByIncomeDateAsc(filter.getStock());
+			} else {
+				incomes = incomeRepository.findAll(new Sort(Sort.Direction.ASC, "incomeDate"));
+			}
+			
+			for (IncomeTO incomeTO : incomes) {
+				StatementVO st = new StatementVO();
+				st.setDate(incomeTO.getIncomeDate());
+				st.setStock(incomeTO.getStock());
+				st.setValue(incomeTO.getValue());
+				st.setQuantity(1L);
+				st.setAmount(incomeTO.getValue());
+				st.setStatementType(incomeTO.getType());
+
+				result.add(st);
+			}
+		}
+
+		return result;
 	}
 }
