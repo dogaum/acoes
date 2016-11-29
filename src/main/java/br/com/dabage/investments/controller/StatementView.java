@@ -46,6 +46,7 @@ public class StatementView extends BasicView implements Serializable {
 	public void clearFilter(ActionEvent event) {
 		filter = new StatementFilter();
 		filter.setType(StatementType.Negotiation);
+		filter.setSort(true);
 
 		types = new ArrayList<SelectItem>();
 		SelectItem neg = new SelectItem(StatementType.Negotiation, super.getMessage("app.statement.lbl.filterType.negotiation"));

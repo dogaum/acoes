@@ -91,7 +91,7 @@
 				    <p:outputPanel id="portfolioDetail" deferred="true" rendered="#{not empty carteiraView.selectedCarteira}">
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title"><i class="fa fa-long-arrow-right"></i><h:outputText value=" #{msg['app.portfolio.subtitle']} #{carteiraView.selectedCarteira.name}"/></h3>
+                                <h3 class="panel-title"><i class="fa fa-fw fa-table"></i> <h:outputText value=" #{msg['app.portfolio.subtitle']} #{carteiraView.selectedCarteira.name}"/></h3>
                             </div>
 
                             <div class="panel-body">
@@ -296,7 +296,7 @@
 									           <p:cellEditor>
 									               <f:facet name="output"><h:outputText value="#{negItem.negotiationType}" /></f:facet>
 									               <f:facet name="input">
-												       <p:selectOneMenu id="negType" value="#{negItem.negotiationType}" style="width:100%">
+												       <p:selectOneMenu value="#{negItem.negotiationType}" style="width:100%">
 								            		   		<f:selectItems value="#{carteiraView.negotiationTypes}" />
 												       </p:selectOneMenu>
 									               </f:facet>
@@ -565,7 +565,7 @@
 						           <p:cellEditor>
 						               <f:facet name="output"><h:outputText value="#{incItem.type}" /></f:facet>
 						               <f:facet name="input">
-									       <p:selectOneMenu id="negType" value="#{incItem.type}" style="width:100%">
+									       <p:selectOneMenu id="incType" value="#{incItem.type}" style="width:100%">
 					            		   		<f:selectItems value="#{carteiraView.incomeTypes}" />
 									       </p:selectOneMenu>
 						               </f:facet>

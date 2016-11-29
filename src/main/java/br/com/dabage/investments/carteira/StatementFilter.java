@@ -19,7 +19,8 @@ public class StatementFilter implements Serializable {
 	private Date filterFinalDate;
 	private StatementType type;
 	private String stock;
-	
+	private boolean sort;
+
 	public Date getFilterInitialDate() {
 		return filterInitialDate;
 	}
@@ -44,4 +45,11 @@ public class StatementFilter implements Serializable {
 	public void setStock(String stock) {
 		this.stock = stock;
 	}
+	public boolean isSort() {
+		return sort;
+	}
+	public void setSort(boolean sort) {
+		this.sort = sort;
+	}
+
 }

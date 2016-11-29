@@ -55,8 +55,8 @@
 		<spring.version>4.0.5.RELEASE</spring.version>
 		<spring.security.version>3.2.4.RELEASE</spring.security.version>
 		<spring.mongo.version>1.6.0.RELEASE</spring.mongo.version>
-		<primefaces.version>5.2</primefaces.version>
-		<pf.extension.version>3.0.0</pf.extension.version>
+		<primefaces.version>5.3</primefaces.version>
+		<pf.extension.version>4.0.0</pf.extension.version>
 		<pf.themes.version>1.0.10</pf.themes.version>
 		<highfaces.version>1.1</highfaces.version>
 	</properties>

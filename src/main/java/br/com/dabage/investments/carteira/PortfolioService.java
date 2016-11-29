@@ -8,9 +8,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import br.com.dabage.investments.company.IncomeCompanyTO;
+import br.com.dabage.investments.news.NewsTO;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
@@ -38,6 +43,9 @@ public class PortfolioService {
 
 	@Autowired
 	PortfolioItemRepository portfolioItemRepository;
+
+	@Autowired
+	MongoTemplate template;
 
 	/**
 	 * Rerturn all sell negotiations from a portfolio
@@ -232,7 +240,7 @@ public class PortfolioService {
 		carteira.setItens(itens);
 	}
 
-	public List<StatementVO> findStatementByFilter(StatementFilter filter) {
+	public List<StatementVO> findStatementByFilterOld(StatementFilter filter) {
 		List<StatementVO> result = new ArrayList<StatementVO>();
 
 		if (filter.getType().equals(StatementType.Negotiation)) {
@@ -264,6 +272,80 @@ public class PortfolioService {
 				incomes = incomeRepository.findAll(new Sort(Sort.Direction.ASC, "incomeDate"));
 			}
 			
+			for (IncomeTO incomeTO : incomes) {
+				StatementVO st = new StatementVO();
+				st.setDate(incomeTO.getIncomeDate());
+				st.setStock(incomeTO.getStock());
+				st.setValue(incomeTO.getValue());
+				st.setQuantity(1L);
+				st.setAmount(incomeTO.getValue());
+				st.setStatementType(incomeTO.getType());
+
+				result.add(st);
+			}
+		}
+
+		return result;
+	}
+
+	public List<StatementVO> findStatementByFilter(StatementFilter filter) {
+		List<StatementVO> result = new ArrayList<StatementVO>();
+		Query query = new Query();
+		
+		if (filter.getType().equals(StatementType.Negotiation)) {
+
+			if (filter.getStock() != null && !filter.getStock().isEmpty()) {
+				query.addCriteria(Criteria.where("stock").is(filter.getStock().toUpperCase()));
+			}
+
+			if (filter.getFilterInitialDate() != null) {
+				query.addCriteria(Criteria.where("dtNegotiation").gte(filter.getFilterInitialDate()));
+			}
+
+			if (filter.getFilterFinalDate() != null) {
+				query.addCriteria(Criteria.where("dtNegotiation").lte(filter.getFilterFinalDate()));
+			}
+
+			if (!filter.isSort()) {
+				query.with(new Sort(Sort.Direction.ASC, "dtNegotiation"));
+			} else {
+				query.with(new Sort(Sort.Direction.DESC, "dtNegotiation"));
+			}
+
+			List<NegotiationTO> negotiations = template.find(query, NegotiationTO.class);
+
+			for (NegotiationTO negotiationTO : negotiations) {
+				StatementVO st = new StatementVO();
+				st.setDate(negotiationTO.getDtNegotiation());
+				st.setStock(negotiationTO.getStock());
+				st.setValue(negotiationTO.getValue());
+				st.setQuantity(negotiationTO.getQuantity());
+				st.setAmount(negotiationTO.getQuantity() * negotiationTO.getValue());
+				st.setStatementType(negotiationTO.getNegotiationType().name());
+
+				result.add(st);
+			}
+		} else {
+			if (filter.getStock() != null && !filter.getStock().isEmpty()) {
+				query.addCriteria(Criteria.where("stock").is(filter.getStock().toUpperCase()));
+			}
+
+			if (filter.getFilterInitialDate() != null) {
+				query.addCriteria(Criteria.where("incomeDate").gte(filter.getFilterInitialDate()));
+			}
+
+			if (filter.getFilterFinalDate() != null) {
+				query.addCriteria(Criteria.where("incomeDate").lte(filter.getFilterFinalDate()));
+			}
+
+			if (!filter.isSort()) {
+				query.with(new Sort(Sort.Direction.ASC, "incomeDate"));
+			} else {
+				query.with(new Sort(Sort.Direction.DESC, "incomeDate"));
+			}
+
+			List<IncomeTO> incomes = template.find(query, IncomeTO.class);
+
 			for (IncomeTO incomeTO : incomes) {
 				StatementVO st = new StatementVO();
 				st.setDate(incomeTO.getIncomeDate());

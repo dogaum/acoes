@@ -51,7 +51,7 @@
 				    <div class="panel-heading">
 				      <h4 class="panel-title">
 				        <a data-toggle="collapse" href="#collapseFilter" class="panel-title">
-				          <h:outputText value="#{msg['app.statement.lbl.filter']}"/>
+				          <i class="fa fa-fw fa-filter"></i> <h:outputText value="#{msg['app.statement.lbl.filter']}"/>
 				        </a>
 				      </h4>
 				    </div>
@@ -63,14 +63,23 @@
 									<f:selectItems value="#{statementView.types}" />
 								</p:selectOneRadio>
 
+								<p:outputLabel value="#{msg['app.statement.lbl.filterSort']}:" for="itSort"/>
+								<p:selectBooleanButton id="itSort"
+									value="#{statementView.filter.sort}"
+									onLabel="#{msg['app.statement.lbl.sort.newer']}"
+									offLabel="#{msg['app.statement.lbl.sort.older']}"
+									onIcon="fa fa-fw fa-sort-amount-desc" offIcon="fa fa-fw fa-sort-amount-asc" />
+
 								<p:outputLabel value="#{msg['app.statement.lbl.symbol']}:" for="itStock"/>
-								<p:autoComplete id="itStock" minQueryLength="3" value="#{statementView.filter.stock}" completeMethod="#{chartView.completeStock}" effect="fade" />
+								<p:autoComplete id="itStock" minQueryLength="3"
+									value="#{statementView.filter.stock}"
+									completeMethod="#{chartView.completeStock}" effect="fade" />
 
 								<p:outputLabel value="#{msg['app.statement.lbl.initialDate']}:" for="itDate"/>
-								<p:calendar id="itDate" value="#{statementView.filter.filterInitialDate}" pattern="dd/MM/yyyy" mask="true" />
+								<p:calendar id="itDate" value="#{statementView.filter.filterInitialDate}" pattern="dd/MM/yyyy" mask="true" showOn="button"/>
 
 								<p:outputLabel value="#{msg['app.statement.lbl.finalDate']}:" for="finalDate"/>
-								<p:calendar id="finalDate" value="#{statementView.filter.filterFinalDate}" pattern="dd/MM/yyyy" mask="true" />
+								<p:calendar id="finalDate" value="#{statementView.filter.filterFinalDate}" pattern="dd/MM/yyyy" mask="true" showOn="button"/>
 							</p:panelGrid>
 
 			                <p:toolbar>
@@ -90,7 +99,7 @@
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3 class="panel-title"><h:outputLabel value="#{msg['app.statement.title']}"/></h3>
+                            <h3 class="panel-title"><i class="fa fa-fw fa-list-ol"></i> <h:outputLabel value="#{msg['app.statement.title']}"/></h3>
                         </div>
                         <div class="panel-body">
                        	    <h:commandLink>
@@ -98,7 +107,7 @@
 						        <p:dataExporter type="xls" target="eventsDT" fileName="extrato" pageOnly="false"/>
 						    </h:commandLink>
 							<p:dataTable id="eventsDT" var="statement" value="#{statementView.statements}"
-								rows="10" paginator="true"
+								rows="10" paginator="true" emptyMessage="#{msg['pf.datatable.noresults']}"
 								paginatorPosition="bottom"
 								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
 

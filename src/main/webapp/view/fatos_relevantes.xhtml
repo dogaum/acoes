@@ -51,7 +51,7 @@
 				    <div class="panel-heading">
 				      <h4 class="panel-title">
 				        <a data-toggle="collapse" href="#collapseFilter" class="panel-title">
-				          <h:outputText value="#{msg['app.fr.lbl.filter']}"/>
+				          <i class="fa fa-fw fa-filter"></i> <h:outputText value="#{msg['app.fr.lbl.filter']}"/>
 				        </a>
 				      </h4>
 				    </div>
@@ -85,7 +85,7 @@
                 <div class="col-lg-6">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3 class="panel-title"><h:outputLabel value="#{msg['app.fr.title']}"/></h3>
+                            <h3 class="panel-title"><i class="fa fa-fw fa-envelope"></i> <h:outputLabel value="#{msg['app.fr.title']}"/></h3>
                         </div>
                         <div class="panel-body">
 							<p:dataTable id="eventsDT" var="news" value="#{newsView.news}"
@@ -111,7 +111,7 @@
                 <div class="col-lg-6">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3 class="panel-title"><h:outputLabel value="#{msg['app.fr.lbl.content']}"/></h3>
+                            <h3 class="panel-title"><i class="fa fa-fw fa-file-text-o"></i> <h:outputLabel value="#{msg['app.fr.lbl.content']}"/></h3>
                         </div>
                         <div class="panel-body">
 							<p:outputPanel id="frViewer" deferred="true">
