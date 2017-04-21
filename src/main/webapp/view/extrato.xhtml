@@ -132,8 +132,18 @@
 										<f:convertNumber type="number" locale="#{msg['locale']}"/>
 									</h:outputText>
 								</p:column>
+								<p:column headerText="#{msg['app.statement.lbl.costs']}" width="90" sortBy="#{statement.costs}">
+									<h:outputText value="#{statement.costs}">
+										<f:convertNumber type="currency" maxFractionDigits="2" locale="#{msg['locale']}"/>
+									</h:outputText>
+								</p:column>
 								<p:column headerText="#{msg['app.statement.lbl.amount']}" width="90" sortBy="#{statement.amount}">
 									<h:outputText value="#{statement.amount}">
+										<f:convertNumber type="number" minFractionDigits="2" locale="#{msg['locale']}"/>
+									</h:outputText>
+								</p:column>
+								<p:column headerText="#{msg['app.statement.lbl.avgPrice']}" width="90" sortBy="#{statement.avgPrice}">
+									<h:outputText value="#{statement.avgPrice}">
 										<f:convertNumber type="number" minFractionDigits="2" locale="#{msg['locale']}"/>
 									</h:outputText>
 								</p:column>

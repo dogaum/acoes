@@ -19,6 +19,10 @@ public class StatementVO {
 
 	private Double value;
 
+	private Double costs;
+
+	private Double avgPrice;
+
 	private Long quantity;
 
 	private Double amount;
@@ -69,6 +73,22 @@ public class StatementVO {
 
 	public void setAmount(Double amount) {
 		this.amount = amount;
+	}
+
+	public Double getCosts() {
+		return costs;
+	}
+
+	public void setCosts(Double costs) {
+		this.costs = costs;
+	}
+
+	public Double getAvgPrice() {
+		return avgPrice;
+	}
+
+	public void setAvgPrice(Double avgPrice) {
+		this.avgPrice = avgPrice;
 	}
 
 }

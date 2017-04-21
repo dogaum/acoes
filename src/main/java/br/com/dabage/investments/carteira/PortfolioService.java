@@ -319,8 +319,17 @@ public class PortfolioService {
 				st.setDate(negotiationTO.getDtNegotiation());
 				st.setStock(negotiationTO.getStock());
 				st.setValue(negotiationTO.getValue());
+				st.setCosts(negotiationTO.getCosts());
 				st.setQuantity(negotiationTO.getQuantity());
-				st.setAmount(negotiationTO.getQuantity() * negotiationTO.getValue());
+				st.setAvgPrice(negotiationTO.getAvgBuyValue());
+
+				Double amount = negotiationTO.getQuantity() * negotiationTO.getValue();
+				if (negotiationTO.getNegotiationType().equals(NegotiationType.Compra)) {
+					amount += negotiationTO.getCosts();
+				} else {
+					amount -= negotiationTO.getCosts();
+				}
+				st.setAmount(amount);
 				st.setStatementType(negotiationTO.getNegotiationType().name());
 
 				result.add(st);
