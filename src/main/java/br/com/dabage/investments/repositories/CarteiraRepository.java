@@ -10,8 +10,6 @@ import br.com.dabage.investments.user.UserTO;
 
 public interface CarteiraRepository extends MongoRepository<CarteiraTO, BigInteger> {
 
-	CarteiraTO findOne(BigInteger id);
-
 	@SuppressWarnings("unchecked")
 	CarteiraTO save (CarteiraTO carteiraTO);
 

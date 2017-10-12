@@ -9,8 +9,6 @@ import br.com.dabage.investments.carteira.IncomeTO;
 
 public interface IncomeRepository extends MongoRepository<IncomeTO, BigInteger> {
 
-	IncomeTO findOne(BigInteger id);
-
 	@SuppressWarnings("unchecked")
 	IncomeTO save (IncomeTO incomeTO);
 
@@ -20,7 +18,7 @@ public interface IncomeRepository extends MongoRepository<IncomeTO, BigInteger> 
 
 	List<IncomeTO> findByIdCarteiraAndTypeAndStock(BigInteger idCarteira, String type, String stock);
 	
-	IncomeTO findTopByOrderByIncomeDateDescAddDateDesc();
+	List<IncomeTO> findFirstByOrderByIncomeDateDescAddDateDesc();
 
 	List<IncomeTO> findByStockOrderByIncomeDateAsc(String stock);
 }

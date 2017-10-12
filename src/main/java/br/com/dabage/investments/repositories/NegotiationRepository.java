@@ -12,8 +12,6 @@ import br.com.dabage.investments.carteira.NegotiationType;
 
 public interface NegotiationRepository extends MongoRepository<NegotiationTO, BigInteger> {
 
-	NegotiationTO findOne(BigInteger id);
-
 	@SuppressWarnings("unchecked")
 	NegotiationTO save (NegotiationTO negotiationTO);
 

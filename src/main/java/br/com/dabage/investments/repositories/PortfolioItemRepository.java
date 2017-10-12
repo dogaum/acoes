@@ -9,8 +9,6 @@ import br.com.dabage.investments.carteira.PortfolioItemTO;
 
 public interface PortfolioItemRepository extends MongoRepository<PortfolioItemTO, BigInteger> {
 
-	PortfolioItemTO findOne(BigInteger id);
-
 	@SuppressWarnings("unchecked")
 	PortfolioItemTO save (PortfolioItemTO portfolioItem);
 

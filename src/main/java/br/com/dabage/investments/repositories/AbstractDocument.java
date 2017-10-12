@@ -54,4 +54,5 @@ public class AbstractDocument implements Serializable {
 	public int hashCode() {
 		return id == null ? 0 : id.hashCode();
 	}
+
 }

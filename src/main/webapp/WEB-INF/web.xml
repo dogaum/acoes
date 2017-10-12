@@ -103,11 +103,8 @@
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener>
  
-	<listener>
-	    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-	</listener>
-
-  	<!-- Spring MVC base configuration to manage all the application urls-->
+ <!--
+  	Spring MVC base configuration to manage all the application urls
     <servlet>
         <servlet-name>mvc-dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -117,7 +114,7 @@
         <servlet-name>mvc-dispatcher</servlet-name>
         <url-pattern>/services/*</url-pattern>
     </servlet-mapping>
-
+-->
 	<error-page>
 	    <error-code>404</error-code>
 	    <location>/404.html</location>

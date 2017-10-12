@@ -377,7 +377,7 @@ public class CarteiraView extends BasicView implements Serializable {
 		Map<String,String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 		String incomeId = params.get("incomeId");
 
-		IncomeTO inc = incomeRepository.findOne(new BigInteger(incomeId));
+		IncomeTO inc = incomeRepository.findById(new BigInteger(incomeId)).get();
 
 		incomeRepository.delete(inc);
 		selectedCarteira.getIncomes().remove(inc);

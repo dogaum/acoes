@@ -183,7 +183,7 @@ public class ConfigView extends BasicView implements Serializable {
 		Object[] array = roles.getTarget().toArray();
 		List<RoleTO> rolesSelected = new ArrayList<RoleTO>();
 		for (int i = 0; i < array.length; i++) {
-			RoleTO role = roleRepository.findOne(new BigInteger((String)array[i]));
+			RoleTO role = roleRepository.findById(new BigInteger((String)array[i])).get();
 			rolesSelected.add(role);
 		}
 		user.setRoles(rolesSelected);

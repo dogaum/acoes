@@ -8,8 +8,6 @@ import br.com.dabage.investments.user.UserTO;
 
 public interface UserRepository extends MongoRepository<UserTO, BigInteger> {
 
-	UserTO findOne(BigInteger id);
-
 	@SuppressWarnings("unchecked")
 	UserTO save (UserTO user);
 

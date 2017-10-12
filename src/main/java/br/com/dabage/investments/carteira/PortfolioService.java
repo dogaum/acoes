@@ -10,12 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import br.com.dabage.investments.company.IncomeCompanyTO;
-import br.com.dabage.investments.news.NewsTO;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
@@ -193,17 +191,20 @@ public class PortfolioService {
 
 			carteira.setTotalPortfolio(carteira.getTotalPortfolio() + item.getTotalValue());
 			item.setActualValue(getQuotation.getLastQuoteCache(item.getStock()));
-			IncomeCompanyTO lastIncomeCompany = incomeCompanyRepository.findTopByStockOrderByIncomeDateDesc(item.getStock());
-			item.setLastIncomeCompany(lastIncomeCompany);
-			if (lastIncomeCompany != null) {
-				Double actualDY = (lastIncomeCompany.getValue() / item.getActualValue());
-				item.setActualDY(actualDY);					
+			List<IncomeCompanyTO> lastIncomeCompanies = incomeCompanyRepository.findTopByStockOrderByIncomeDateDesc(item.getStock());
+			if (lastIncomeCompanies != null && !lastIncomeCompanies.isEmpty()) {
+				IncomeCompanyTO lastIncomeCompany = lastIncomeCompanies.get(0);
+				item.setLastIncomeCompany(lastIncomeCompany);
+				if (lastIncomeCompany != null) {
+					Double actualDY = (lastIncomeCompany.getValue() / item.getActualValue());
+					item.setActualDY(actualDY);					
 
-				Double buyDY = 0D;
-				if (item.getAvgValue() != null && !item.getAvgValue().equals(0D)) {
-					buyDY = (lastIncomeCompany.getValue() / item.getAvgValue());
-				}
-				item.setBuyDY(buyDY);
+					Double buyDY = 0D;
+					if (item.getAvgValue() != null && !item.getAvgValue().equals(0D)) {
+						buyDY = (lastIncomeCompany.getValue() / item.getAvgValue());
+					}
+					item.setBuyDY(buyDY);
+				}				
 			}
 
 			carteira.setTotalPortfolioActual(carteira.getTotalPortfolioActual() + item.getTotalActual());
@@ -233,7 +234,7 @@ public class PortfolioService {
 		}
 
 		// Last Income
-		IncomeTO lastIncome = incomeRepository.findTopByOrderByIncomeDateDescAddDateDesc();
+		IncomeTO lastIncome = incomeRepository.findFirstByOrderByIncomeDateDescAddDateDesc().get(0);
 		carteira.setLastIncome(lastIncome);
 
 		Collections.sort(itens);

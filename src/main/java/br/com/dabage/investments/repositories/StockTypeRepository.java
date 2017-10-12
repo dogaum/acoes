@@ -9,8 +9,6 @@ import br.com.dabage.investments.config.StockTypeTO;
 
 public interface StockTypeRepository extends MongoRepository<StockTypeTO, BigInteger> {
 
-	StockTypeTO findOne(BigInteger id);
-
 	@SuppressWarnings("unchecked")
 	StockTypeTO save (StockTypeTO stockTypeTO);
 

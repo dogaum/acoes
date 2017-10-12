@@ -7,15 +7,20 @@
 
         
         <!-- MongoBD Database configuration host and port -->
-        <mongo:mongo id="mongo" host="127.6.155.130" port="27017" />
-        
+        <mongo:mongo-client id="mongo" credentials="admin:1AITjmHDZC2U@admin" host="cluster0-shard-00-00-hhsrz.mongodb.net" port="27017"
+        					replica-set="cluster0-shard-00-00-hhsrz.mongodb.net:27017,cluster0-shard-00-01-hhsrz.mongodb.net:27017,cluster0-shard-00-02-hhsrz.mongodb.net:27017">
+    		<mongo:client-options write-concern="NORMAL"
+    							  max-connection-idle-time="60000"
+    							  socket-keep-alive="true"
+    							  read-preference="PRIMARY"
+    							  ssl="true" />
+		</mongo:mongo-client>
+
         <!-- Define the mongoDbFactory with your database Name  -->
 		<mongo:db-factory dbname="acoes"
-						  mongo-ref="mongo"
-						  host="127.6.155.130"
-						  port="27017" 
-						  username="admin"
-						  password="1AITjmHDZC2U" />
+						  mongo-ref="mongo"/>
+ 
+		<!-- Senha antiga: 1AITjmHDZC2U  -->
  
  		<!-- Define the MongoTemplate  -->
 		<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
@@ -24,6 +29,5 @@
  		
  		<!-- Base package to scan the mongo repositories, where we create de DAOS to access data and domain objects -->
         <mongo:repositories base-package="br.com.dabage.investments.repositories" />
-       
 
 </beans>

@@ -9,8 +9,6 @@ import br.com.dabage.investments.news.NewsTO;
 
 public interface NewsRepository extends MongoRepository<NewsTO, BigInteger> {
 
-	NewsTO findOne(BigInteger id);
-
 	@SuppressWarnings("unchecked")
 	NewsTO save (NewsTO newsTO);
 

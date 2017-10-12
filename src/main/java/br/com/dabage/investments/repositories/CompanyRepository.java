@@ -9,8 +9,6 @@ import br.com.dabage.investments.company.CompanyTO;
 
 public interface CompanyRepository extends MongoRepository<CompanyTO, BigInteger> {
 
-	CompanyTO findOne(BigInteger id);
-
 	@SuppressWarnings("unchecked")
 	CompanyTO save (CompanyTO companyTO);
 

@@ -128,7 +128,7 @@ public class ResultView extends BasicView implements Serializable {
 			addWarnMessage("Selecione uma carteira.");
 			return;
 		} else {
-			selectedPortfolio = carteiraRepository.findOne(selectedPortfolio.getId());
+			selectedPortfolio = carteiraRepository.findById(selectedPortfolio.getId()).get();
 			sellNegotiations = portfolioService.getSellNegotiations(selectedPortfolio);
 			Collections.sort(sellNegotiations);
 			totalPortfolioResult = portfolioService.getTotalPortfolioResult(sellNegotiations);

@@ -50,22 +50,17 @@
 	</pluginRepositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.6</maven.compiler.source>
-		<maven.compiler.target>1.6</maven.compiler.target>
-		<spring.version>4.0.5.RELEASE</spring.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<spring.version>5.0.0.RELEASE</spring.version>
 		<spring.security.version>3.2.4.RELEASE</spring.security.version>
-		<spring.mongo.version>1.6.0.RELEASE</spring.mongo.version>
+		<spring.mongo.version>2.0.0.RELEASE</spring.mongo.version>
 		<primefaces.version>5.3</primefaces.version>
 		<pf.extension.version>4.0.0</pf.extension.version>
 		<pf.themes.version>1.0.10</pf.themes.version>
 		<highfaces.version>1.1</highfaces.version>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.2-1003-jdbc4</version>
-		</dependency>
 		<!-- PrimeFaces -->
 		<dependency>
 			<groupId>org.primefaces</groupId>
@@ -198,7 +193,7 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>2.12.4</version>
+			<version>3.5.0</version>
 		</dependency>
 
 		<!-- Log4j -->
@@ -288,7 +283,7 @@
 						<artifactId>maven-war-plugin</artifactId>
 						<version>2.1.1</version>
 						<configuration>
-							<outputDirectory>C:/Douglas/dev/apache-tomcat-7.0.53/webapps</outputDirectory>
+							<outputDirectory>C:/dev/apache-tomcat-8.5.13/webapps</outputDirectory>
 							<warName>ROOT</warName>
 						</configuration>
 					</plugin>
