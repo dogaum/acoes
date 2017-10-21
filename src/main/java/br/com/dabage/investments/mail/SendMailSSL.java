@@ -1,21 +1,26 @@
 package br.com.dabage.investments.mail;
  
+import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class SendMailSSL {
 
-	public static void send(String subject, String textContent) {
+	public static void send(String subject, String textContent, File file) {
 		Properties props = new Properties();
 		props.put("mail.smtp.host", "smtp.gmail.com");
 		props.put("mail.smtp.socketFactory.port", "465");
@@ -39,8 +44,32 @@ public class SendMailSSL {
 					InternetAddress.parse("dogaum@gmail.com"));
 
 			message.setSubject(subject);
-			message.setText(textContent);
+
+			if (file != null) {
+				// creates message part
+		        MimeBodyPart messageBodyPart = new MimeBodyPart();
+		        messageBodyPart.setContent(textContent, "text/html");
+		 
+		        // creates multi-part
+		        Multipart multipart = new MimeMultipart();
+		        multipart.addBodyPart(messageBodyPart);
+		 
+                MimeBodyPart attachPart = new MimeBodyPart();
  
+                try {
+                    attachPart.attachFile(file);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+ 
+                multipart.addBodyPart(attachPart);
+	 
+		        // sets the multi-part as e-mail's content
+                message.setContent(multipart);
+			} else {
+				message.setText(textContent);
+			}
+
 			Transport.send(message);
  
 		} catch (MessagingException e) {

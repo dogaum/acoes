@@ -42,7 +42,8 @@ public class InsertTickers {
 					}
 					String[] infos = li.text().split(" ");
 					String tickerFull = infos[infos.length-1];
-					String ticker = tickerFull.substring(0, tickerFull.length() - 3); 
+					String ticker = tickerFull.replace(".SA", "");
+					ticker = ticker.replace(".SO", "");
 					String companyName = "";
 					for (int i = 0; i < infos.length - 1; i++) {
 						companyName += infos[i] + " ";

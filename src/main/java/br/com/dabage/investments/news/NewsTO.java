@@ -1,5 +1,7 @@
 package br.com.dabage.investments.news;
 
+import java.io.File;
+
 import org.primefaces.model.SelectableDataModel;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
@@ -34,7 +36,7 @@ public class NewsTO extends AbstractDocument implements SelectableDataModel<News
 	private String newsHref;
 
 	@Transient
-	private String attached;
+	private File attached;
 
 	@Transient
 	private String newLink;
@@ -87,11 +89,11 @@ public class NewsTO extends AbstractDocument implements SelectableDataModel<News
 		this.newsHref = newsHref;
 	}
 
-	public String getAttached() {
+	public File getAttached() {
 		return attached;
 	}
 
-	public void setAttached(String attached) {
+	public void setAttached(File attached) {
 		this.attached = attached;
 	}
 

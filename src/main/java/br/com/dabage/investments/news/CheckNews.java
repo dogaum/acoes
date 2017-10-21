@@ -1,6 +1,8 @@
 package br.com.dabage.investments.news;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -13,6 +15,7 @@ import java.util.Locale;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -136,7 +139,10 @@ public class CheckNews {
 					String href = link.getElementsByTag("a").get(0).attr("href");
 					String newsName = link.text();
 
-					doc = Jsoup.connect(prefix + href).get();
+					connection = Jsoup.connect(prefix + href);
+					connection.ignoreHttpErrors(true);
+					connection.timeout(30000);
+					doc = connection.get();
 					Element news = doc.getElementById("contentNoticia");
 
 					NewsTO newsBean = new NewsTO();
@@ -156,9 +162,8 @@ public class CheckNews {
 										income)
 										+ news.text()
 										+ "\n\n"
-										+ newsBean.getNewLink()
-										+ "\n\n Dados do anexo: \n\n"
-										+ newsBean.getAttached());
+										+ newsBean.getNewLink(),
+								newsBean.getAttached());
 					}
 				}
 			}
@@ -263,8 +268,6 @@ public class CheckNews {
 
 	public Double checkIncome(NewsTO newsTO) {
 		Double income = null;
-		Double amortization = null;
-
 		if (newsTO.getNews().contains("rendimento")) {
 
 			int indexIni = newsTO.getNews().indexOf("http");
@@ -280,12 +283,27 @@ public class CheckNews {
 			try {
 				reader = new PdfReader(linkPdf);
 				String dados = PdfTextExtractor.getTextFromPage(reader, 1);
-				newsTO.setAttached(dados);
+				URL url = new URL(linkPdf);
+				File file = new File("anexo.pdf");
+				FileUtils.copyURLToFile(url, file);
+				newsTO.setAttached(file);
 				parser = new IncomePdfParser(dados);
 				reader.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// Não é PDF, é HTML
+				// Pegar o html e enviar por email
+				Connection connection = Jsoup.connect(linkPdf);
+				connection.ignoreHttpErrors(true);
+				connection.timeout(30000);
+
+				try {
+					File file = new File("Anexo.html");
+					Document doc = connection.get();
+					FileUtils.write(file, doc.html(), "UTF-8");
+					newsTO.setAttached(file);
+				} catch (IOException e1) {
+				}
+
 			}
 
 			income = parser.getValue();
@@ -321,11 +339,12 @@ public class CheckNews {
 			}
 		} else {
 			// get attachment
+			String linkPdf = null;
 			if (newsTO.getNews().contains("https")) {
 
 				int indexIni = newsTO.getNews().indexOf("http");
 				int indexFin = newsTO.getNews().lastIndexOf("flnk");
-				String linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
+				linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
 				linkPdf = linkPdf.replaceFirst("https", "http");
 				linkPdf = linkPdf.replaceAll("visualizarDocumento", "exibirDocumento");
 
@@ -334,11 +353,25 @@ public class CheckNews {
 				PdfReader reader;
 				try {
 					reader = new PdfReader(linkPdf);
-					String dados = PdfTextExtractor.getTextFromPage(reader, 1);
-					newsTO.setAttached(dados);
+					URL url = new URL(linkPdf);
+					File file = new File("anexo.pdf");
+					FileUtils.copyURLToFile(url, file);
+					newsTO.setAttached(file);
 					reader.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					// Não é PDF, é HTML
+					// Pegar o html e enviar por email
+					Connection connection = Jsoup.connect(linkPdf);
+					connection.ignoreHttpErrors(true);
+					connection.timeout(30000);
+
+					try {
+						File file = new File("Anexo.html");
+						Document doc = connection.get();
+						FileUtils.write(file, doc.html(), "UTF-8");
+						newsTO.setAttached(file);
+					} catch (IOException e1) {
+					}
 				}
 			}
 		}
@@ -381,6 +414,20 @@ public class CheckNews {
 		}
 	}
 
+	public void checkIncomesByInterval(Date initialDate, Date finalDate) {
+		String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=proventos%20dos%20emissores&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
+		String INICIO = dateFormatSearch.format(initialDate);
+		endFII = endFII.replaceFirst("INICIO", INICIO);
+
+		String FIM = dateFormatSearch.format(finalDate);
+		endFII = endFII.replaceFirst("FIM", FIM);
+
+		int pages = 3;
+		for (int i = 1; i < pages; i++) {
+			checkIncomes(endFII + i);
+		}
+	}
+
 	private void checkIncomes(String endFII) {
 		StringBuffer buffer = new StringBuffer();
 		try {
@@ -397,7 +444,10 @@ public class CheckNews {
 					String href = link.getElementsByTag("a").get(0).attr("href");
 					String newsName = link.text();
 
-					doc = Jsoup.connect(prefix + href).get();
+					connection = Jsoup.connect(prefix + href);
+					connection.ignoreHttpErrors(true);
+					connection.timeout(30000);
+					doc = connection.get();
 					Element news = doc.getElementById("contentNoticia");
 
 					NewsTO newsBean = new NewsTO();
@@ -414,85 +464,88 @@ public class CheckNews {
 					String[] companies = total.split("EMPRESA: ");
 					buffer = new StringBuffer();
 					for (int i = 1; i < companies.length; i++) {
-						String company = companies[i];
-
-						if (!company.contains("RENDIMENTO")) {
-							continue;
-						}
-
-						String[] lines = company.split("\r");
-						String ticker = lines[3].substring(14, 21).trim();
-						CompanyTO cmp = companyRepository.findByTicker(ticker);
-						// Company does not exist
-						if (cmp == null) {
-							continue;
-						}						
-						buffer.append(ticker);
-						buffer.append("\n");
-
-						String incomeDateStr = lines[3].substring(60, 70);
-						buffer.append(incomeDateStr);
-						buffer.append("\n");						
-
-						if (lines[4].trim().length() < 23) {
-							continue;
-						}
-
-						String income = lines[4].trim().substring(10, 23);
-						buffer.append(income);
-						buffer.append("\n");						
-
-						Double incomeValue = new Double(income.replace(".", "").replace(",", "."));
-
-						String paymentDateStr = lines[5].trim().substring(10, 20); 
-						buffer.append(paymentDateStr);
-						buffer.append("\n\n");
-
-						buffer.append(getQuotationsByPrefix(ticker.substring(0, 4), incomeValue));
-						buffer.append("========================= \n");
-
-						IncomeCompanyTO incomeTO = new IncomeCompanyTO();
-						Calendar cal = Calendar.getInstance();
-						Date incomeDate = null;
-						Date paymentDate = null;
 						try {
-							incomeDate = dateFormat.parse(incomeDateStr);
-							paymentDate = dateFormat.parse(paymentDateStr);
-						} catch (ParseException e) {
-							incomeDate = new Date();
+							String company = companies[i];
+	
+							if (!company.contains("RENDIMENTO")) {
+								continue;
+							}
+	
+							String[] lines = company.split("\r");
+							String ticker = lines[3].substring(14, 21).trim();
+							CompanyTO cmp = companyRepository.findByTicker(ticker);
+							// Company does not exist
+							if (cmp == null) {
+								continue;
+							}						
+							buffer.append(ticker);
+							buffer.append("\n");
+	
+							String incomeDateStr = lines[3].substring(60, 70);
+							buffer.append(incomeDateStr);
+							buffer.append("\n");						
+	
+							if (lines[4].trim().length() < 23) {
+								continue;
+							}
+	
+							String income = lines[4].trim().substring(10, 23);
+							buffer.append(income);
+							buffer.append("\n");						
+	
+							Double incomeValue = new Double(income.replace(".", "").replace(",", "."));
+	
+							String paymentDateStr = lines[5].trim().substring(10, 20); 
+							buffer.append(paymentDateStr);
+							buffer.append("\n\n");
+	
+							buffer.append(getQuotationsByPrefix(ticker.substring(0, 4), incomeValue));
+							buffer.append("========================= \n");
+	
+							IncomeCompanyTO incomeTO = new IncomeCompanyTO();
+							Calendar cal = Calendar.getInstance();
+							Date incomeDate = null;
+							Date paymentDate = null;
+							try {
+								incomeDate = dateFormat.parse(incomeDateStr);
+								paymentDate = dateFormat.parse(paymentDateStr);
+							} catch (ParseException e) {
+								incomeDate = new Date();
+							}
+							cal.setTime(incomeDate);
+	
+							incomeTO.setIncomeDate(cal.getTime());
+							incomeTO.setPaymentDate(paymentDate);
+							incomeTO.setValue(incomeValue);
+							incomeTO.setIdCompany(cmp.getId());
+							incomeTO.setStock(ticker);
+							int month = cal.get(Calendar.MONTH) + 1;
+							String yearMonth = cal.get(Calendar.YEAR) + StringUtils.leftPad(month + "", 2, "0") ;
+							incomeTO.setYearMonth(Integer.parseInt(yearMonth));
+	
+							IncomeCompanyTO incTemp = incomeCompanyRepository.findByStockAndYearMonth(ticker, incomeTO.getYearMonth());
+							if (incTemp != null) {
+								incTemp.setPaymentDate(incomeTO.getPaymentDate());
+								incTemp.setIncomeDate(incomeTO.getIncomeDate());
+								incTemp.setValue(incomeTO.getValue());
+								incomeCompanyRepository.save(incTemp);
+							} else {
+								incomeCompanyRepository.save(incomeTO);	
+							}
+						} catch (Exception e) {
+							// Continue processing
 						}
-						cal.setTime(incomeDate);
-
-						incomeTO.setIncomeDate(cal.getTime());
-						incomeTO.setPaymentDate(paymentDate);
-						incomeTO.setValue(incomeValue);
-						incomeTO.setIdCompany(cmp.getId());
-						incomeTO.setStock(ticker);
-						int month = cal.get(Calendar.MONTH) + 1;
-						String yearMonth = cal.get(Calendar.YEAR) + StringUtils.leftPad(month + "", 2, "0") ;
-						incomeTO.setYearMonth(Integer.parseInt(yearMonth));
-
-						IncomeCompanyTO incTemp = incomeCompanyRepository.findByStockAndYearMonth(ticker, incomeTO.getYearMonth());
-						if (incTemp != null) {
-							incTemp.setPaymentDate(incomeTO.getPaymentDate());
-							incTemp.setIncomeDate(incomeTO.getIncomeDate());
-							incTemp.setValue(incomeTO.getValue());
-							incomeCompanyRepository.save(incTemp);
-						} else {
-							incomeCompanyRepository.save(incomeTO);	
-						}
-
 					}
 					
 					if (!buffer.toString().isEmpty()) {
 						// Send Email
-						SendMailSSL.send("Proventos Ex-" + dateFormat.format(new Date()), buffer.toString());
+						SendMailSSL.send("Proventos Ex-" + dateFormat.format(new Date()), buffer.toString(), null);
 					}
 				}
 			}
 
 		} catch (Exception e) {
-			SendMailSSL.send("Erro: Proventos Ex-" + dateFormat.format(new Date()), buffer.toString() + e.getMessage());
+			SendMailSSL.send("Erro: Proventos Ex-" + dateFormat.format(new Date()), buffer.toString() + e.getMessage(), null);
 			e.printStackTrace();
 		}
 	}
