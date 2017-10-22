@@ -14,6 +14,8 @@
     							  min-connections-per-host="1"
     							  socket-keep-alive="true"
     							  read-preference="PRIMARY"
+    							  connect-timeout="30000"
+    							  socket-timeout="30000"
     							  ssl="true" />
 		</mongo:mongo-client>
 

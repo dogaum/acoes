@@ -110,15 +110,17 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	@PostConstruct
 	public void prepare() {
+
+	}
+
+	public String init() {
 		incomeTypes = IncomeTypes.incomeTypes();
 		negotiationTypes = new ArrayList<SelectItem>();
 		for (int i = 0; i < NegotiationType.values().length; i++) {
 			SelectItem item = new SelectItem(NegotiationType.values()[i], NegotiationType.values()[i].name());
 			negotiationTypes.add(item);
 		}
-	}
 
-	public String init() {
 		UserTO user = getUserLoggedIn();
 		carteiras = carteiraRepository.findByUser(user);
 		emptyPosition = false;

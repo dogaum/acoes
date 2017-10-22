@@ -227,9 +227,10 @@
 			                    </li>
 
 		                        <li>
-		                            <a href="fatos_relevantes.jsf"><i class="fa fa-fw fa-envelope"></i>
-		                            	<h:outputText value=" #{msg['app.menu.fr']}" />
-		                            </a>
+		                    		<h:commandLink action="#{newsView.init}">
+		                    			<i class="fa fa-fw fa-envelope"></i>
+		                    			<h:outputText value=" #{msg['app.menu.fr']}" />
+		                    		</h:commandLink>
 		                        </li>
 		                        <li class="divider"></li>
 		                        <li>

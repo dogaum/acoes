@@ -37,7 +37,7 @@ public class CompanyTO extends AbstractDocument {
 	@Transient
 	private Map<String, List<IncomeVO>> lastIncomes;
 
-	@DBRef
+	@DBRef(lazy=true)
 	private StockTypeTO stockType;
 
 	public String getPrefix() {

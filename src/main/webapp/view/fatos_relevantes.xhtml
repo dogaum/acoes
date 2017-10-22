@@ -91,7 +91,7 @@
 							<p:dataTable id="eventsDT" var="news" value="#{newsView.news}"
 								selectionMode="single" selection="#{newsView.selectedNews}"
 								rowKey="#{news.newsHeader}" rows="10" paginator="true"
-								paginatorPosition="bottom"
+								paginatorPosition="bottom" lazy="true"
 								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
 								<p:ajax event="rowSelect" update=":form:frViewer" />
 								<p:ajax event="rowUnselect" update=":form:frViewer" />

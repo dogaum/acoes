@@ -2,15 +2,14 @@ package br.com.dabage.investments.controller;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.faces.bean.RequestScoped;
 import javax.faces.event.ActionEvent;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -42,7 +41,7 @@ public class NewsView extends BasicView implements Serializable {
 	@Autowired
 	MongoTemplate template;
 	
-	private List<NewsTO> news;
+	private List<NewsTO> news = new ArrayList<NewsTO>();
 
 	private NewsTO selectedNews;
 
@@ -53,10 +52,9 @@ public class NewsView extends BasicView implements Serializable {
 	private String filterSymbol;
 	private String filterSubject;
 
-	@PostConstruct
-	public void prepare() {
-		news = newsRepository.findAll(new Sort(Sort.Direction.DESC, "newsDate"));
+	public String init() {
 		clearFilter(null);
+		return "fr";
 	}
 
 	public void clearFilter(ActionEvent event) {

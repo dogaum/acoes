@@ -19,12 +19,15 @@ public class CheckFIINewsJob {
 	@Scheduled(fixedDelay=60000)
 	public void execute() {
 		Calendar cal = Calendar.getInstance();
-		if (DateUtils.isWorkingDay(cal)) {
+		if (DateUtils.isWorkingDay(cal)
+				&& (cal.get(Calendar.HOUR_OF_DAY) > 8 && cal.get(Calendar.HOUR_OF_DAY) < 22)) {
 			System.out.println("Executing " + CheckFIINewsJob.class.getSimpleName() + " on " + new Date());
 
 			String query = "fii";
 			int qtyNews = checkNews.run(query);
 			System.out.println(qtyNews + " news found on " + new Date());			
+		} else {
+			System.out.println("Job " + CheckFIINewsJob.class.getSimpleName() + " out of date: " + new Date());
 		}
 	}
 }

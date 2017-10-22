@@ -44,11 +44,11 @@ public class HomeService {
 	 */
 	public void loadHomeCache() {
 		homeCache = new HashMap<UserTO, HomeVO>();
-		List<UserTO> users = userRepository.findAll();
+/*		List<UserTO> users = userRepository.findAll();
 		for (UserTO user : users) {
 			HomeVO home = loadHomeByUser(user);
 			homeCache.put(user, home);
-		}
+		}*/
 	}
 
 	public HomeVO loadHomeByUser(UserTO user) {

@@ -72,7 +72,7 @@ public class CompanyService {
 		return result;
 	}
 
-	private List<IncomeTotal> getLasIncomes(List<IncomeCompanyTO> incomesCompany) {
+	private List<IncomeTotal> getLastIncomes(List<IncomeCompanyTO> incomesCompany) {
 		List<IncomeTotal> incomes = new ArrayList<IncomeTotal>();
 		IncomeLabel incomeLabel = new IncomeLabel();
 

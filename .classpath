@@ -10,7 +10,7 @@
 	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar" sourcepath="C:/Users/dsaraujo/.m2/repository/javax/mail/mail/1.4/mail-1.4-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_121"/>
-	<classpathentry kind="var" path="M2_REPO/org/primefaces/primefaces/5.3/primefaces-5.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/primefaces/primefaces/5.3/primefaces-5.3.jar" sourcepath="C:/Users/dsaraujo/.m2/repository/org/primefaces/primefaces/5.3/primefaces-5.3-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/primefaces/extensions/primefaces-extensions/4.0.0/primefaces-extensions-4.0.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar"/>
@@ -37,8 +37,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/security/spring-security-acl/3.2.4.RELEASE/spring-security-acl-3.2.4.RELEASE.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-jdbc/3.2.8.RELEASE/spring-jdbc-3.2.8.RELEASE.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-tx/5.0.0.RELEASE/spring-tx-5.0.0.RELEASE.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/data/spring-data-mongodb/2.0.0.RELEASE/spring-data-mongodb-2.0.0.RELEASE.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/data/spring-data-commons/2.0.0.RELEASE/spring-data-commons-2.0.0.RELEASE.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/data/spring-data-mongodb/2.0.0.RELEASE/spring-data-mongodb-2.0.0.RELEASE.jar" sourcepath="C:/Users/dsaraujo/.m2/repository/org/springframework/data/spring-data-mongodb/2.0.0.RELEASE/spring-data-mongodb-2.0.0.RELEASE-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/data/spring-data-commons/2.0.0.RELEASE/spring-data-commons-2.0.0.RELEASE.jar" sourcepath="C:/Users/dsaraujo/.m2/repository/org/springframework/data/spring-data-commons/2.0.0.RELEASE/spring-data-commons-2.0.0.RELEASE-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mongodb/mongo-java-driver/3.5.0/mongo-java-driver-3.5.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
