@@ -284,7 +284,7 @@ public class CheckNews {
 				reader = new PdfReader(linkPdf);
 				String dados = PdfTextExtractor.getTextFromPage(reader, 1);
 				URL url = new URL(linkPdf);
-				File file = new File("anexo.pdf");
+				File file = new File("/temp/Anexo.pdf");
 				FileUtils.copyURLToFile(url, file);
 				newsTO.setAttached(file);
 				parser = new IncomePdfParser(dados);
@@ -297,7 +297,7 @@ public class CheckNews {
 				connection.timeout(30000);
 
 				try {
-					File file = new File("Anexo.html");
+					File file = new File("/temp/Anexo.html");
 					Document doc = connection.get();
 					FileUtils.write(file, doc.html(), "UTF-8");
 					newsTO.setAttached(file);
@@ -354,7 +354,7 @@ public class CheckNews {
 				try {
 					reader = new PdfReader(linkPdf);
 					URL url = new URL(linkPdf);
-					File file = new File("anexo.pdf");
+					File file = new File("/temp/Anexo.pdf");
 					FileUtils.copyURLToFile(url, file);
 					newsTO.setAttached(file);
 					reader.close();
@@ -366,7 +366,7 @@ public class CheckNews {
 					connection.timeout(30000);
 
 					try {
-						File file = new File("Anexo.html");
+						File file = new File("/temp/Anexo.html");
 						Document doc = connection.get();
 						FileUtils.write(file, doc.html(), "UTF-8");
 						newsTO.setAttached(file);

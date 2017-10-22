@@ -1,4 +1,0 @@
-echo "LANG is: $LANG"
-echo "Executing pre_start"
-export LANG=pt_BR.utf8
-echo "LANG is: $LANG"
