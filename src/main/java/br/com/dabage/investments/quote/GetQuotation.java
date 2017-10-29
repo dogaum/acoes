@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.primefaces.json.JSONArray;
@@ -24,6 +25,8 @@ import br.com.dabage.investments.utils.DateUtils;
 
 @Component
 public class GetQuotation {
+
+	private Logger log = Logger.getLogger(GetQuotation.class);
 
 	static String cmaQuoteUrl = "http://acoes.agronegocios-e.com.br/Grafico//CmaGraf.php?O=12&P=";
 
@@ -50,7 +53,7 @@ public class GetQuotation {
 			try {
 				date = preFormatDate.parse(lineValues[0]);
 			} catch (ParseException e) {
-				e.printStackTrace();
+				log.error(e);
 			} // Data;
 			String data = unFormatCompleteDate.format(date);
 
@@ -67,7 +70,7 @@ public class GetQuotation {
 			
 			return json.toString();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 		
 		return "";
@@ -86,7 +89,7 @@ public class GetQuotation {
 
 			return new Double(lineValues[4]);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 
 		return 0D;
@@ -172,10 +175,8 @@ public class GetQuotation {
 			quote.setStock(stock);
 
 			quoteCache.put(stock, quote);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
+		} catch (IOException | ParseException e) {
+			log.error(e);
 		}
 
 	}
@@ -236,12 +237,10 @@ public class GetQuotation {
 				obj.put("labels", datesArray);
 				return obj;
 			} catch (JSONException e) {
-				e.printStackTrace();
+				log.error(e);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
+		} catch (IOException | ParseException e) {
+			log.error(e);
 		}
 		
 		return null;
@@ -284,10 +283,8 @@ public class GetQuotation {
 				result.add(quote);
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
+		} catch (IOException | ParseException e) {
+			log.error(e);
 		}
 		
 		return result;
@@ -298,7 +295,7 @@ public class GetQuotation {
 		try {
 			number = numberFormat.parse(usNumberFormat);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 		return unFormatNumber.format(number);
 	}

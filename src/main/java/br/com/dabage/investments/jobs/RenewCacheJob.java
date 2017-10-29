@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,8 @@ import br.com.dabage.investments.utils.DateUtils;
 @Component
 public class RenewCacheJob {
 
+	private Logger log = Logger.getLogger(RenewCacheJob.class);
+	
 	@Resource
 	public GetQuotation getQuotation;
 
@@ -22,11 +25,10 @@ public class RenewCacheJob {
 		Calendar cal = Calendar.getInstance();
 		if (DateUtils.isWorkingDay(cal)
 				&& (cal.get(Calendar.HOUR_OF_DAY) > 9 && cal.get(Calendar.HOUR_OF_DAY) < 19)) {
-			System.out.println("Executing " + RenewCacheJob.class.getSimpleName() + " on " + new Date());
+			log.info("Executing " + RenewCacheJob.class.getSimpleName() + " on " + new Date());
 			getQuotation.renewCache();			
 		} else {
-			System.out.println("Job " + RenewCacheJob.class.getSimpleName() + " out of date: " + new Date());
+			log.info("Job " + RenewCacheJob.class.getSimpleName() + " is out of date.");
 		}
-
 	}
 }

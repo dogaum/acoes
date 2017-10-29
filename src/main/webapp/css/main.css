@@ -1,6 +1,6 @@
 .ui-widget {
-    font-size: 90%;
+    font-size: 0.85em !important;
  }
 .ui-widget .ui-widget {
-    font-size: 100%;
+    font-size: 0.85em !important;
  }

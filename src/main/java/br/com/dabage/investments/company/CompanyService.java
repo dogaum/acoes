@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,8 @@ import br.com.dabage.investments.utils.DateUtils;
 
 @Service
 public class CompanyService {
+
+	private Logger log = Logger.getLogger(CompanyService.class);
 
 	@Autowired
 	CarteiraRepository carteiraRepository;

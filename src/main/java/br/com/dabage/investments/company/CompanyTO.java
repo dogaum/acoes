@@ -33,6 +33,7 @@ public class CompanyTO extends AbstractDocument {
 	private String ticker;
 	private String name;
 	private String fullName;
+	private String category;
 
 	@Transient
 	private Map<String, List<IncomeVO>> lastIncomes;
@@ -83,6 +84,14 @@ public class CompanyTO extends AbstractDocument {
 
 	public void setLastIncomes(Map<String, List<IncomeVO>> lastIncomes) {
 		this.lastIncomes = lastIncomes;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	@Override

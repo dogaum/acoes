@@ -15,10 +15,13 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SendMailSSL {
+
+	private static Logger log = Logger.getLogger(SendMailSSL.class);
 
 	public static void send(String subject, String textContent, File file) {
 		Properties props = new Properties();
@@ -59,7 +62,7 @@ public class SendMailSSL {
                 try {
                     attachPart.attachFile(file);
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                	log.error(ex);
                 }
  
                 multipart.addBodyPart(attachPart);
@@ -73,6 +76,7 @@ public class SendMailSSL {
 			Transport.send(message);
  
 		} catch (MessagingException e) {
+			log.error(e);
 			throw new RuntimeException(e);
 		}
 	}

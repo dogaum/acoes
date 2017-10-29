@@ -38,7 +38,6 @@ public class HomeView extends BasicView implements Serializable {
 	@PostConstruct
 	public void initHome() {
 		credits = getMessage("app.home.credits");
-		//homeService.loadHomeCache();
 	}
 
 	public void init() {

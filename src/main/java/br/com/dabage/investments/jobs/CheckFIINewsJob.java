@@ -3,6 +3,7 @@ package br.com.dabage.investments.jobs;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,18 +17,21 @@ public class CheckFIINewsJob {
 	@Autowired
 	public CheckNews checkNews;
 
+	private Logger log = Logger.getLogger(CheckFIINewsJob.class);
+
 	@Scheduled(fixedDelay=60000)
 	public void execute() {
 		Calendar cal = Calendar.getInstance();
 		if (DateUtils.isWorkingDay(cal)
 				&& (cal.get(Calendar.HOUR_OF_DAY) > 8 && cal.get(Calendar.HOUR_OF_DAY) < 22)) {
-			System.out.println("Executing " + CheckFIINewsJob.class.getSimpleName() + " on " + new Date());
+			log.info("Executing " + CheckFIINewsJob.class.getSimpleName() + " on " + new Date());
 
 			String query = "fii";
 			int qtyNews = checkNews.run(query);
-			System.out.println(qtyNews + " news found on " + new Date());			
-		} else {
-			System.out.println("Job " + CheckFIINewsJob.class.getSimpleName() + " out of date: " + new Date());
+			log.info(qtyNews + " news found on " + new Date());			
+		}
+		else {
+			log.info("Job " + CheckFIINewsJob.class.getSimpleName() + " is out of date.");
 		}
 	}
 }

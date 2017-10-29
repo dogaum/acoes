@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,8 @@ import br.com.dabage.investments.repositories.PortfolioItemRepository;
 @Service
 public class ConfigService {
 
+	private Logger log = Logger.getLogger(ConfigService.class);
+
 	@Autowired
 	CarteiraRepository carteiraRepository;
 	
@@ -36,6 +39,7 @@ public class ConfigService {
 	IncomeRepository incomeRepository;
 
 	public void calcPortfolioItem() {
+		log.trace("ConfigService.calcPortfolioItem is executing.");
 		portfolioItemRepository.deleteAll();
 		List<CarteiraTO> carteiras = carteiraRepository.findAll();
 		for (CarteiraTO carteira : carteiras) {
@@ -84,5 +88,6 @@ public class ConfigService {
 				}
 			}
 		}
+		log.trace("ConfigService.calcPortfolioItem has finish.");
 	}
 }

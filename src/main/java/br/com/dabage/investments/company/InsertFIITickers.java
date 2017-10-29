@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,6 +17,8 @@ import br.com.dabage.investments.repositories.StockTypeRepository;
 
 @Component
 public class InsertFIITickers {
+
+	private Logger log = Logger.getLogger(InsertFIITickers.class);
 
 	@Resource
 	CompanyRepository companyRepository;
@@ -61,7 +64,7 @@ public class InsertFIITickers {
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error(e);
 			}
 
 	}
