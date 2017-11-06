@@ -33,9 +33,9 @@ import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CompanyRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
 import br.com.dabage.investments.repositories.NewsRepository;
+import br.com.dabage.investments.utils.DateUtils;
 
 import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
 @Component
 public class CheckNews {
@@ -56,6 +56,8 @@ public class CheckNews {
 
 	static NumberFormat numberFormat = new DecimalFormat ("#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR")));
 
+	static NumberFormat numberFormatIncome = new DecimalFormat ("#,##0.000000", new DecimalFormatSymbols (new Locale ("pt", "BR")));
+	
 	static DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 	static DateFormat dateFormatSearch = new SimpleDateFormat("yyyy-MM-dd");
@@ -122,15 +124,29 @@ public class CheckNews {
 
 	}
 	
-	public int run(String query) {
+	public int run(String query, NewsFilterType ft, String sDate, String fDate) {
 
 		int qtyNews = 0;
+		StringBuffer endFII = new StringBuffer();
+		endFII.append("http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br");
+		// Query
+		endFII.append("&q=");
+		endFII.append(query);
+		// Filter type
+		endFII.append("&tipoFiltro=");
+		endFII.append(ft.getKey());
 
-		String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=" + query + "&tipoFiltro=0";
+		if (ft.equals(NewsFilterType.INTERVAL)) {
+			endFII.append("&periodoDe=");
+			endFII.append(sDate);
+			endFII.append("&periodoAte=");
+			endFII.append(fDate);
+		}
+
 		String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
 
 		try {
-			Connection connection = Jsoup.connect(endFII);
+			Connection connection = Jsoup.connect(endFII.toString());
 			connection.ignoreHttpErrors(true);
 			connection.timeout(30000);
 
@@ -232,8 +248,19 @@ public class CheckNews {
 		}
 
 		if (income != null) {
-			result.append("Rendimento R$ " + numberFormat.format(income));
+			result.append("Rendimento R$ " + numberFormatIncome.format(income));
 			result.append("\n");
+			
+			Calendar cal = Calendar.getInstance();
+			IncomeCompanyTO incomeActual = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
+			result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()) + ": R$ " + numberFormatIncome.format(incomeActual.getValue()));
+			result.append("\n");
+
+			cal.add(Calendar.MONTH, -1);
+			IncomeCompanyTO incomeBefore = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
+			result.append("Rendimento " + DateUtils.formatToMonthYear(incomeBefore.getYearMonth()) + ": R$ " + numberFormatIncome.format(incomeBefore.getValue()));
+			result.append("\n");
+
 			result.append("DY: ");
 			Double dy = (income / lastQuote) * 100;
 			result.append(numberFormat.format(dy) + " % a.m.");
@@ -244,73 +271,33 @@ public class CheckNews {
 		return result.toString();
 	}
 
-	private Double getIncome(String line) {
-		Double income = null;
-		int ini = line.indexOf("R$");
-		line = line.substring(ini).trim();
-		String[] array2 = line.split(" ");
-		for (int j = 0; j < array2.length; j++) {
-			String linha2 = array2[j];
-			linha2 = linha2.replaceAll("[^\\d+(\\.\\,\\d+)?]", "");
-			if (linha2.isEmpty() || linha2.length() < 2) {
-				continue;
-			}
-			char lastChar = linha2.charAt(linha2.length() -1);
-			while (!Character.isDigit(lastChar)) {
-				linha2 = linha2.substring(0, linha2.length() - 1);
-				lastChar = linha2.charAt(linha2.length() -1);
-			}
-			linha2 = linha2.replace(".", "");
-			linha2 = linha2.replace(",", ".");
-			
-			income = Double.valueOf(linha2);
-		}
-		
-		return income;
-	}
-
 	public Double checkIncome(NewsTO newsTO) {
 		Double income = null;
-		if (newsTO.getNews().contains("rendimento")) {
+		if (newsTO.getNewsHeader().toLowerCase().contains("aviso aos cotistas")) {
 
 			int indexIni = newsTO.getNews().indexOf("http");
 			int indexFin = newsTO.getNews().lastIndexOf("flnk");
-			String linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
-			linkPdf = linkPdf.replaceFirst("https", "http");
-			linkPdf = linkPdf.replaceAll("visualizarDocumento", "exibirDocumento");
-			
-			newsTO.setNewLink(linkPdf);
+			String link = newsTO.getNews().substring(indexIni, indexFin-1);
+			link = link.replaceFirst("https", "http");
+			link = link.replaceAll("visualizarDocumento", "exibirDocumento");
 
-			PdfReader reader;
-			IncomePdfParser parser = null;
+			newsTO.setNewLink(link);
+			Connection connection = Jsoup.connect(link);
+			connection.ignoreHttpErrors(true);
+			connection.timeout(30000);
+
+			Document doc = null;
 			try {
-				reader = new PdfReader(linkPdf);
-				String dados = PdfTextExtractor.getTextFromPage(reader, 1);
-				URL url = new URL(linkPdf);
-				File file = new File("/tmp/Anexo.pdf");
-				FileUtils.copyURLToFile(url, file);
+				File file = new File("/tmp/Rendimento.html");
+				doc = connection.get();
+				FileUtils.write(file, doc.html(), "UTF-8");
 				newsTO.setAttached(file);
-				parser = new IncomePdfParser(dados);
-				reader.close();
-			} catch (IOException e) {
-				// Não é PDF, é HTML
-				// Pegar o html e enviar por email
-				Connection connection = Jsoup.connect(linkPdf);
-				connection.ignoreHttpErrors(true);
-				connection.timeout(30000);
-
-				try {
-					File file = new File("/tmp/Anexo.html");
-					Document doc = connection.get();
-					FileUtils.write(file, doc.html(), "UTF-8");
-					newsTO.setAttached(file);
-				} catch (IOException e1) {
-				}
-
+			} catch (IOException e1) {
 			}
 
-			income = parser.getValue();
-
+			IncomeHtmlParser htmlParser = new IncomeHtmlParser(doc);
+			income = htmlParser.getValue();
+			
 			if (income != null) {
 				CompanyTO company = companyRepository.findByTicker(newsTO.getTicker() + "11");
 				if (company == null) {
@@ -339,6 +326,14 @@ public class CheckNews {
 					incomeCompanyRepository.save(incomeTO);	
 				}
 
+				// Update company information
+				company.setCnpj(htmlParser.getFundCnpj());
+				company.setAdmName(htmlParser.getAdmName());
+				company.setAdmCnpj(htmlParser.getAdmCnpj());
+				company.setResponsible(htmlParser.getResponsible());
+				company.setPhone(htmlParser.getPhone());
+				company.setIsin(htmlParser.getIsin());
+				companyRepository.save(company);
 			}
 		} else {
 			// get attachment

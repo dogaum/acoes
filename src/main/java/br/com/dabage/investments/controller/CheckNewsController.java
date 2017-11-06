@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.dabage.investments.news.CheckNews;
+import br.com.dabage.investments.news.NewsFilterType;
 
 @RestController
 @RequestMapping("/checknews")
@@ -19,7 +20,7 @@ public class CheckNewsController {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/{query}")
 	public String checkNews(@PathVariable("query") String query) {
-		checkNews.run(query);
+		checkNews.run(query, NewsFilterType.DAY, null, null);
 		if (query == null || query.isEmpty()) {
 			query = "TODOS";
 		}

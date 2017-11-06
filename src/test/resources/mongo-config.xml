@@ -1,0 +1,36 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        				http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd ">
+
+        
+        <!-- MongoBD Database configuration host and port -->
+        <mongo:mongo-client id="mongo" credentials="admin:1AITjmHDZC2U@admin" host="cluster0-shard-00-00-hhsrz.mongodb.net" port="27017"
+        					replica-set="cluster0-shard-00-00-hhsrz.mongodb.net:27017,cluster0-shard-00-01-hhsrz.mongodb.net:27017,cluster0-shard-00-02-hhsrz.mongodb.net:27017">
+    		<mongo:client-options write-concern="NORMAL"
+    							  max-connection-idle-time="3000000"
+    							  min-connections-per-host="1"
+    							  socket-keep-alive="true"
+    							  read-preference="PRIMARY"
+    							  connect-timeout="30000"
+    							  socket-timeout="30000"
+    							  ssl="true" />
+		</mongo:mongo-client>
+
+        <!-- Define the mongoDbFactory with your database Name  -->
+		<mongo:db-factory dbname="acoes"
+						  mongo-ref="mongo"/>
+ 
+		<!-- Senha antiga: 1AITjmHDZC2U  -->
+ 
+ 		<!-- Define the MongoTemplate  -->
+		<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+			<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+		</bean>  
+ 		
+ 		<!-- Base package to scan the mongo repositories, where we create de DAOS to access data and domain objects -->
+        <mongo:repositories base-package="br.com.dabage.investments.repositories" />
+
+</beans>

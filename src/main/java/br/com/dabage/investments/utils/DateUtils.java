@@ -17,6 +17,8 @@ public class DateUtils {
 	
 	private static final DateFormat formatMonth = new SimpleDateFormat("MM");
 
+	private static final DateFormat formatDayMonthYear = new SimpleDateFormat("dd/MM/yyyy");
+
 	/**
 	 * Get YearMonth in a Date
 	 * @param date
@@ -69,5 +71,16 @@ public class DateUtils {
 		}
 
 		return result;
+	}
+
+	public static Date parseStrToDate(String str) {
+		Date ret = null;
+
+		try {
+			ret = formatDayMonthYear.parse(str);
+		} catch (ParseException e) {
+		}
+
+		return ret;
 	}
 }

@@ -51,7 +51,7 @@ public class SendMailSSL {
 			if (file != null) {
 				// creates message part
 		        MimeBodyPart messageBodyPart = new MimeBodyPart();
-		        messageBodyPart.setContent(textContent, "text/html");
+		        messageBodyPart.setContent(textContent, "text/plain");
 		 
 		        // creates multi-part
 		        Multipart multipart = new MimeMultipart();

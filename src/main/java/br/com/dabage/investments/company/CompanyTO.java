@@ -34,6 +34,12 @@ public class CompanyTO extends AbstractDocument {
 	private String name;
 	private String fullName;
 	private String category;
+	private String cnpj;
+	private String admName;
+	private String admCnpj;
+	private String responsible;
+	private String phone;
+	private String isin;
 
 	@Transient
 	private Map<String, List<IncomeVO>> lastIncomes;
@@ -92,6 +98,54 @@ public class CompanyTO extends AbstractDocument {
 
 	public void setCategory(String category) {
 		this.category = category;
+	}
+
+	public String getCnpj() {
+		return cnpj;
+	}
+
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+
+	public String getAdmName() {
+		return admName;
+	}
+
+	public void setAdmName(String admName) {
+		this.admName = admName;
+	}
+
+	public String getAdmCnpj() {
+		return admCnpj;
+	}
+
+	public void setAdmCnpj(String admCnpj) {
+		this.admCnpj = admCnpj;
+	}
+
+	public String getResponsible() {
+		return responsible;
+	}
+
+	public void setResponsible(String responsible) {
+		this.responsible = responsible;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getIsin() {
+		return isin;
+	}
+
+	public void setIsin(String isin) {
+		this.isin = isin;
 	}
 
 	@Override
