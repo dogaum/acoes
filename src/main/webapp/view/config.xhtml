@@ -88,7 +88,7 @@
 									        </h:outputText>
 									        <h:outputText value=" #{msg['percentSymbol']}" />
 						               </f:facet>
-						               <f:facet name="input"><pe:inputNumber value="#{stockTypeItem.irNormal}" symbolPosition="s" symbol=" #{msg['percentSymbol']}" /></f:facet>
+						               <f:facet name="input"><p:inputNumber value="#{stockTypeItem.irNormal}" symbolPosition="s" symbol=" #{msg['percentSymbol']}" /></f:facet>
 						            </p:cellEditor>
 							    </p:column>
 
@@ -100,7 +100,7 @@
 									        </h:outputText>
 									        <h:outputText value=" #{msg['percentSymbol']}" />
 						               </f:facet>
-						               <f:facet name="input"><pe:inputNumber value="#{stockTypeItem.irDayTrade}" symbolPosition="s" symbol=" #{msg['percentSymbol']}" /></f:facet>
+						               <f:facet name="input"><p:inputNumber value="#{stockTypeItem.irDayTrade}" symbolPosition="s" symbol=" #{msg['percentSymbol']}" /></f:facet>
 						            </p:cellEditor>
 							    </p:column>
 
@@ -111,7 +111,7 @@
 									        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
 									        </h:outputText>
 						               </f:facet>
-						               <f:facet name="input"><pe:inputNumber value="#{stockTypeItem.exempt}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+						               <f:facet name="input"><p:inputNumber value="#{stockTypeItem.exempt}"  symbol="#{msg['currencySymbol']} "/></f:facet>
 						            </p:cellEditor>
 							    </p:column>
 
@@ -229,6 +229,112 @@
 				    </div>
 				  </div>
                 </div>
+				<!-- Companies Config -->
+                <div class="col-lg-12">
+				  <div class="panel panel-green">
+				    <div class="panel-heading">
+				      <h4 class="panel-title">
+				        <a data-toggle="collapse" href="#collapseCompanies" class="panel-title">
+				          <h:outputText value="#{msg['app.config.companies.title']}"/>
+				        </a>
+				      </h4>
+				    </div>
+				    <div id="collapseCompanies" class="panel-collapse collapse out">
+				      <div class="panel-body">
+				      	<p:outputPanel id="companiesContent" deferred="true">
+							<p:dataTable widgetVar="companyTable" var="companyItem" value="#{configView.companies}" style="margin-left:27px" rowKey="#{companyItem.id}"
+								rows="10" paginator="true" emptyMessage="#{msg['pf.datatable.noresults']}"
+								paginatorPosition="bottom" editable="true"
+								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+	
+								<p:ajax event="rowEdit" listener="#{configView.editCompany}" update=":form:companiesContent" />
+	
+							    <p:column headerText="#{msg['app.config.companies.ticker']}" sortBy="#{companyItem.ticker}"
+							     	filterable="true" filterBy="#{companyItem.ticker}" >
+							     	<p:outputLabel value="#{companyItem.ticker}"/>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.name']}" sortBy="#{companyItem.name}"
+							     	filterable="true" filterBy="#{companyItem.name}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.name}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.name}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.fullName']}" sortBy="#{companyItem.fullName}"
+							     	filterable="true" filterBy="#{companyItem.fullName}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.fullName}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.fullName}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.category']}" sortBy="#{companyItem.category}"
+							     	filterable="true" filterBy="#{companyItem.category}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.category}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.category}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.setor']}" sortBy="#{companyItem.setor}"
+							     	filterable="true" filterBy="#{companyItem.setor}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.setor}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.setor}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.cnpj']}" sortBy="#{companyItem.cnpj}"
+							     	filterable="true" filterBy="#{companyItem.cnpj}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.cnpj}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.cnpj}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.admName']}" sortBy="#{companyItem.admName}"
+							     	filterable="true" filterBy="#{companyItem.admName}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.admName}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.admName}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.admCnpj']}" sortBy="#{companyItem.admCnpj}"
+							     	filterable="true" filterBy="#{companyItem.admCnpj}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.admCnpj}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.admCnpj}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.responsible']}" sortBy="#{companyItem.responsible}"
+							     	filterable="true" filterBy="#{companyItem.responsible}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.responsible}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.responsible}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.phone']}" sortBy="#{companyItem.phone}"
+							     	filterable="true" filterBy="#{companyItem.phone}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.phone}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.phone}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column style="width:38px">
+							        <p:rowEditor />
+							    </p:column>
+							</p:dataTable>
+				      	</p:outputPanel>
+				      </div>
+				    </div>
+				  </div>
+                </div>
             </div>
 
 	        <p:dialog widgetVar="addStockTypeDlg" modal="true" position="center" header="#{msg['app.config.stockType.add.dlg.header']}" width="530" showEffect="fade" hideEffect="fade" closeOnEscape="true">
@@ -239,13 +345,13 @@
 				        <p:inputText id="stName" type="text" value="#{configView.stockType.name}"/>
 
 						<p:outputLabel value="#{msg['app.config.stockType.lbl.irNormal']}:" for="stIRNormal" />
-						<pe:inputNumber id="stIRNormal" value="#{configView.stockType.irNormal}" symbolPosition="s" symbol=" #{msg['percentSymbol']}" />
+						<p:inputNumber id="stIRNormal" value="#{configView.stockType.irNormal}" symbolPosition="s" symbol=" #{msg['percentSymbol']}" />
 
 						<p:outputLabel value="#{msg['app.config.stockType.lbl.irDayTrade']}:" for="stDayTrade" />
-						<pe:inputNumber id="stDayTrade" value="#{configView.stockType.irDayTrade}" symbolPosition="s" symbol=" #{msg['percentSymbol']}" />
+						<p:inputNumber id="stDayTrade" value="#{configView.stockType.irDayTrade}" symbolPosition="s" symbol=" #{msg['percentSymbol']}" />
 
 						<p:outputLabel value="#{msg['app.config.stockType.lbl.exempt']}:" for="stExempt" />
-						<pe:inputNumber id="stExempt" value="#{configView.stockType.exempt}"  symbol="#{msg['currencySymbol']} " />
+						<p:inputNumber id="stExempt" value="#{configView.stockType.exempt}"  symbol="#{msg['currencySymbol']} " />
 	                </h:panelGrid>
 	
 	                <p:separator />

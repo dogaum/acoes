@@ -30,6 +30,8 @@ public class GetQuotation {
 
 	static String cmaQuoteUrl = "http://acoes.agronegocios-e.com.br/Grafico//CmaGraf.php?O=12&P=";
 
+	static String googleQuoteUrl = "https://finance.google.com/finance/getprices?q=";
+
 	static SimpleDateFormat preFormatDate = new SimpleDateFormat("yyMMdd");
 	static SimpleDateFormat unFormatDate = new SimpleDateFormat("dd/MM");
 	static SimpleDateFormat unFormatCompleteDate = new SimpleDateFormat("yyyy-MM-dd");

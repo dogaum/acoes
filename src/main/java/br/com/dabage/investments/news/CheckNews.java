@@ -109,7 +109,7 @@ public class CheckNews {
 
 							Double income = checkIncome(newsBean);
 							if (income == null) {
-								log.trace("Nao encontrou: " + newsBean.getTicker());
+								log.error("Nao encontrou: " + newsBean.getTicker());
 							}
 						}
 					}
@@ -233,7 +233,7 @@ public class CheckNews {
 		}
 
 		if (company == null) {
-			log.trace("Nao achou a empresa de ticker" + prefix);
+			log.error("Nao achou a empresa de ticker" + prefix);
 			return result.toString();
 		}
 		

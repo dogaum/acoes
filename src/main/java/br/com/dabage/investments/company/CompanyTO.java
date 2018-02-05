@@ -40,6 +40,7 @@ public class CompanyTO extends AbstractDocument {
 	private String responsible;
 	private String phone;
 	private String isin;
+	private String setor;
 
 	@Transient
 	private Map<String, List<IncomeVO>> lastIncomes;
@@ -148,10 +149,18 @@ public class CompanyTO extends AbstractDocument {
 		this.isin = isin;
 	}
 
+	public String getSetor() {
+		return setor;
+	}
+
+	public void setSetor(String setor) {
+		this.setor = setor;
+	}
+
 	@Override
 	public String toString() {
 		return "CompanyBean [prefix=" + prefix + ", ticker=" + ticker
-				+ ", name=" + name + ", fullName=" + fullName + "]";
+				+ ", name=" + name + ", fullName=" + fullName+ ", Setor=" + setor + "]";
 	}
 
 }

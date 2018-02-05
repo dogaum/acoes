@@ -68,8 +68,8 @@
 		                    <div class="col-lg-4 text-center">
 		                        <div class="panel panel-default">
 		                            <div class="panel-body">
-										<hf:chart type="pie" title="" credits="#{homeView.credits}">
-										    <hf:chartSerie name="Carteira" value="#{homeView.home.carteiras}" type="pie"
+										<hf:chart type="pie" title="#{msg['app.home.portfolio.graph.buy']}" credits="#{homeView.credits}">
+										    <hf:chartSerie name="Carteirai" value="#{homeView.home.carteiras}" type="pie"
 										     			   var="point" point="#{point.totalPortfolio}" tickLabel="#{point.name}"
 										     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
 										    <hf:chartTooltip  backgroundColor="#000000" shared="true">
@@ -82,7 +82,23 @@
 										</hf:chart>
 		                            </div>
 		                        </div>
-		                    </div>							
+		                        <div class="panel panel-default">
+		                            <div class="panel-body">
+										<hf:chart type="pie" title="#{msg['app.home.portfolio.graph.actual']}" credits="#{homeView.credits}">
+										    <hf:chartSerie name="Carteiraf" value="#{homeView.home.carteiras}" type="pie"
+										     			   var="point" point="#{point.totalPortfolioActual}" tickLabel="#{point.name}"
+										     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
+										    <hf:chartTooltip  backgroundColor="#000000" shared="true">
+										        <f:facet name="header">
+										            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
+										        </f:facet>
+										        <f:facet name="body"><h:outputText value="&lt;span style='color:white'> &lt;b>{point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/></f:facet>
+										        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
+										    </hf:chartTooltip>
+										</hf:chart>
+		                            </div>
+		                        </div>
+		                    </div>
 		                    <div class="col-lg-8 text-right">
 		                        <div class="panel panel-default">
 		                            <div class="panel-body">

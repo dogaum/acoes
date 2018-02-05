@@ -29,7 +29,7 @@ public class CheckNewCompaniesJob {
 		if (DateUtils.isWorkingDay(cal)) {
 			log.info("Executing " + CheckNewCompaniesJob.class.getSimpleName() + " on " + new Date());
 			insertFIITickers.run();
-			insertTickers.run();			
+			//insertTickers.run();			
 		} else {
 			log.info("Job " + CheckNewCompaniesJob.class.getSimpleName() + " is out of date.");
 		}

@@ -148,6 +148,11 @@
 										 				actionListener="#{carteiraView.selectCarteira}" update=":form">
 										 		<h:outputText value="#{(carteiraView.emptyPosition) ? msg['app.portfolio.btn.showAll'] : msg['app.portfolio.btn.hideAll']}" />
 										</p:commandLink>
+										
+			                       	    <h:commandLink title="#{msg['app.label.export.xls']}">
+									        <i class="fa fa-fw fa-file-excel-o"></i>
+									        <p:dataExporter type="xlsx" target="carteira" fileName="carteira" pageOnly="false"/>
+									    </h:commandLink>
                             		</div>
                             	</div>
 
@@ -172,14 +177,14 @@
 				                	</f:facet>
 				                </p:toolbar>
 
-								<p:dataTable id="itemTable" var="item" value="#{carteiraView.carteiraItens}" emptyMessage="#{msg['pf.datatable.noresults']}"
+								<p:dataTable id="carteira" var="item" value="#{carteiraView.carteiraItens}" emptyMessage="#{msg['pf.datatable.noresults']}"
 										 	reflow="true" selectionMode="single" rowKey="#{item.stock}" selection="#{carteiraView.selectedCarteiraItem}">
 
-									<p:column style="width:38px">
+									<p:column style="width:38px" exportable="false">
 							            <p:rowToggler />
 							        </p:column>
 
-							        <p:column style="width:50px;text-align: center">
+							        <p:column style="width:50px;text-align: center" exportable="false">
 							             <p:commandButton update=":form:incomeDetail" oncomplete="PF('incomeDialog').show()" icon="ui-icon-search" title="#{msg['app.portfolio.incomes.header']}">
 							                <f:setPropertyActionListener value="#{item}" target="#{carteiraView.selectedCarteiraItem}"/>
 							            </p:commandButton>
@@ -317,7 +322,7 @@
 												        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
 												        </h:outputText>
 									               </f:facet>
-									               <f:facet name="input"><pe:inputNumber value="#{negItem.value}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+									               <f:facet name="input"><p:inputNumber value="#{negItem.value}"  symbol="#{msg['currencySymbol']} "/></f:facet>
 									            </p:cellEditor>
 										    </p:column>
 
@@ -328,7 +333,7 @@
 												        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
 												        </h:outputText>
 									               </f:facet>
-									               <f:facet name="input"><pe:inputNumber value="#{negItem.costs}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+									               <f:facet name="input"><p:inputNumber value="#{negItem.costs}"  symbol="#{msg['currencySymbol']} "/></f:facet>
 									            </p:cellEditor>
 										    </p:column>
 
@@ -338,7 +343,7 @@
 											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 										        </f:facet>
-										        <f:facet name="input"><pe:inputNumber value="#{negItem.avgBuyValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+										        <f:facet name="input"><p:inputNumber value="#{negItem.avgBuyValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
 										    </p:column>
 
 										    <p:column headerText="#{msg['app.portfolio.resultValue']}" sortBy="#{negItem.calculateValue}">
@@ -347,7 +352,7 @@
 											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 										        </f:facet>
-										        <f:facet name="input"><pe:inputNumber value="#{negItem.calculateValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+										        <f:facet name="input"><p:inputNumber value="#{negItem.calculateValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
 										    </p:column>
 
 										    <p:column style="width:38px">
@@ -491,10 +496,10 @@
 								<p:spinner id="negQuantity" value="#{carteiraView.negotiation.quantity}" min="0" />
 		
 								<p:outputLabel value="#{msg['app.portfolio.unitValue']}:" for="negUnitValue" />
-								<pe:inputNumber id="negUnitValue" value="#{carteiraView.negotiation.value}"  symbol="#{msg['currencySymbol']} " />
+								<p:inputNumber id="negUnitValue" value="#{carteiraView.negotiation.value}"  symbol="#{msg['currencySymbol']} " />
 		
 								<p:outputLabel value="#{msg['app.portfolio.costs']}:" for="negCosts" />
-								<pe:inputNumber id="negCosts" value="#{carteiraView.negotiation.costs}"  symbol="#{msg['currencySymbol']} " />
+								<p:inputNumber id="negCosts" value="#{carteiraView.negotiation.costs}"  symbol="#{msg['currencySymbol']} " />
 			                </h:panelGrid>
 			
 			                <p:separator />
@@ -525,7 +530,7 @@
 		        				<p:calendar id="incomeDate" value="#{carteiraView.income.incomeDate}" pattern="dd/MM/yyyy" mask="true" />
 		
 								<p:outputLabel value="#{msg['app.portfolio.income.value']}:" for="incomeValue" />
-								<pe:inputNumber id="incomeValue" value="#{carteiraView.income.value}"  symbol="#{msg['currencySymbol']} " />
+								<p:inputNumber id="incomeValue" value="#{carteiraView.income.value}"  symbol="#{msg['currencySymbol']} " />
 		
 			                </h:panelGrid>
 
@@ -544,7 +549,11 @@
 					<!-- Income Detail -->
 				    <p:dialog widgetVar="incomeDialog" modal="true" position="center" header="#{msg['app.portfolio.incomes.header']}" width="60%" showEffect="fade" hideEffect="fade" resizable="true" draggable="true" closeOnEscape="true">
 				        <p:panel id="incomeDetail" style="text-align:center;">
-							<p:dataTable widgetVar="incItemTable" var="incItem" value="#{carteiraView.selectedCarteiraItem.incomes}" style="margin-left:27px" rowKey="#{incItem.id}"
+                       	    <h:commandLink title="#{msg['app.label.export.xls']}">
+						        <i class="fa fa-fw fa-file-excel-o"></i>
+						        <p:dataExporter type="xlsx" target="rendimento" fileName="rendimento" pageOnly="true"/>
+						    </h:commandLink>
+							<p:dataTable id="rendimento" widgetVar="incItemTable" var="incItem" value="#{carteiraView.selectedCarteiraItem.incomes}" style="margin-left:27px" rowKey="#{incItem.id}"
 										 editable="true" paginator="true" rows="10" rowsPerPageTemplate="10,20" reflow="true" sortBy="#{incItem.stock}"
                          				 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          				 rendered="#{not empty carteiraView.selectedCarteiraItem}">
@@ -579,7 +588,7 @@
 									        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
 									        </h:outputText>
 						               </f:facet>
-						               <f:facet name="input"><pe:inputNumber value="#{incItem.value}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+						               <f:facet name="input"><p:inputNumber value="#{incItem.value}"  symbol="#{msg['currencySymbol']} "/></f:facet>
 						            </p:cellEditor>
 							    </p:column>
 

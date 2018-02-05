@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 
+import br.com.dabage.investments.carteira.IncomeTO;
+import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.config.ConfigService;
 import br.com.dabage.investments.config.StockTypeTO;
 import br.com.dabage.investments.home.HomeService;
@@ -65,12 +67,18 @@ public class ConfigView extends BasicView implements Serializable {
 
 	private DualListModel<RoleTO> roles;
 
+	private List<CompanyTO> companies;
+
 	public String init() {
 		// Stock Types
 		stockTypes = stockTypeRepository.findByRemoveDateNull();
 
 		// All Users
 		users = userRepository.findAll();
+
+		// All Companies
+		companies = companyRepository.findAll();
+
 		prepareRoles();
         return "config";
     }
@@ -271,9 +279,23 @@ public class ConfigView extends BasicView implements Serializable {
 		return true;
 	}
 
+	/**
+	 * Refresh Quote and Home cache
+	 */
 	public void refreshQuoteCache() {
 		getQuotation.cleanQuoteCache();
 		homeService.loadHomeCache();
+	}
+
+	/**
+	 * Save the Company edition
+	 * @param event
+	 */
+	public void editCompany(RowEditEvent event) {
+
+		CompanyTO company = (CompanyTO) event.getObject();
+
+		companyRepository.save(company);
 	}
 
 	public List<StockTypeTO> getStockTypes() {
@@ -314,6 +336,14 @@ public class ConfigView extends BasicView implements Serializable {
 
 	public void setRoles(DualListModel<RoleTO> roles) {
 		this.roles = roles;
+	}
+
+	public List<CompanyTO> getCompanies() {
+		return companies;
+	}
+
+	public void setCompanies(List<CompanyTO> companies) {
+		this.companies = companies;
 	}
 
 }

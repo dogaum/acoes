@@ -142,8 +142,12 @@
                                 <h3 class="panel-title"><i class="fa fa-fw fa-line-chart"></i><h:outputText value=" #{msg['app.result.detail']} #{resultView.selectedPortfolio.name}"/></h3>
                             </div>
                             <div class="panel-body">
-								<p:dataTable id="itemTable" var="result" value="#{resultView.results}" emptyMessage="#{msg['pf.datatable.noresults']}">
-									<p:column style="width:38px" priority="9">
+	                       	    <h:commandLink title="#{msg['app.label.export.xls']}">
+							        <i class="fa fa-fw fa-file-excel-o"></i>
+							        <p:dataExporter type="xlsx" target="resultado" fileName="resultado" pageOnly="false"/>
+							    </h:commandLink>
+								<p:dataTable id="resultado" var="result" value="#{resultView.results}" emptyMessage="#{msg['pf.datatable.noresults']}">
+									<p:column style="width:38px" priority="9" exportable="false">
 							            <p:rowToggler />
 							        </p:column>
 
