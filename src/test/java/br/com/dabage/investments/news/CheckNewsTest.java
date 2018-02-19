@@ -42,7 +42,7 @@ public class CheckNewsTest {
 	@Test
 	public void testRun() {
 		String query = "fii";
-		int qtyNews = checkNews.run(query, NewsFilterType.DAY, null, null);
+		int qtyNews = checkNews.run(query, NewsFilterType.DAY, null, null, 1);
 		System.out.println(qtyNews);
 	}
 
@@ -51,10 +51,18 @@ public class CheckNewsTest {
 		String query = "aviso aos cotistas";
 		String sDate = "2017-11-03";
 		String fDate = "2017-11-03";
-		int qtyNews = checkNews.run(query, NewsFilterType.INTERVAL, sDate, fDate);
+		int qtyNews = checkNews.run(query, NewsFilterType.INTERVAL, sDate, fDate, 1);
 		System.out.println(qtyNews);
 	}
 
+	@Test
+	public void testCheckInformeMensal() {
+		String query = "informe mensal";
+		String sDate = "2018-02-01";
+		String fDate = "2018-02-18";
+		checkNews.run(query, NewsFilterType.INTERVAL, sDate, fDate, 9);
+	}
+	
 	@Test
 	public void testCheckIncomes() {
 		fail("Not yet implemented");

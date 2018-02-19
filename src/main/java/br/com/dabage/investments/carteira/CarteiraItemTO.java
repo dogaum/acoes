@@ -3,6 +3,7 @@ package br.com.dabage.investments.carteira;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.company.IncomeCompanyTO;
 
 public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
@@ -57,6 +58,8 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 	private List<IncomeTO> incomes;
 
 	private IncomeCompanyTO lastIncomeCompany;
+
+	private CompanyTO company;
 
 	public void addNegotiation(NegotiationTO neg) {
 		// Add to the list
@@ -238,6 +241,14 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 
 	public void setBuyDY(Double buyDY) {
 		this.buyDY = buyDY;
+	}
+
+	public CompanyTO getCompany() {
+		return company;
+	}
+
+	public void setCompany(CompanyTO company) {
+		this.company = company;
 	}
 
 	@Override

@@ -56,13 +56,16 @@
 						        <i class="fa fa-fw fa-file-excel-o"></i>
 						        <p:dataExporter type="xlsx" target="itemTable" fileName="rendimentos" pageOnly="false"/>
 						    </h:commandLink>
+						    <p:commandLink title="#{msg['app.incomes.reload.title']}" action="#{incomeView.resetIncomes}" update=":form:panelNewIncome">
+						        <i class="fa fa-fw fa-undo"></i>
+						    </p:commandLink>
 		                </f:facet>
 	                	<f:facet name="right">
 						    <p:commandLink id="reNewIncome" onclick="PF('addIncomeReDlg').show()" actionListener="#{incomeView.prepareIncome}"
 						    				update=":form:panelNewIncome">
 						        <i class="fa fa-fw fa-usd"></i>
 						        <h:outputText value="#{msg['app.incomes.income.add']}" />
-						    </p:commandLink>				                		
+						    </p:commandLink>
 	                	</f:facet>
 	                </p:toolbar>
 	                <p:outputPanel>

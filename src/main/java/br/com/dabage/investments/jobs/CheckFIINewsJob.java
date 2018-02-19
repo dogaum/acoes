@@ -28,7 +28,7 @@ public class CheckFIINewsJob {
 			log.info("Executing " + CheckFIINewsJob.class.getSimpleName() + " on " + new Date());
 
 			String query = "fii";
-			int qtyNews = checkNews.run(query, NewsFilterType.DAY, null, null);
+			int qtyNews = checkNews.run(query, NewsFilterType.DAY, null, null, 1);
 			log.info(qtyNews + " news found on " + new Date());			
 		}
 		else {

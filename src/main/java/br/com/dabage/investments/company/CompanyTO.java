@@ -34,6 +34,7 @@ public class CompanyTO extends AbstractDocument {
 	private String name;
 	private String fullName;
 	private String category;
+	private String classification;
 	private String cnpj;
 	private String admName;
 	private String admCnpj;
@@ -41,6 +42,11 @@ public class CompanyTO extends AbstractDocument {
 	private String phone;
 	private String isin;
 	private String setor;
+	private Double vp;
+	private Long qtdCotistas;
+	private Long qtdCotas;
+	private Double ativo;
+	private Double totalDisponibilidade;
 
 	@Transient
 	private Map<String, List<IncomeVO>> lastIncomes;
@@ -155,6 +161,54 @@ public class CompanyTO extends AbstractDocument {
 
 	public void setSetor(String setor) {
 		this.setor = setor;
+	}
+
+	public String getClassification() {
+		return classification;
+	}
+
+	public void setClassification(String classification) {
+		this.classification = classification;
+	}
+
+	public Double getVp() {
+		return vp;
+	}
+
+	public void setVp(Double vp) {
+		this.vp = vp;
+	}
+
+	public Long getQtdCotistas() {
+		return qtdCotistas;
+	}
+
+	public void setQtdCotistas(Long qtdCotistas) {
+		this.qtdCotistas = qtdCotistas;
+	}
+
+	public Long getQtdCotas() {
+		return qtdCotas;
+	}
+
+	public void setQtdCotas(Long qtdCotas) {
+		this.qtdCotas = qtdCotas;
+	}
+
+	public Double getAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(Double ativo) {
+		this.ativo = ativo;
+	}
+
+	public Double getTotalDisponibilidade() {
+		return totalDisponibilidade;
+	}
+
+	public void setTotalDisponibilidade(Double totalDisponibilidade) {
+		this.totalDisponibilidade = totalDisponibilidade;
 	}
 
 	@Override

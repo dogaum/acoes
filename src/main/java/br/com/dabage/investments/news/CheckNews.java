@@ -124,7 +124,7 @@ public class CheckNews {
 
 	}
 	
-	public int run(String query, NewsFilterType ft, String sDate, String fDate) {
+	public int run(String query, NewsFilterType ft, String sDate, String fDate, int pages) {
 
 		int qtyNews = 0;
 		StringBuffer endFII = new StringBuffer();
@@ -145,52 +145,67 @@ public class CheckNews {
 
 		String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
 
-		try {
-			Connection connection = Jsoup.connect(endFII.toString());
-			connection.ignoreHttpErrors(true);
-			connection.timeout(30000);
+		for (int i = pages; i >= 1; i--) {
+			String finalUrl = endFII.toString() + "&pg=" + i;
+			try {
+				Connection connection = Jsoup.connect(finalUrl);
+				connection.ignoreHttpErrors(true);
+				connection.timeout(30000);
 
-			Document doc = connection.get();
-			Element pagina = doc.getElementById("linksNoticias");
-			if (pagina != null) {
-				Elements links = pagina.getElementsByTag("li");
-				for (Element link : links) {
-					String href = link.getElementsByTag("a").get(0).attr("href");
-					String newsName = link.text();
+				Document doc = connection.get();
+				Element pagina = doc.getElementById("linksNoticias");
+				if (pagina != null) {
+					Elements links = pagina.getElementsByTag("li");
+					for (Element link : links) {
+						try {
+							String href = link.getElementsByTag("a").get(0).attr("href");
+							String newsName = link.text();
 
-					connection = Jsoup.connect(prefix + href);
-					connection.ignoreHttpErrors(true);
-					connection.timeout(30000);
-					doc = connection.get();
-					Element news = doc.getElementById("contentNoticia");
+							connection = Jsoup.connect(prefix + href);
+							connection.ignoreHttpErrors(true);
+							connection.timeout(30000);
+							doc = connection.get();
+							Element news = doc.getElementById("contentNoticia");
 
-					NewsTO newsBean = new NewsTO();
-					newsBean.setNewsHeader(newsName.substring(19));
-					newsBean.setNewsDate(getDateFromNews(newsName));
-					newsBean.setStockType(getStockType(newsBean.getNewsHeader()));
-					newsBean.setTicker(getStockTicker(newsBean.getNewsHeader()));
-					newsBean.setNews(news.text());
-					newsBean.setNewsHref(prefix + href);
+							NewsTO newsBean = new NewsTO();
+							newsBean.setNewsHeader(newsName.substring(19));
+							newsBean.setNewsDate(getDateFromNews(newsName));
+							newsBean.setStockType(getStockType(newsBean.getNewsHeader()));
+							newsBean.setTicker(getStockTicker(newsBean.getNewsHeader()));
+							newsBean.setNews(news.text());
+							newsBean.setNewsHref(prefix + href);
 
-					if (insertNews(newsBean) && newsBean.getNewsHeader().toLowerCase().contains("fii")) {
-						qtyNews++;
-						Double income = checkIncome(newsBean);
-						SendMailSSL.send(
-								newsName,
-								getQuotationsByPrefix(newsBean.getTicker(),
-										income)
-										+ news.text()
-										+ "\n\n"
-										+ newsBean.getNewLink(),
-								newsBean.getAttached());
+							if (insertNews(newsBean) && newsBean.getNewsHeader().toLowerCase().contains("fii")) {
+								qtyNews++;
+								Double income = checkIncome(newsBean);
+
+								try {
+									checkInformeMensal(newsBean);	
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+
+								SendMailSSL.send(
+										newsName,
+										getQuotationsByPrefix(newsBean.getTicker(),
+												income)
+												+ news.text()
+												+ "\n\n"
+												+ newsBean.getNewLink(),
+										newsBean.getAttached());
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
 					}
 				}
+
+			} catch (Exception e) {
+				log.error(e);
 			}
-
-		} catch (Exception e) {
-			log.error(e);
 		}
-
+		
 		return qtyNews;
 	}
 
@@ -253,18 +268,25 @@ public class CheckNews {
 			
 			Calendar cal = Calendar.getInstance();
 			IncomeCompanyTO incomeActual = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
-			result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()) + ": R$ " + numberFormatIncome.format(incomeActual.getValue()));
-			result.append("\n");
+			if (incomeActual != null) {
+				result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()) + ": R$ " + numberFormatIncome.format(incomeActual.getValue()));
+				result.append("\n");				
+			}
 
 			cal.add(Calendar.MONTH, -1);
 			IncomeCompanyTO incomeBefore = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
-			result.append("Rendimento " + DateUtils.formatToMonthYear(incomeBefore.getYearMonth()) + ": R$ " + numberFormatIncome.format(incomeBefore.getValue()));
-			result.append("\n");
+			if (incomeBefore != null) {
+				result.append("Rendimento " + DateUtils.formatToMonthYear(incomeBefore.getYearMonth()) + ": R$ " + numberFormatIncome.format(incomeBefore.getValue()));
+				result.append("\n");				
+			}
 
-			result.append("DY: ");
-			Double dy = (income / lastQuote) * 100;
-			result.append(numberFormat.format(dy) + " % a.m.");
-			result.append(" / " + numberFormat.format(dy * 12) + " % a.a.");
+			if (lastQuote != null) {
+				result.append("DY: ");
+				Double dy = (income / lastQuote) * 100;
+				result.append(numberFormat.format(dy) + " % a.m.");
+				result.append(" / " + numberFormat.format(dy * 12) + " % a.a.");				
+			}
+
 		}
 		result.append("\n");
 		result.append("\n");
@@ -545,6 +567,66 @@ public class CheckNews {
 		} catch (Exception e) {
 			log.error(e);
 			SendMailSSL.send("Erro: Proventos Ex-" + dateFormat.format(new Date()), buffer.toString() + e.getMessage(), null);
+		}
+	}
+
+	public void checkInformeMensal(NewsTO newsTO) {
+		if (newsTO.getNewsHeader().toLowerCase().contains("informe mensal")
+				&& !newsTO.getNewsHeader().toLowerCase().contains("(C)")) {
+
+			CompanyTO company = companyRepository.findByTicker(newsTO.getTicker() + "11");
+			if (company == null) {
+				company = companyRepository.findByTicker(newsTO.getTicker() + "11B");
+			}
+
+			if (company == null) {
+				return;
+			}
+
+			int indexIni = newsTO.getNews().indexOf("http");
+			int indexFin = newsTO.getNews().lastIndexOf("flnk");
+			String link = newsTO.getNews().substring(indexIni, indexFin-1);
+			link = link.replaceFirst("https", "http");
+			link = link.replaceAll("visualizarDocumento", "exibirDocumento");
+
+			newsTO.setNewLink(link);
+			Connection connection = Jsoup.connect(link);
+			connection.ignoreHttpErrors(true);
+			connection.timeout(30000);
+
+			Document doc = null;
+			try {
+				doc = connection.get();
+			} catch (IOException e1) {
+			}
+
+			InformeMensalParser htmlParser = new InformeMensalParser(doc);
+			System.out.println("Fundo: " + newsTO.getTicker());
+			System.out.println("Data: " + DateUtils.formatDateToStr(htmlParser.getInfoDate()));
+			System.out.println("Cotistas: " + htmlParser.getQtdCotistas());
+			System.out.println("Ativo: " + htmlParser.getAtivo());
+			System.out.println("Patrimonio: " + htmlParser.getPatrimonioLiquido());
+			System.out.println("Cotas: " + htmlParser.getQtdCotas());
+			System.out.println("VP: " + htmlParser.getVp());
+			System.out.println("Total Disponibilidade: " + htmlParser.getTotalDisponibilidade());
+			System.out.println("Total Investido: " + htmlParser.getTotalInvestido());
+			System.out.println("Total a Receber: " + htmlParser.getTotalAReceber());
+			System.out.println("Receber Aluguel: " + htmlParser.getReceberAluguel());
+			System.out.println("Receber Venda: " + htmlParser.getReceberVenda());
+			System.out.println("Receber Outros: " + htmlParser.getReceberOutros());
+			System.out.println("Rendimentos A Distribuir: " + htmlParser.getRendimentosADistribuir());
+			System.out.println("Taxa Adm A Pagar: " + htmlParser.getTaxaAdmAPagar());
+			System.out.println("Taxa Performance A Pagar: " + htmlParser.getTaxaPerformanceAPagar());
+			System.out.println("Outros Valores A Pagar: " + htmlParser.getOutrosValoresAPagar());
+			System.out.println("Total Passivo: " + htmlParser.getTotalPassivo());
+			System.out.println();
+
+			company.setQtdCotas(htmlParser.getQtdCotas());
+			company.setQtdCotistas(htmlParser.getQtdCotistas());
+			company.setAtivo(htmlParser.getAtivo());
+			company.setVp(htmlParser.getVp());
+			company.setTotalDisponibilidade(htmlParser.getTotalDisponibilidade());
+			companyRepository.save(company);
 		}
 	}
 }

@@ -242,7 +242,11 @@
 				    <div id="collapseCompanies" class="panel-collapse collapse out">
 				      <div class="panel-body">
 				      	<p:outputPanel id="companiesContent" deferred="true">
-							<p:dataTable widgetVar="companyTable" var="companyItem" value="#{configView.companies}" style="margin-left:27px" rowKey="#{companyItem.id}"
+                       	    <h:commandLink title="#{msg['app.label.export.xls']}">
+						        <i class="fa fa-fw fa-file-excel-o"></i>
+						        <p:dataExporter type="xlsx" target="empresas" fileName="empresas" pageOnly="false"/>
+						    </h:commandLink>
+							<p:dataTable id="empresas" widgetVar="companyTable" var="companyItem" value="#{configView.companies}" style="margin-left:27px" rowKey="#{companyItem.id}"
 								rows="10" paginator="true" emptyMessage="#{msg['pf.datatable.noresults']}"
 								paginatorPosition="bottom" editable="true"
 								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
@@ -252,6 +256,17 @@
 							    <p:column headerText="#{msg['app.config.companies.ticker']}" sortBy="#{companyItem.ticker}"
 							     	filterable="true" filterBy="#{companyItem.ticker}" >
 							     	<p:outputLabel value="#{companyItem.ticker}"/>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.vp']}" sortBy="#{companyItem.vp}">
+						           <p:cellEditor>
+						               <f:facet name="output">
+									        <h:outputText value="#{companyItem.vp}" title="#{msg['app.config.companies.vp.title']}">
+									        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+									        </h:outputText>
+						               </f:facet>
+						               <f:facet name="input"><p:inputNumber value="#{companyItem.vp}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+						            </p:cellEditor>
 							    </p:column>
 
 							    <p:column headerText="#{msg['app.config.companies.name']}" sortBy="#{companyItem.name}"
@@ -283,6 +298,14 @@
 						           <p:cellEditor>
 						               <f:facet name="output"><p:outputLabel value="#{companyItem.setor}" /></f:facet>
 						               <f:facet name="input"><p:inputText value="#{companyItem.setor}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.companies.classification']}" sortBy="#{companyItem.classification}"
+							     	filterable="true" filterBy="#{companyItem.classification}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{companyItem.classification}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{companyItem.classification}"/></f:facet>
 						            </p:cellEditor>
 							    </p:column>
 

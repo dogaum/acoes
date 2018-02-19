@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import br.com.dabage.investments.company.IncomeCompanyTO;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
+import br.com.dabage.investments.repositories.CompanyRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
 import br.com.dabage.investments.repositories.IncomeRepository;
 import br.com.dabage.investments.repositories.NegotiationRepository;
@@ -44,6 +45,9 @@ public class PortfolioService {
 
 	@Autowired
 	MongoTemplate template;
+
+	@Autowired
+	CompanyRepository companyRepository;
 
 	/**
 	 * Rerturn all sell negotiations from a portfolio
@@ -180,7 +184,7 @@ public class PortfolioService {
 		carteira.setTotalCalculateResult(0D);
 		carteira.setTotalLastIncome(0D);
 		for (CarteiraItemTO item : itens) {
-
+			item.setCompany(companyRepository.findByTicker(item.getStock()));
 			PortfolioItemTO portItem = portfolioItemRepository.findByIdCarteiraAndStock(carteira.getId(), item.getStock());
 			if (portItem != null) {
 				item.setQuantity(portItem.getQuantity());

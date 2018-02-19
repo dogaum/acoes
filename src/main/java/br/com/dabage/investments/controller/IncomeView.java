@@ -63,11 +63,22 @@ public class IncomeView extends BasicView implements Serializable {
 		return "rendimentos";
 	}
 
+	public void resetIncomes() {
+		incomes = new ArrayList<IncomeTotal>();
+		calcResults();
+	}
+
 	/**
 	 * Calculate results
 	 */
 	private void calcResults() {
+
+		if (incomes != null && !incomes.isEmpty()) {
+			return;
+		}
+
 		incomes = new ArrayList<IncomeTotal>();
+
 		List<IncomeCompanyTO> incomesCompany = null;
 		incomeLabel = new IncomeLabel();
 

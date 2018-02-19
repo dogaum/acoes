@@ -83,4 +83,12 @@ public class DateUtils {
 
 		return ret;
 	}
+
+	public static String formatDateToStr(Date date) {
+		String ret = null;
+
+		ret = formatDayMonthYear.format(date);
+
+		return ret;
+	}
 }

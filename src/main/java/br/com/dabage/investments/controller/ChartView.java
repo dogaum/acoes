@@ -42,7 +42,7 @@ public class ChartView extends BasicView implements Serializable {
 	@Resource
 	GetQuotation getQuotation;
 
-	private String stock = "IBOV";
+	private String stock = "";
 
 	@PostConstruct
 	public void init() {
@@ -64,16 +64,6 @@ public class ChartView extends BasicView implements Serializable {
 	public void createGrafico() {
 		grafico = new OhlcChartModel();
 
-		List<Quote> quotes = getQuotation.getQuoteHist(stock);
-		if (quotes == null || quotes.isEmpty()) {
-			addInfoMessage("Codigo nao encontrado: " + stock.toUpperCase());
-		}
-
-		for (Quote quote : quotes) {
-			grafico.add(new OhlcChartSeries(unFormatCompleteDate.format(quote.getDate()), quote.getOpen(),
-					quote.getHigh(), quote.getLow(), quote.getClose()));
-		}
-
         grafico.setTitle(stock.toUpperCase());
         grafico.getAxis(AxisType.Y).setLabel("R$");
 
@@ -85,7 +75,22 @@ public class ChartView extends BasicView implements Serializable {
         grafico.setAnimate(true);
         grafico.setCandleStick(true);
         grafico.setZoom(true);
-    }
+
+        if (stock == null || stock.isEmpty()) {
+        	return;
+        }
+
+		List<Quote> quotes = getQuotation.getQuoteHist(stock);
+		if (quotes == null || quotes.isEmpty()) {
+			addInfoMessage("Codigo nao encontrado: " + stock.toUpperCase());
+		}
+
+		for (Quote quote : quotes) {
+			grafico.add(new OhlcChartSeries(unFormatCompleteDate.format(quote.getDate()), quote.getOpen(),
+					quote.getHigh(), quote.getLow(), quote.getClose()));
+		}
+
+	}
 
     public List<String> completeStock(String stock) {
         List<String> results = new ArrayList<String>();

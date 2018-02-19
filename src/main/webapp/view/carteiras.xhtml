@@ -111,7 +111,17 @@
 									        <img src="/img/chart-pie_yellow.png"/>
 									    </p:commandLink>
                             		</div>
-                            		<div class="col-lg-9">
+                            		<div class="col-lg-1">
+									    <p:commandLink id="clSetorPre" onclick="PF('setorPreChartDlg').show()" title="#{msg['app.portfolio.chart.sector.pre']}">
+									        <img src="/img/chart-pie_blue.png"/>
+									    </p:commandLink>
+                            		</div>
+                            		<div class="col-lg-1">
+									    <p:commandLink id="clSetorPos" onclick="PF('setorPosChartDlg').show()" title="#{msg['app.portfolio.chart.sector.pos']}">
+									        <img src="/img/chart-pie_red.png"/>
+									    </p:commandLink>
+                            		</div>
+                            		<div class="col-lg-7">
                             		 	<br/>
 							        	<b><h:outputText value="#{msg['app.portfolio.lastNegotiation']}: " /></b>
 							        	<h:outputText value="#{carteiraView.selectedCarteira.lastNegotiation.negotiationType} "/>
@@ -197,6 +207,10 @@
 			                    		</p:commandLink>
 								    </p:column>
 
+								    <p:column headerText="#{msg['app.portfolio.company.setor']}" sortBy="#{item.company.setor}" style="text-align:left">
+								        <h:outputText value="#{item.company.setor}" />
+								    </p:column>
+
 								    <p:column headerText="#{msg['app.portfolio.qty']}" style="text-align:right">
 								        <h:outputText value="#{item.quantity}" />
 								    </p:column>
@@ -209,6 +223,12 @@
 
 								    <p:column headerText="#{msg['app.portfolio.actualValue']}" style="text-align:right">
 								        <h:outputText value="#{item.actualValue}">
+								        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
+								        </h:outputText>
+								    </p:column>
+
+								    <p:column headerText="#{msg['app.portfolio.company.vp']}" style="text-align:right">
+								        <h:outputText value="#{item.company.vp}">
 								        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 								        </h:outputText>
 								    </p:column>
@@ -258,13 +278,13 @@
 								        </h:outputText>
 								    </p:column>
 
-								    <p:column headerText="#{msg['app.portfolio.resultValue']}" style="text-align:right">
+								    <p:column headerText="#{msg['app.portfolio.resultValue']}" sortBy="#{item.totalCalculateResult}" style="text-align:right">
 								        <h:outputText value="#{item.totalCalculateResult}">
 								        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 								        </h:outputText>
 								    </p:column>
 
-								    <p:column headerText="#{msg['app.portfolio.resultPlusIncome']}" style="text-align:right">
+								    <p:column headerText="#{msg['app.portfolio.resultPlusIncome']}" sortBy="#{item.resultPlusIncome}" style="text-align:right">
 								        <h:outputText value="#{item.resultPlusIncome}">
 								        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 								        </h:outputText>
@@ -374,80 +394,81 @@
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalLastIncome}">
-											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 										    <p:column style="text-align:right">
 											    <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalBuyDY}">
-											        	<f:convertNumber type="percent" minFractionDigits="2"/>
+											        	<f:convertNumber type="percent" minFractionDigits="2" maxFractionDigits="2"/>
 											        </h:outputText>
 											    </f:facet>
 										    </p:column>
 										    <p:column style="text-align:right">
 											    <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalActualDY}">
-											        	<f:convertNumber type="percent" minFractionDigits="2"/>
+											        	<f:convertNumber type="percent" minFractionDigits="2" maxFractionDigits="2"/>
 											        </h:outputText>
 											    </f:facet>
 										    </p:column>
 										    <p:column style="text-align:right">
 											    <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.percentTotalActual}">
-											        	<f:convertNumber type="percent" minFractionDigits="2"/>
+											        	<f:convertNumber type="percent" minFractionDigits="2" maxFractionDigits="2"/>
 											        </h:outputText>
 											    </f:facet>
 										    </p:column>
 										    <p:column style="text-align:right">
 											    <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalPortfolio / carteiraView.selectedCarteira.totalPortfolio}">
-											        	<f:convertNumber type="percent" minFractionDigits="2"/>
+											        	<f:convertNumber type="percent" minFractionDigits="2" maxFractionDigits="2"/>
 											        </h:outputText>
 											    </f:facet>
 										    </p:column>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalPortfolio}">
-											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalPortfolioIncome}">
-											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalCalculateResult}">
-											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalPortfolioActualPlusIncome}">
-											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 							                <p:column style="text-align:right">
 									            <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalPortfolioActual}">
-											        	<f:convertNumber type="number" maxFractionDigits="2" locale="#{msg['locale']}"/>
+											        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
 										    <p:column style="text-align:right" width="90">
 											    <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.percentTotalPos}">
-											        	<f:convertNumber type="percent" minFractionDigits="2"/>
+											        	<f:convertNumber type="percent" minFractionDigits="2" maxFractionDigits="2"/>
 											        </h:outputText>
 											    </f:facet>
 										    </p:column>
@@ -664,6 +685,42 @@
 							     			   var="point3" point="#{point3.totalActual + point3.resultPlusIncome}" tickLabel="#{point3.stock}"
 							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
 							    <hf:chartTooltip  backgroundColor="#000000" shared="true">
+							        <f:facet name="header">
+							            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
+							        </f:facet>
+							        <f:facet name="body"><h:outputText value="&lt;span style='color:white'> &lt;b>{point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/></f:facet>
+							        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
+							    </hf:chartTooltip>
+							</hf:chart>
+						</p:panel>
+			        </p:dialog>
+
+					<!-- Setor Pre Chart -->
+			        <p:dialog widgetVar="setorPreChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.sector.pre']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
+						<p:panel id="panelSetorPreChart">
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" height="60%" width="60%">
+							    <hf:chartSerie name="Por Setor Pre" value="#{carteiraView.sectorPreCharList}" type="pie"
+							     			   var="point4" point="#{point4.value}" tickLabel="#{point4.sector}"
+							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
+							    <hf:chartTooltip backgroundColor="#000000" shared="true">
+							        <f:facet name="header">
+							            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
+							        </f:facet>
+							        <f:facet name="body"><h:outputText value="&lt;span style='color:white'> &lt;b>{point.y:,.2f}&lt;/b>&lt;/span>&lt;br/>"/></f:facet>
+							        <f:facet name="footer"><h:outputText escape="false" value='&lt;/td>&lt;/tr>&lt;/table>' /></f:facet>
+							    </hf:chartTooltip>
+							</hf:chart>
+						</p:panel>
+			        </p:dialog>
+
+					<!-- Setor Pos Chart -->
+			        <p:dialog widgetVar="setorPosChartDlg" modal="true" position="center" header="#{msg['app.portfolio.chart.sector.pos']}" showEffect="fade" hideEffect="fade" closeOnEscape="true">
+						<p:panel id="panelSetorPosChart">
+							<hf:chart type="pie" title="" credits="#{homeView.credits}" height="60%" width="60%">
+							    <hf:chartSerie name="Por Setor Pos" value="#{carteiraView.sectorPosCharList}" type="pie"
+							     			   var="point5" point="#{point5.value}" tickLabel="#{point5.sector}"
+							     			   dataLabel="&lt;b>{point.name}&lt;/b>: {point.percentage:,.2f} % &lt;i>&lt;/i>"/>
+							    <hf:chartTooltip backgroundColor="#000000" shared="true">
 							        <f:facet name="header">
 							            <h:outputText escape="false" value="&lt;table>&lt;tr>&lt;td style='color:white;font-weight:bold;padding-right:5px;'>{point.key}:&lt;/td>&lt;td style='padding-left: 5px;'>"/>
 							        </f:facet>

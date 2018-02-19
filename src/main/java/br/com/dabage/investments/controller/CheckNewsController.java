@@ -20,7 +20,7 @@ public class CheckNewsController {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/{query}")
 	public String checkNews(@PathVariable("query") String query) {
-		checkNews.run(query, NewsFilterType.DAY, null, null);
+		checkNews.run(query, NewsFilterType.DAY, null, null, 1);
 		if (query == null || query.isEmpty()) {
 			query = "TODOS";
 		}

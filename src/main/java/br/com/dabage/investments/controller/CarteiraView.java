@@ -31,6 +31,7 @@ import br.com.dabage.investments.carteira.NegotiationTO;
 import br.com.dabage.investments.carteira.NegotiationType;
 import br.com.dabage.investments.carteira.PortfolioItemTO;
 import br.com.dabage.investments.carteira.PortfolioService;
+import br.com.dabage.investments.carteira.SectorChartVO;
 import br.com.dabage.investments.company.CompanyService;
 import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.config.ConfigService;
@@ -58,6 +59,8 @@ public class CarteiraView extends BasicView implements Serializable {
 	private List<CarteiraItemTO> carteiraItensPreChart;
 	private List<CarteiraItemTO> carteiraItensPosChart;
 	private List<CarteiraItemTO> carteiraItensPosIncomeChart;
+	private List<SectorChartVO> sectorPreCharList;
+	private List<SectorChartVO> sectorPosCharList;
 
 	private CarteiraItemTO selectedCarteiraItem;
 	private Double selectedCarteiraItemTotalValue;
@@ -230,6 +233,41 @@ public class CarteiraView extends BasicView implements Serializable {
 				return new Double(o2.getTotalActual() + o2.getResultPlusIncome()).compareTo(new Double(o1.getTotalActual() + o1.getResultPlusIncome()));
 			}
 		});
+
+		// Sector Chart
+		sectorPreCharList = new ArrayList<SectorChartVO>();
+		sectorPosCharList = new ArrayList<SectorChartVO>();
+		for (CarteiraItemTO carteiraItemTO : carteiraItens) {
+			if (carteiraItemTO.getQuantity() == null || carteiraItemTO.getQuantity().equals(0L)) {
+				continue;
+			}
+			String sector = "Outros";
+			if (carteiraItemTO.getCompany().getSetor() != null) {
+				sector = carteiraItemTO.getCompany().getSetor();
+			}
+			SectorChartVO sectorPre = new SectorChartVO(sector);
+			SectorChartVO sectorPos = new SectorChartVO(sector);
+			Double valuePre = carteiraItemTO.getTotalValue();
+			Double valuePos = carteiraItemTO.getTotalActual();
+
+			if (sectorPreCharList.contains(sectorPre)) {
+				int index = sectorPreCharList.indexOf(sectorPre);
+				sectorPre = sectorPreCharList.get(index);
+				sectorPre.setValue(valuePre + sectorPre.getValue());
+			} else {
+				sectorPre.setValue(valuePre);
+				sectorPreCharList.add(sectorPre);
+			}
+
+			if (sectorPosCharList.contains(sectorPos)) {
+				int index = sectorPosCharList.indexOf(sectorPos);
+				sectorPos = sectorPosCharList.get(index);
+				sectorPos.setValue(valuePos + sectorPos.getValue());
+			} else {
+				sectorPos.setValue(valuePos);
+				sectorPosCharList.add(sectorPos);
+			}
+		}
 	}
 
 	/**
@@ -597,6 +635,22 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	public void setSelectedCompany(CompanyTO selectedCompany) {
 		this.selectedCompany = selectedCompany;
+	}
+
+	public List<SectorChartVO> getSectorPreCharList() {
+		return sectorPreCharList;
+	}
+
+	public void setSectorPreCharList(List<SectorChartVO> sectorPreCharList) {
+		this.sectorPreCharList = sectorPreCharList;
+	}
+
+	public List<SectorChartVO> getSectorPosCharList() {
+		return sectorPosCharList;
+	}
+
+	public void setSectorPosCharList(List<SectorChartVO> sectorPosCharList) {
+		this.sectorPosCharList = sectorPosCharList;
 	}
 
 }
