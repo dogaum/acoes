@@ -108,6 +108,7 @@ public class IncomeView extends BasicView implements Serializable {
 		for (IncomeTotal inc : incomes) {
 			List<IncomeCompanyTO> incCompanies = inc.getIncomes();
 			Collections.sort(incCompanies, IncomeCompanyTO.IncomeDateDesc);
+			inc.setCompany(companyRepository.findByTicker(inc.getStock()));
 
 			int count = 0;
 			Double avg12 = 0D;

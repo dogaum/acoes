@@ -69,8 +69,8 @@
 	                	</f:facet>
 	                </p:toolbar>
 	                <p:outputPanel>
-						<p:dataTable id="itemTable" var="income" value="#{incomeView.incomes}" emptyMessage="#{msg['pf.datatable.noresults']}"
-									 selectionMode="single" rowKey="#{income.stock}" >
+						<p:dataTable id="itemTable" var="income" value="#{incomeView.incomes}" emptyMessage="#{msg['pf.datatable.noresults']}" resizableColumns="true"
+									 selectionMode="single" rowKey="#{income.stock}" scrollable="true" scrollHeight="450" scrollWidth="85%" frozenColumns="1">
 						    <p:column headerText="#{msg['app.incomes.stock']}" sortBy="#{income.stock}" style="text-align:left" width="80">
 						        <h:outputText value="#{income.stock}" style="font-weight: bold;"/>
 						    </p:column>
@@ -154,6 +154,16 @@
 						    <p:column headerText="#{msg['percentSymbol']}" sortBy="#{income.lastPercent}" style="text-align:right" width="80">
 						        <h:outputText value="#{income.lastPercent}">
 						        	<f:convertNumber type="percent" minFractionDigits="2"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{msg['app.incomes.company.vp']}" style="text-align:right" width="80">
+						        <h:outputText value="#{income.company.vp}">
+						        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{msg['app.incomes.pvp']}" sortBy="#{income.pVp}" style="text-align:right" width="80">
+						        <h:outputText value="#{income.pVp}">
+						        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 						        </h:outputText>
 						    </p:column>
 						</p:dataTable>

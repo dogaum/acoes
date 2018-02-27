@@ -6,7 +6,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Connection;
@@ -20,7 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import br.com.dabage.investments.company.IncomeCompanyTO;
 import br.com.dabage.investments.mail.SendMailSSL;
+import br.com.dabage.investments.repositories.IncomeCompanyRepository;
+import br.com.dabage.investments.utils.DateUtils;
 
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
@@ -29,10 +42,25 @@ import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 @ContextConfiguration(inheritLocations=true, locations = { "classpath:mongo-config.xml", "classpath:mvc-dispatcher-servlet.xml" })
 public class CheckNewsTest {
 
+	static DecimalFormatSymbols symbols = null;
+
+	static {
+		symbols = new DecimalFormatSymbols (new Locale ("pt", "BR"));
+		symbols.setMinusSign('-');
+		symbols.setPercent('%');
+	}
+
 	static DateFormat dateFormatSearch = new SimpleDateFormat("yyyy-MM-dd");
+
+	static NumberFormat numberFormatIncome = new DecimalFormat ("#,##0.000000", symbols);
+
+	static DecimalFormat numberFormat = new DecimalFormat ("#,##0.00", symbols);
 
 	@Autowired
 	public CheckNews checkNews;
+
+	@Resource
+	private IncomeCompanyRepository incomeCompanyRepository;
 
 	@Test
 	public void testRun2() {
@@ -65,7 +93,41 @@ public class CheckNewsTest {
 	
 	@Test
 	public void testCheckIncomes() {
-		fail("Not yet implemented");
+		String ticker = "BRCR11";
+		StringBuffer result = new StringBuffer();
+
+		ArrayList<IncomeCompanyTO> list = new ArrayList<IncomeCompanyTO>();
+		int count = -13;
+		while (count < 0) {
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.MONTH, count);
+			IncomeCompanyTO incomeCompany = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
+			if (incomeCompany != null) {
+				list.add(incomeCompany);
+			}
+			count++;
+		}
+		numberFormat.setPositivePrefix("+");
+		IncomeCompanyTO incomeBefore = null;
+		for (IncomeCompanyTO incomeActual : list) {
+			if (incomeBefore != null) {
+				Double incBefore = incomeBefore.getValue();
+				Double incActual = incomeActual.getValue();
+				result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+				result.append(": R$ " + numberFormatIncome.format(incActual));
+				Double dy = (((incActual / incBefore) -1 ) * 100);
+				result.append(" " + numberFormat.format(dy) + "%");
+				result.append("\n");
+			} else {
+				result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+				result.append(": R$ " + numberFormatIncome.format(incomeActual.getValue()));
+				result.append("\n");
+			}
+			incomeBefore = incomeActual;
+		}
+
+		System.out.println(result.toString());
+		
 	}
 
 	@Test

@@ -37,6 +37,8 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 
 	private Double buyDY;
 
+	private Double pVp;
+
 	/** Summaring */
 
 	private Double percentActAvgValue;
@@ -249,6 +251,15 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 
 	public void setCompany(CompanyTO company) {
 		this.company = company;
+	}
+
+	public Double getpVp() {
+		if (company != null && company.getVp() != null) {
+			if (actualValue != null) {
+				pVp = (actualValue / company.getVp());
+			}
+		}
+		return pVp;
 	}
 
 	@Override

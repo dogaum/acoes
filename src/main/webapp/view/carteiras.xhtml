@@ -233,6 +233,12 @@
 								        </h:outputText>
 								    </p:column>
 
+								    <p:column headerText="#{msg['app.portfolio.pvp']}" sortBy="#{item.pVp}" style="text-align:right">
+								        <h:outputText value="#{item.pVp}">
+								        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
+								        </h:outputText>
+								    </p:column>
+
 								    <p:column headerText="#{msg['app.portfolio.lastIncome.s']}" style="text-align:right">
 			                    		<p:commandLink update=":form:panelNewIncome" oncomplete="PF('addIncomeDlg').show()" actionListener="#{carteiraView.prepareIncome}">
 			                    			<f:param name="stock" value="#{item.stock}" />
@@ -388,6 +394,8 @@
         							</p:rowExpansion>
 									<p:columnGroup type="footer">
 							            <p:row>
+							                <p:column style="text-align:right"/>
+							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>

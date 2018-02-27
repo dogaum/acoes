@@ -9,6 +9,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -54,7 +55,7 @@ public class CheckNews {
 	@Resource
 	private IncomeCompanyRepository incomeCompanyRepository;
 
-	static NumberFormat numberFormat = new DecimalFormat ("#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR")));
+	static DecimalFormat numberFormat = new DecimalFormat ("#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR")));
 
 	static NumberFormat numberFormatIncome = new DecimalFormat ("#,##0.000000", new DecimalFormatSymbols (new Locale ("pt", "BR")));
 	
@@ -241,6 +242,8 @@ public class CheckNews {
 
 	private String getQuotationsByPrefix(String prefix, Double income) {
 		StringBuffer result = new StringBuffer();
+		numberFormat.setPositivePrefix("+");
+		numberFormat.setNegativePrefix("-");
 
 		CompanyTO company = companyRepository.findByTicker(prefix + "11");
 		if (company == null) {
@@ -248,7 +251,7 @@ public class CheckNews {
 		}
 
 		if (company == null) {
-			log.error("Nao achou a empresa de ticker" + prefix);
+			log.error("Nao achou a empresa de ticker prefix: " + prefix);
 			return result.toString();
 		}
 		
@@ -265,26 +268,43 @@ public class CheckNews {
 		if (income != null) {
 			result.append("Rendimento R$ " + numberFormatIncome.format(income));
 			result.append("\n");
-			
-			Calendar cal = Calendar.getInstance();
-			IncomeCompanyTO incomeActual = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
-			if (incomeActual != null) {
-				result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()) + ": R$ " + numberFormatIncome.format(incomeActual.getValue()));
-				result.append("\n");				
-			}
-
-			cal.add(Calendar.MONTH, -1);
-			IncomeCompanyTO incomeBefore = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
-			if (incomeBefore != null) {
-				result.append("Rendimento " + DateUtils.formatToMonthYear(incomeBefore.getYearMonth()) + ": R$ " + numberFormatIncome.format(incomeBefore.getValue()));
-				result.append("\n");				
-			}
 
 			if (lastQuote != null) {
 				result.append("DY: ");
 				Double dy = (income / lastQuote) * 100;
 				result.append(numberFormat.format(dy) + " % a.m.");
-				result.append(" / " + numberFormat.format(dy * 12) + " % a.a.");				
+				result.append(" / " + numberFormat.format(dy * 12) + " % a.a.");
+				result.append("\n");
+			}
+
+			ArrayList<IncomeCompanyTO> list = new ArrayList<IncomeCompanyTO>();
+			int count = -13;
+			while (count < 0) {
+				Calendar cal = Calendar.getInstance();
+				cal.add(Calendar.MONTH, count);
+				IncomeCompanyTO incomeCompany = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
+				if (incomeCompany != null) {
+					list.add(incomeCompany);
+				}
+				count++;
+			}
+
+			IncomeCompanyTO incomeBefore = null;
+			for (IncomeCompanyTO incomeActual : list) {
+				if (incomeBefore != null) {
+					Double incBefore = incomeBefore.getValue();
+					Double incActual = incomeActual.getValue();
+					result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+					result.append(": R$ " + numberFormatIncome.format(incActual));
+					Double dy = (((incActual / incBefore) -1 ) * 100);
+					result.append(" " + numberFormat.format(dy) + "%");
+					result.append("\n");
+				} else {
+					result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+					result.append(": R$ " + numberFormatIncome.format(incomeActual.getValue()));
+					result.append("\n");
+				}
+				incomeBefore = incomeActual;
 			}
 
 		}

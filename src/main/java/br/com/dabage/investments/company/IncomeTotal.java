@@ -21,6 +21,10 @@ public class IncomeTotal implements Serializable, Comparable<IncomeTotal>  {
 
 	private List<IncomeCompanyTO> incomes;
 
+	private CompanyTO company;
+
+	private Double pVp;
+
 	public Double avg24;
 
 	public Double avg12;
@@ -213,6 +217,23 @@ public class IncomeTotal implements Serializable, Comparable<IncomeTotal>  {
 
 	public void setLastPercent(Double lastPercent) {
 		this.lastPercent = lastPercent;
+	}
+
+	public CompanyTO getCompany() {
+		return company;
+	}
+
+	public void setCompany(CompanyTO company) {
+		this.company = company;
+	}
+
+	public Double getpVp() {
+		if (company != null && company.getVp() != null) {
+			if (lastQuote != null) {
+				pVp = (lastQuote / company.getVp());
+			}
+		}
+		return pVp;
 	}
 
 	@Override
