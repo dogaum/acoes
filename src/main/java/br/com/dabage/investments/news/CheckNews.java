@@ -55,7 +55,9 @@ public class CheckNews {
 	@Resource
 	private IncomeCompanyRepository incomeCompanyRepository;
 
-	static DecimalFormat numberFormat = new DecimalFormat ("#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR")));
+	static DecimalFormat percentFormat = new DecimalFormat ("#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR")));
+	
+	static NumberFormat numberFormat = new DecimalFormat ("#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR")));
 
 	static NumberFormat numberFormatIncome = new DecimalFormat ("#,##0.000000", new DecimalFormatSymbols (new Locale ("pt", "BR")));
 	
@@ -242,8 +244,8 @@ public class CheckNews {
 
 	private String getQuotationsByPrefix(String prefix, Double income) {
 		StringBuffer result = new StringBuffer();
-		numberFormat.setPositivePrefix("+");
-		numberFormat.setNegativePrefix("-");
+		percentFormat.setPositivePrefix("+");
+		percentFormat.setNegativePrefix("-");
 
 		CompanyTO company = companyRepository.findByTicker(prefix + "11");
 		if (company == null) {
@@ -258,7 +260,6 @@ public class CheckNews {
 		String ticker = company.getTicker();
 		Double lastQuote = getQuotation.getLastQuote(ticker);
 		if (lastQuote != null) {
-			result.append("Ultimo negocio:\n");
 			result.append(ticker);
 			result.append(" : ");
 			result.append("R$ " + numberFormat.format(lastQuote));
@@ -274,7 +275,7 @@ public class CheckNews {
 				Double dy = (income / lastQuote) * 100;
 				result.append(numberFormat.format(dy) + " % a.m.");
 				result.append(" / " + numberFormat.format(dy * 12) + " % a.a.");
-				result.append("\n");
+				result.append("\n\n");
 			}
 
 			ArrayList<IncomeCompanyTO> list = new ArrayList<IncomeCompanyTO>();
@@ -288,7 +289,7 @@ public class CheckNews {
 				}
 				count++;
 			}
-
+			result.append("\n Historico: \n");
 			IncomeCompanyTO incomeBefore = null;
 			for (IncomeCompanyTO incomeActual : list) {
 				if (incomeBefore != null) {
@@ -297,7 +298,7 @@ public class CheckNews {
 					result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
 					result.append(": R$ " + numberFormatIncome.format(incActual));
 					Double dy = (((incActual / incBefore) -1 ) * 100);
-					result.append(" " + numberFormat.format(dy) + "%");
+					result.append(" " + percentFormat.format(dy) + "%");
 					result.append("\n");
 				} else {
 					result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
@@ -330,10 +331,10 @@ public class CheckNews {
 
 			Document doc = null;
 			try {
-				File file = new File("/tmp/Rendimento.html");
+				//File file = new File("/tmp/Rendimento.html");
 				doc = connection.get();
-				FileUtils.write(file, doc.html(), "UTF-8");
-				newsTO.setAttached(file);
+				//FileUtils.write(file, doc.html(), "UTF-8");
+				//newsTO.setAttached(file);
 			} catch (IOException e1) {
 			}
 
