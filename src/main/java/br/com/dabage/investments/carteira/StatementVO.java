@@ -25,6 +25,8 @@ public class StatementVO {
 
 	private Long quantity;
 
+	private Long quantityPortfolio;
+
 	private Double amount;
 
 	public Date getDate() {
@@ -89,6 +91,14 @@ public class StatementVO {
 
 	public void setAvgPrice(Double avgPrice) {
 		this.avgPrice = avgPrice;
+	}
+
+	public Long getQuantityPortfolio() {
+		return quantityPortfolio;
+	}
+
+	public void setQuantityPortfolio(Long quantityPortfolio) {
+		this.quantityPortfolio = quantityPortfolio;
 	}
 
 }

@@ -61,4 +61,8 @@ public class HtmlParserUtils {
 
 		return result;
 	}
+
+	public static String formatDouble(Double value) {
+		return numberFormat.format(value);
+	}
 }

@@ -31,6 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import br.com.dabage.investments.company.IncomeCompanyTO;
+import br.com.dabage.investments.config.ConfigService;
 import br.com.dabage.investments.mail.SendMailSSL;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
 import br.com.dabage.investments.utils.DateUtils;
@@ -62,6 +63,9 @@ public class CheckNewsTest {
 	@Resource
 	private IncomeCompanyRepository incomeCompanyRepository;
 
+	@Autowired
+	private ConfigService configService;
+	
 	@Test
 	public void testRun2() {
 		fail("Not yet implemented");
@@ -167,7 +171,8 @@ public class CheckNewsTest {
 			SendMailSSL.send(
 					"Teste",
 					"Teste",
-					file);
+					file,
+					"dogaum@gmail.com");
 		}
 	}
 
@@ -267,5 +272,10 @@ public class CheckNewsTest {
 		}
 
 		return qtyNews;
+	}
+
+	@Test
+	public void testPortfolioIR() {
+		configService.calculatePortfolioIR(2017);
 	}
 }

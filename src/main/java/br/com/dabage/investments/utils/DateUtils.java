@@ -73,6 +73,15 @@ public class DateUtils {
 		return result;
 	}
 
+	public static String formatToMonthYear(Date date) {
+		String result = "";
+		if (date != null) {
+			result = formatMonthYear.format(date);
+		}
+
+		return result;
+	}
+
 	public static Date parseStrToDate(String str) {
 		Date ret = null;
 

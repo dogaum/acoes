@@ -72,8 +72,9 @@ public class CarteiraTO extends AbstractDocument {
 	private IncomeTO lastIncome;
 	@Transient
 	private List<CarteiraItemTO> itens;
-	
-	
+	@Transient
+	private List<PortfolioItemTO> portfolioItens;
+
 	public UserTO getUser() {
 		return user;
 	}
@@ -233,6 +234,14 @@ public class CarteiraTO extends AbstractDocument {
 
 	public void setTotalActualDY(Double totalActualDY) {
 		this.totalActualDY = totalActualDY;
+	}
+
+	public List<PortfolioItemTO> getPortfolioItens() {
+		return portfolioItens;
+	}
+
+	public void setPortfolioItens(List<PortfolioItemTO> portfolioItens) {
+		this.portfolioItens = portfolioItens;
 	}
 
 }

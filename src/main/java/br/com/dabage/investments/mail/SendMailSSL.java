@@ -23,7 +23,7 @@ public class SendMailSSL {
 
 	private static Logger log = Logger.getLogger(SendMailSSL.class);
 
-	public static void send(String subject, String textContent, File file) {
+	public static void send(String subject, String textContent, File file, String email) {
 		Properties props = new Properties();
 		props.put("mail.smtp.host", "smtp.gmail.com");
 		props.put("mail.smtp.socketFactory.port", "465");
@@ -44,7 +44,7 @@ public class SendMailSSL {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress("dogaum@gmail.com"));
 			message.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse("dogaum@gmail.com"));
+					InternetAddress.parse(email));
 
 			message.setSubject(subject);
 

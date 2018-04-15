@@ -6,11 +6,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.mongodb.core.query.Query;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import br.com.dabage.investments.company.IncomeCompanyTO;
@@ -303,12 +304,12 @@ public class PortfolioService {
 				query.addCriteria(Criteria.where("stock").is(filter.getStock().toUpperCase()));
 			}
 
-			if (filter.getFilterInitialDate() != null) {
+			if (filter.getFilterInitialDate() != null && filter.getFilterFinalDate() == null) {
 				query.addCriteria(Criteria.where("dtNegotiation").gte(filter.getFilterInitialDate()));
-			}
-
-			if (filter.getFilterFinalDate() != null) {
+			} else if (filter.getFilterInitialDate() == null && filter.getFilterFinalDate() != null) {
 				query.addCriteria(Criteria.where("dtNegotiation").lte(filter.getFilterFinalDate()));
+			} else if (filter.getFilterInitialDate() != null && filter.getFilterFinalDate() != null) {
+				query.addCriteria(Criteria.where("dtNegotiation").gte(filter.getFilterInitialDate()).lte(filter.getFilterFinalDate()));
 			}
 
 			if (!filter.isSort()) {
@@ -326,6 +327,7 @@ public class PortfolioService {
 				st.setValue(negotiationTO.getValue());
 				st.setCosts(negotiationTO.getCosts());
 				st.setQuantity(negotiationTO.getQuantity());
+				st.setQuantityPortfolio(negotiationTO.getActualQuantity());
 				st.setAvgPrice(negotiationTO.getAvgBuyValue());
 
 				Double amount = negotiationTO.getQuantity() * negotiationTO.getValue();
@@ -344,12 +346,12 @@ public class PortfolioService {
 				query.addCriteria(Criteria.where("stock").is(filter.getStock().toUpperCase()));
 			}
 
-			if (filter.getFilterInitialDate() != null) {
+			if (filter.getFilterInitialDate() != null && filter.getFilterFinalDate() == null) {
 				query.addCriteria(Criteria.where("incomeDate").gte(filter.getFilterInitialDate()));
-			}
-
-			if (filter.getFilterFinalDate() != null) {
+			} else if (filter.getFilterInitialDate() == null && filter.getFilterFinalDate() != null) {
 				query.addCriteria(Criteria.where("incomeDate").lte(filter.getFilterFinalDate()));
+			} else if (filter.getFilterInitialDate() != null && filter.getFilterFinalDate() != null) {
+				query.addCriteria(Criteria.where("incomeDate").gte(filter.getFilterInitialDate()).lte(filter.getFilterFinalDate()));
 			}
 
 			if (!filter.isSort()) {
@@ -375,4 +377,5 @@ public class PortfolioService {
 
 		return result;
 	}
+
 }

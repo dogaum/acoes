@@ -134,6 +134,7 @@ public class PortfolioItemTO extends AbstractDocument implements Comparable<Port
 	@Transient
 	public void addNegotiation(NegotiationTO negotiation) {
 		boolean isFisrt = Boolean.FALSE;
+		Long actualQuantity = 0L;
 		if (this.quantity == null) {
 			isFisrt = Boolean.TRUE;
 		}
@@ -149,6 +150,7 @@ public class PortfolioItemTO extends AbstractDocument implements Comparable<Port
 
 		if (isFisrt) {
 			this.quantity = negotiation.getQuantity();
+			actualQuantity = negotiation.getQuantity();
 			this.balance = totalNegotiation;
 			BigDecimal avgPriceBD = new BigDecimal(totalNegotiation / this.quantity).setScale(2, RoundingMode.HALF_EVEN);
 			this.avgPrice = avgPriceBD.doubleValue();
@@ -159,7 +161,7 @@ public class PortfolioItemTO extends AbstractDocument implements Comparable<Port
 			this.balance = this.balance + totalNegotiation;
 			if (negotiation.getNegotiationType().equals(NegotiationType.Compra)) {
 				Long quantityBefore = this.quantity;
-				Long actualQuantity = this.quantity + negotiation.getQuantity();
+				actualQuantity = this.quantity + negotiation.getQuantity();
 
 				if (actualQuantity.equals(0L)) {
 					this.avgPrice = 0D;
@@ -180,24 +182,46 @@ public class PortfolioItemTO extends AbstractDocument implements Comparable<Port
 				this.accumulatedResult += this.result;
 
 				this.quantity = this.quantity - negotiation.getQuantity();
-
+				actualQuantity = this.quantity;
 				// Update NegotiationTO
 				negotiation.setCalculated(Boolean.TRUE);
 				negotiation.setAvgBuyValue(this.avgPrice);
 				negotiation.setCalculateDate(new Date());
 				negotiation.setCalculateValue(this.result);
-
-				// If Sell, does not change avg price or if quantity is 0, then avgPrice = 0
-				if (this.quantity.equals(0L)) {
-					this.avgPrice = 0D;
-				}
 			}
 		}
+		negotiation.setActualQuantity(actualQuantity);
 	}
-	
+
 	@Transient
 	public void addAmortization(IncomeTO income) {
 		avgPrice -= income.getValue() / quantity;
 		balance = avgPrice * quantity;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((stock == null) ? 0 : stock.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PortfolioItemTO other = (PortfolioItemTO) obj;
+		if (stock == null) {
+			if (other.stock != null)
+				return false;
+		} else if (!stock.equals(other.stock))
+			return false;
+		return true;
+	}
+
 }

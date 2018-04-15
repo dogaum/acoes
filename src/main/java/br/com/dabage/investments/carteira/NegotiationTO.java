@@ -24,6 +24,8 @@ public class NegotiationTO extends AbstractDocument implements Comparable<Negoti
 
 	private Long quantity;
 
+	private Long actualQuantity;
+
 	private NegotiationType negotiationType;
 
 	private Double costs;
@@ -171,6 +173,14 @@ public class NegotiationTO extends AbstractDocument implements Comparable<Negoti
 
 	public void setFeeDayTrade(Double feeDayTrade) {
 		this.feeDayTrade = feeDayTrade;
+	}
+
+	public Long getActualQuantity() {
+		return actualQuantity;
+	}
+
+	public void setActualQuantity(Long actualQuantity) {
+		this.actualQuantity = actualQuantity;
 	}
 
 	@Override

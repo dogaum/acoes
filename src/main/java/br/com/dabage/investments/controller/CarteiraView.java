@@ -43,6 +43,7 @@ import br.com.dabage.investments.repositories.IncomeCompanyRepository;
 import br.com.dabage.investments.repositories.IncomeRepository;
 import br.com.dabage.investments.repositories.NegotiationRepository;
 import br.com.dabage.investments.repositories.PortfolioItemRepository;
+import br.com.dabage.investments.repositories.UserRepository;
 import br.com.dabage.investments.user.UserTO;
 
 @Controller(value="carteiraView")

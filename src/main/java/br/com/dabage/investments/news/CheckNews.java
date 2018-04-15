@@ -195,7 +195,8 @@ public class CheckNews {
 												+ news.text()
 												+ "\n\n"
 												+ newsBean.getNewLink(),
-										newsBean.getAttached());
+										newsBean.getAttached(),
+										"dogaum@gmail.com");
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -267,49 +268,64 @@ public class CheckNews {
 		}
 
 		if (income != null) {
-			result.append("Rendimento R$ " + numberFormatIncome.format(income));
-			result.append("\n");
+			// History
+			ArrayList<IncomeCompanyTO> list = new ArrayList<IncomeCompanyTO>();
+			int count = -13;
+			int avgCount = 0;
+			Double avg = 0D;
+			while (count <= 0) {
+				Calendar cal = Calendar.getInstance();
+				cal.add(Calendar.MONTH, count);
+				IncomeCompanyTO incomeCompany = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
+				if (incomeCompany != null) {
+					avgCount++;
+					list.add(incomeCompany);
+				}
+				count++;
+			}
+			StringBuffer hist = new StringBuffer();
+			hist.append("\n Historico: \n");
+			IncomeCompanyTO incomeBefore = null;
+			String lastIncomeFormatted = "";
+			for (IncomeCompanyTO incomeActual : list) {
+				lastIncomeFormatted = "";
+				avg += incomeActual.getValue();
+				if (incomeBefore != null) {
+					Double incBefore = incomeBefore.getValue();
+					Double incActual = incomeActual.getValue();
+					lastIncomeFormatted += ("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+					lastIncomeFormatted += (": R$ " + numberFormatIncome.format(incActual));
+					Double dy = (((incActual / incBefore) -1 ) * 100);
+					lastIncomeFormatted += (" " + percentFormat.format(dy) + "%");
+					lastIncomeFormatted += ("\n");
+				} else {
+					lastIncomeFormatted += ("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+					lastIncomeFormatted += (": R$ " + numberFormatIncome.format(incomeActual.getValue()));
+					lastIncomeFormatted += ("\n");
+				}
+				hist.append(lastIncomeFormatted);
+				incomeBefore = incomeActual;
+			}
+			hist.append("\n");
+
+			result.append(lastIncomeFormatted);
+			result.append("\n\n");
 
 			if (lastQuote != null) {
 				result.append("DY: ");
 				Double dy = (income / lastQuote) * 100;
 				result.append(numberFormat.format(dy) + " % a.m.");
 				result.append(" / " + numberFormat.format(dy * 12) + " % a.a.");
+				result.append("\n");
+				result.append("DY Médio: ");
+				Double dyAvg = ((avg / avgCount) / lastQuote) * 100;
+				result.append(numberFormat.format(dyAvg) + " % a.m.");
+				result.append(" / " + numberFormat.format(dyAvg * 12) + " % a.a.");
 				result.append("\n\n");
 			}
-
-			ArrayList<IncomeCompanyTO> list = new ArrayList<IncomeCompanyTO>();
-			int count = -13;
-			while (count < 0) {
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.MONTH, count);
-				IncomeCompanyTO incomeCompany = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
-				if (incomeCompany != null) {
-					list.add(incomeCompany);
-				}
-				count++;
-			}
-			result.append("\n Historico: \n");
-			IncomeCompanyTO incomeBefore = null;
-			for (IncomeCompanyTO incomeActual : list) {
-				if (incomeBefore != null) {
-					Double incBefore = incomeBefore.getValue();
-					Double incActual = incomeActual.getValue();
-					result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
-					result.append(": R$ " + numberFormatIncome.format(incActual));
-					Double dy = (((incActual / incBefore) -1 ) * 100);
-					result.append(" " + percentFormat.format(dy) + "%");
-					result.append("\n");
-				} else {
-					result.append("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
-					result.append(": R$ " + numberFormatIncome.format(incomeActual.getValue()));
-					result.append("\n");
-				}
-				incomeBefore = incomeActual;
-			}
-
+			result.append(hist.toString());
 		}
-		result.append("\n");
+
 		result.append("\n");
 		return result.toString();
 	}
@@ -580,14 +596,14 @@ public class CheckNews {
 					
 					if (!buffer.toString().isEmpty()) {
 						// Send Email
-						SendMailSSL.send("Proventos Ex-" + dateFormat.format(new Date()), buffer.toString(), null);
+						SendMailSSL.send("Proventos Ex-" + dateFormat.format(new Date()), buffer.toString(), null, "dogaum@gmail.com");
 					}
 				}
 			}
 
 		} catch (Exception e) {
 			log.error(e);
-			SendMailSSL.send("Erro: Proventos Ex-" + dateFormat.format(new Date()), buffer.toString() + e.getMessage(), null);
+			SendMailSSL.send("Erro: Proventos Ex-" + dateFormat.format(new Date()), buffer.toString() + e.getMessage(), null, "dogaum@gmail.com");
 		}
 	}
 

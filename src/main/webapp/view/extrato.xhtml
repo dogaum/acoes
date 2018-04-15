@@ -127,11 +127,6 @@
 										<f:convertNumber type="currency" maxFractionDigits="2" locale="#{msg['locale']}"/>
 									</h:outputText>
 								</p:column>
-								<p:column headerText="#{msg['app.statement.lbl.qtt']}" width="90" sortBy="#{statement.quantity}">
-									<h:outputText value="#{statement.quantity}">
-										<f:convertNumber type="number" locale="#{msg['locale']}"/>
-									</h:outputText>
-								</p:column>
 								<p:column headerText="#{msg['app.statement.lbl.costs']}" width="90" sortBy="#{statement.costs}">
 									<h:outputText value="#{statement.costs}">
 										<f:convertNumber type="currency" maxFractionDigits="2" locale="#{msg['locale']}"/>
@@ -140,6 +135,16 @@
 								<p:column headerText="#{msg['app.statement.lbl.amount']}" width="90" sortBy="#{statement.amount}">
 									<h:outputText value="#{statement.amount}">
 										<f:convertNumber type="number" minFractionDigits="2" locale="#{msg['locale']}"/>
+									</h:outputText>
+								</p:column>
+								<p:column headerText="#{msg['app.statement.lbl.qtt']}" width="90" sortBy="#{statement.quantity}">
+									<h:outputText value="#{statement.quantity}">
+										<f:convertNumber type="number" locale="#{msg['locale']}"/>
+									</h:outputText>
+								</p:column>
+								<p:column headerText="#{msg['app.statement.lbl.qttPortfolio']}" width="90" sortBy="#{statement.quantityPortfolio}">
+									<h:outputText value="#{statement.quantityPortfolio}">
+										<f:convertNumber type="number" locale="#{msg['locale']}"/>
 									</h:outputText>
 								</p:column>
 								<p:column headerText="#{msg['app.statement.lbl.avgPrice']}" width="90" sortBy="#{statement.avgPrice}">
