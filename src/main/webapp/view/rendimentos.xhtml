@@ -71,10 +71,32 @@
 	                <p:outputPanel>
 						<p:dataTable id="itemTable" var="income" value="#{incomeView.incomes}" emptyMessage="#{msg['pf.datatable.noresults']}" resizableColumns="true"
 									 selectionMode="single" rowKey="#{income.stock}" scrollable="true" scrollHeight="450" scrollWidth="85%" frozenColumns="1">
-						    <p:column headerText="#{msg['app.incomes.stock']}" sortBy="#{income.stock}" style="text-align:left" width="80">
+						    <p:column headerText="#{msg['app.incomes.stock']}" filterBy="#{income.stock}" sortBy="#{income.stock}" style="text-align:left" width="80">
 						        <h:outputText value="#{income.stock}" style="font-weight: bold;"/>
 						    </p:column>
-	
+						    <p:column headerText="#{msg['app.incomes.company.setor']}" filterBy="#{income.company.setor}" sortBy="#{income.company.setor}" style="text-align:left" width="80">
+						        <h:outputText value="#{income.company.setor}" />
+						    </p:column>
+						    <p:column headerText="#{msg['app.incomes.lastQuote']}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.lastQuote}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{msg['percentSymbol']}" sortBy="#{income.lastPercent}" style="text-align:right" width="80">
+						        <h:outputText value="#{income.lastPercent}">
+						        	<f:convertNumber type="percent" minFractionDigits="2"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{msg['app.incomes.company.vp']}" style="text-align:right" width="80">
+						        <h:outputText value="#{income.company.vp}">
+						        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{msg['app.incomes.pvp']}" sortBy="#{income.pVp}" style="text-align:right" width="80">
+						        <h:outputText value="#{income.pVp}">
+						        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
 						    <p:column headerText="#{msg['app.incomes.avg24']}" style="text-align:center" width="80">
 						        <h:outputText value="#{income.avg24}">
 						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
@@ -144,26 +166,6 @@
 						    <p:column headerText="#{incomeView.incomeLabel.lbl1}" style="text-align:center" width="80">
 						        <h:outputText value="#{income.value1}">
 						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{msg['app.incomes.lastQuote']}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.lastQuote}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{msg['percentSymbol']}" sortBy="#{income.lastPercent}" style="text-align:right" width="80">
-						        <h:outputText value="#{income.lastPercent}">
-						        	<f:convertNumber type="percent" minFractionDigits="2"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{msg['app.incomes.company.vp']}" style="text-align:right" width="80">
-						        <h:outputText value="#{income.company.vp}">
-						        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{msg['app.incomes.pvp']}" sortBy="#{income.pVp}" style="text-align:right" width="80">
-						        <h:outputText value="#{income.pVp}">
-						        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="2" locale="#{msg['locale']}"/>
 						        </h:outputText>
 						    </p:column>
 						</p:dataTable>

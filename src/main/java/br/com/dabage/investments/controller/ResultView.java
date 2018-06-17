@@ -94,6 +94,7 @@ public class ResultView extends BasicView implements Serializable {
 		if (ite.hasNext()) {
 			ResultTO first = ite.next();
 			first.setResultAmount(first.getResult());
+			first.setTotalFee(first.getFee());
 			if (first.getFee() < 10D) {
 				first.setFeeAmount(first.getFee());
 			} else {
@@ -108,10 +109,13 @@ public class ResultView extends BasicView implements Serializable {
 					thisResult.setResultAmount(thisResult.getResult());
 				}
 
-				thisResult.setFeeAmount(first.getFeeAmount());
-				
-				if (thisResult.getTotalFee() < 10D) {
-					thisResult.setFeeAmount(thisResult.getFee() + thisResult.getFeeAmount());
+				Double totalFee = thisResult.getFee() + first.getFeeAmount();
+				if (totalFee < 10D) {
+					thisResult.setTotalFee(0D);
+					thisResult.setFeeAmount(totalFee);
+				} else {
+					thisResult.setTotalFee(totalFee);
+					thisResult.setFeeAmount(0D);
 				}
 
 				first = thisResult;

@@ -187,18 +187,15 @@
 				                	</f:facet>
 				                </p:toolbar>
 
+							    <p:contextMenu for="carteira">
+							        <p:menuitem value="#{msg['app.portfolio.negotiation.header']}" update=":form:negotiationDetail"
+							        			 icon="fa fa-fw fa-plus-circle" oncomplete="PF('negotiationDialog').show()"/>
+							        <p:menuitem value="#{msg['app.portfolio.incomes.header']}" update=":form:incomeDetail"
+							        			 icon="fa fa-fw fa-usd" oncomplete="PF('incomeDialog').show()"/>
+							    </p:contextMenu>
+
 								<p:dataTable id="carteira" var="item" value="#{carteiraView.carteiraItens}" emptyMessage="#{msg['pf.datatable.noresults']}"
 										 	reflow="true" selectionMode="single" rowKey="#{item.stock}" selection="#{carteiraView.selectedCarteiraItem}">
-
-									<p:column style="width:38px" exportable="false">
-							            <p:rowToggler />
-							        </p:column>
-
-							        <p:column style="width:50px;text-align: center" exportable="false">
-							             <p:commandButton update=":form:incomeDetail" oncomplete="PF('incomeDialog').show()" icon="ui-icon-search" title="#{msg['app.portfolio.incomes.header']}">
-							                <f:setPropertyActionListener value="#{item}" target="#{carteiraView.selectedCarteiraItem}"/>
-							            </p:commandButton>
-							        </p:column>
 
 								    <p:column headerText="#{msg['app.portfolio.symbol']}" sortBy="#{item.stock}" style="text-align:center">
 			                    		<p:commandLink update=":form:panelPosCompanyDlg" oncomplete="PF('posCompanyDlg').show()" actionListener="#{carteiraView.selectCompany}">
@@ -207,7 +204,8 @@
 			                    		</p:commandLink>
 								    </p:column>
 
-								    <p:column headerText="#{msg['app.portfolio.company.setor']}" sortBy="#{item.company.setor}" style="text-align:left">
+								    <p:column headerText="#{msg['app.portfolio.company.setor']}" filterBy="#{item.company.setor}" sortBy="#{item.company.setor}"
+								    			 style="text-align:left" width="120">
 								        <h:outputText value="#{item.company.setor}" />
 								    </p:column>
 
@@ -307,95 +305,8 @@
 								        	<f:convertNumber type="percent" minFractionDigits="2"/>
 								        </h:outputText>
 								    </p:column>
-							        <p:rowExpansion>
-										<p:dataTable widgetVar="negItemTable" var="negItem" value="#{item.negotiations}" style="margin-left:27px" rowKey="#{negItem.id}"
-													 editable="true">
-
-											<p:ajax event="rowEdit" listener="#{carteiraView.editNegotiation}" update=":form:portfolioDetail" />
- 
- 										    <p:column headerText="#{msg['app.portfolio.date']}" sortBy="#{negItem.dtNegotiation}">
-										        <h:outputText value="#{negItem.dtNegotiation}">
-										        	<f:convertDateTime locale="#{msg['locale']}"  />
-										        </h:outputText>
-										    </p:column>
-
-										    <p:column headerText="#{msg['app.portfolio.symbol']}" sortBy="#{negItem.stock}">
-										        <h:outputText value="#{negItem.stock}" />
-										    </p:column>
-
-										    <p:column headerText="#{msg['app.portfolio.type']}" sortBy="#{negItem.negotiationType}">
-									           <p:cellEditor>
-									               <f:facet name="output"><h:outputText value="#{negItem.negotiationType}" /></f:facet>
-									               <f:facet name="input">
-												       <p:selectOneMenu value="#{negItem.negotiationType}" style="width:100%">
-								            		   		<f:selectItems value="#{carteiraView.negotiationTypes}" />
-												       </p:selectOneMenu>
-									               </f:facet>
-									            </p:cellEditor>
-										    </p:column>
-										 
-										    <p:column headerText="#{msg['app.portfolio.qty']}" sortBy="#{negItem.quantity}">
-									           <p:cellEditor>
-									               <f:facet name="output"><h:outputText value="#{negItem.quantity}" /></f:facet>
-									               <f:facet name="input"><p:spinner value="#{negItem.quantity}" min="0" /></f:facet>
-									            </p:cellEditor>
-										    </p:column>
-
-										    <p:column headerText="#{msg['app.portfolio.value']}" sortBy="#{negItem.value}">
-									           <p:cellEditor>
-									               <f:facet name="output">
-												        <h:outputText value="#{negItem.value}">
-												        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
-												        </h:outputText>
-									               </f:facet>
-									               <f:facet name="input"><p:inputNumber value="#{negItem.value}"  symbol="#{msg['currencySymbol']} "/></f:facet>
-									            </p:cellEditor>
-										    </p:column>
-
-										    <p:column headerText="#{msg['app.portfolio.costs']}" sortBy="#{negItem.costs}">
-									           <p:cellEditor>
-									               <f:facet name="output">
-												        <h:outputText value="#{negItem.costs}">
-												        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
-												        </h:outputText>
-									               </f:facet>
-									               <f:facet name="input"><p:inputNumber value="#{negItem.costs}"  symbol="#{msg['currencySymbol']} "/></f:facet>
-									            </p:cellEditor>
-										    </p:column>
-
-										    <p:column headerText="#{msg['app.portfolio.avgValue']}" sortBy="#{negItem.avgBuyValue}">
-										        <f:facet name="output">
-											        <h:outputText value="#{negItem.avgBuyValue}">
-											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
-											        </h:outputText>
-										        </f:facet>
-										        <f:facet name="input"><p:inputNumber value="#{negItem.avgBuyValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
-										    </p:column>
-
-										    <p:column headerText="#{msg['app.portfolio.resultValue']}" sortBy="#{negItem.calculateValue}">
-										        <f:facet name="output">
-											        <h:outputText value="#{negItem.calculateValue}">
-											        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
-											        </h:outputText>
-										        </f:facet>
-										        <f:facet name="input"><p:inputNumber value="#{negItem.calculateValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
-										    </p:column>
-
-										    <p:column style="width:38px">
-										        <p:rowEditor />
-										    </p:column>
-										    <p:column style="width:48px">
-										        <p:commandButton icon="ui-icon-close" action="#{carteiraView.deleteNegotiation}" update=":form:portfolioDetail" id="cbDeleteNegotiation">
-										        	<f:setPropertyActionListener value="#{negItem}" target="#{carteiraView.negotiation}" for="cbDeleteNegotiation"/>
-										        	<p:confirm header="#{msg['app.label.confirm']}" message="#{msg['app.portfolio.delete.dlg.msg']}" icon="ui-icon-alert" />
-										        </p:commandButton>
-										    </p:column>
-										</p:dataTable>
-        							</p:rowExpansion>
 									<p:columnGroup type="footer">
 							            <p:row>
-							                <p:column style="text-align:right"/>
-							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
@@ -473,7 +384,7 @@
 											        </h:outputText>
 									            </f:facet>
 							                </p:column>
-										    <p:column style="text-align:right" width="90">
+										    <p:column style="text-align:right">
 											    <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.percentTotalPos}">
 											        	<f:convertNumber type="percent" minFractionDigits="2" maxFractionDigits="2"/>
@@ -575,6 +486,101 @@
 						</p:panel>
 			        </p:dialog>
 
+					<!-- Negotiation Detail -->
+					<p:dialog widgetVar="negotiationDialog" modal="true" position="center" header="#{msg['app.portfolio.negotiation.header']}" width="60%" showEffect="fade" hideEffect="fade" resizable="true" draggable="true" closeOnEscape="true">
+				        <p:panel id="negotiationDetail" style="text-align:center;">
+                       	    <h:commandLink title="#{msg['app.label.export.xls']}">
+						        <i class="fa fa-fw fa-file-excel-o"></i>
+						        <p:dataExporter type="xlsx" target="operacoes" fileName="operacoes" pageOnly="true"/>
+						    </h:commandLink>
+							<p:dataTable id="operacoes" widgetVar="negItemTable" var="negItem" value="#{carteiraView.selectedCarteiraItem.negotiations}" style="margin-left:27px" rowKey="#{negItem.id}"
+										 editable="true" paginator="true" rows="10" rowsPerPageTemplate="10,20" reflow="true" sortBy="#{negItem.stock}"
+                         				 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         				 emptyMessage="app.portfolio.empty">
+	
+								<p:ajax event="rowEdit" listener="#{carteiraView.editNegotiation}" update=":form:portfolioDetail" />
+	
+								    <p:column headerText="#{msg['app.portfolio.date']}" sortBy="#{negItem.dtNegotiation}">
+							        <h:outputText value="#{negItem.dtNegotiation}">
+							        	<f:convertDateTime locale="#{msg['locale']}"  />
+							        </h:outputText>
+							    </p:column>
+	
+							    <p:column headerText="#{msg['app.portfolio.symbol']}" sortBy="#{negItem.stock}">
+							        <h:outputText value="#{negItem.stock}" />
+							    </p:column>
+	
+							    <p:column headerText="#{msg['app.portfolio.type']}" sortBy="#{negItem.negotiationType}">
+						           <p:cellEditor>
+						               <f:facet name="output"><h:outputText value="#{negItem.negotiationType}" /></f:facet>
+						               <f:facet name="input">
+									       <p:selectOneMenu value="#{negItem.negotiationType}" style="width:100%">
+					            		   		<f:selectItems value="#{carteiraView.negotiationTypes}" />
+									       </p:selectOneMenu>
+						               </f:facet>
+						            </p:cellEditor>
+							    </p:column>
+							 
+							    <p:column headerText="#{msg['app.portfolio.qty']}" sortBy="#{negItem.quantity}">
+						           <p:cellEditor>
+						               <f:facet name="output"><h:outputText value="#{negItem.quantity}" /></f:facet>
+						               <f:facet name="input"><p:spinner value="#{negItem.quantity}" min="0" /></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+	
+							    <p:column headerText="#{msg['app.portfolio.value']}" sortBy="#{negItem.value}">
+						           <p:cellEditor>
+						               <f:facet name="output">
+									        <h:outputText value="#{negItem.value}">
+									        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+									        </h:outputText>
+						               </f:facet>
+						               <f:facet name="input"><p:inputNumber value="#{negItem.value}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+	
+							    <p:column headerText="#{msg['app.portfolio.costs']}" sortBy="#{negItem.costs}">
+						           <p:cellEditor>
+						               <f:facet name="output">
+									        <h:outputText value="#{negItem.costs}">
+									        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+									        </h:outputText>
+						               </f:facet>
+						               <f:facet name="input"><p:inputNumber value="#{negItem.costs}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+	
+							    <p:column headerText="#{msg['app.portfolio.avgValue']}" sortBy="#{negItem.avgBuyValue}">
+							        <f:facet name="output">
+								        <h:outputText value="#{negItem.avgBuyValue}">
+								        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+								        </h:outputText>
+							        </f:facet>
+							        <f:facet name="input"><p:inputNumber value="#{negItem.avgBuyValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+							    </p:column>
+	
+							    <p:column headerText="#{msg['app.portfolio.resultValue']}" sortBy="#{negItem.calculateValue}">
+							        <f:facet name="output">
+								        <h:outputText value="#{negItem.calculateValue}">
+								        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+								        </h:outputText>
+							        </f:facet>
+							        <f:facet name="input"><p:inputNumber value="#{negItem.calculateValue}"  symbol="#{msg['currencySymbol']} "/></f:facet>
+							    </p:column>
+	
+							    <p:column style="width:38px" exportable="false">
+							        <p:rowEditor />
+							    </p:column>
+							    <p:column style="width:48px" exportable="false">
+							        <p:commandButton icon="ui-icon-close" action="#{carteiraView.deleteNegotiation}" update=":form:portfolioDetail" id="cbDeleteNegotiation">
+							        	<f:setPropertyActionListener value="#{negItem}" target="#{carteiraView.negotiation}" for="cbDeleteNegotiation"/>
+							        	<p:confirm header="#{msg['app.label.confirm']}" message="#{msg['app.portfolio.delete.dlg.msg']}" icon="ui-icon-alert" />
+							        </p:commandButton>
+							    </p:column>
+							</p:dataTable>
+						</p:panel>
+					</p:dialog>
+
 					<!-- Income Detail -->
 				    <p:dialog widgetVar="incomeDialog" modal="true" position="center" header="#{msg['app.portfolio.incomes.header']}" width="60%" showEffect="fade" hideEffect="fade" resizable="true" draggable="true" closeOnEscape="true">
 				        <p:panel id="incomeDetail" style="text-align:center;">
@@ -585,7 +591,7 @@
 							<p:dataTable id="rendimento" widgetVar="incItemTable" var="incItem" value="#{carteiraView.selectedCarteiraItem.incomes}" style="margin-left:27px" rowKey="#{incItem.id}"
 										 editable="true" paginator="true" rows="10" rowsPerPageTemplate="10,20" reflow="true" sortBy="#{incItem.stock}"
                          				 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                         				 rendered="#{not empty carteiraView.selectedCarteiraItem}">
+                         				 emptyMessage="app.portfolio.empty">
 
 								<p:ajax event="rowEdit" listener="#{carteiraView.editIncome}" update=":form:portfolioDetail" />
 

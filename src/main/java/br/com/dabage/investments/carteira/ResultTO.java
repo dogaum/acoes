@@ -43,6 +43,8 @@ public class ResultTO implements Serializable, Comparable<ResultTO> {
 
 	private Boolean dayTrade;
 
+	private Double totalFee;
+	
 	/** Add a new Negotiation to calc */
 	public void addNegotiation(NegotiationTO negotiation) {
 		negotiations.add(negotiation);
@@ -55,13 +57,11 @@ public class ResultTO implements Serializable, Comparable<ResultTO> {
 	 * @return
 	 */
 	public Double getTotalFee() {
+		return this.totalFee;
+	}
 
-		if (getFee() + feeAmount < 10D) {
-			return 0D;
-		} else {
-			return getFee() + feeAmount;
-		}
-
+	public void setTotalFee(Double totalFee) {
+		this.totalFee = totalFee;
 	}
 
 	/** Returns a year month formatted */
