@@ -67,10 +67,9 @@ public class NewsView extends BasicView implements Serializable {
 		Query query = new Query();
 
 		if (filterSubject != null && !filterSubject.isEmpty()) {
-			TextCriteria criteria = TextCriteria.forDefaultLanguage()
-					  .matching(filterSubject.toUpperCase());
-
-			 query = TextQuery.queryText(criteria);			
+			//TextCriteria criteria = TextCriteria.forDefaultLanguage().matching(filterSubject.toUpperCase());
+			//query = TextQuery.queryText(criteria);
+			query.addCriteria(Criteria.where("newsHeader").regex(filterSymbol.toUpperCase()));
 		}
 
 		if (filterSymbol != null && !filterSymbol.isEmpty()) {

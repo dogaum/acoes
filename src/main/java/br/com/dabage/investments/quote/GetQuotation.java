@@ -14,8 +14,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
 import org.primefaces.json.JSONObject;
@@ -32,6 +34,8 @@ public class GetQuotation {
 
 	static String googleQuoteUrl = "https://finance.google.com/finance/getprices?q=";
 
+	static String itauQuoteUrl = "http://www.itaucorretora.com.br/Finder/Finder/?stock=";
+	
 	static SimpleDateFormat preFormatDate = new SimpleDateFormat("yyMMdd");
 	static SimpleDateFormat unFormatDate = new SimpleDateFormat("dd/MM");
 	static SimpleDateFormat unFormatCompleteDate = new SimpleDateFormat("yyyy-MM-dd");
@@ -39,6 +43,8 @@ public class GetQuotation {
 	static NumberFormat unFormatNumber = NumberFormat.getInstance();
 
 	static Map<String, Quote> quoteCache;
+
+	static final int TIMEOUT = 1500;
 
 	public String getLastQuotation(String stock) {
 	
@@ -101,7 +107,8 @@ public class GetQuotation {
 		if (quoteCache != null) {
 			for(Quote quote : quoteCache.values()) {
 				if (isCacheInvalidate(quote.getLastUpdate())) {
-					getQuoteForCache(quote.getStock(), quote);
+					//getQuoteForCache(quote.getStock(), quote);
+					getQuoteFromItau(quote.getStock(), quote);
 				}
 			}
 		}
@@ -144,7 +151,8 @@ public class GetQuotation {
 		}
 
 		if (quote == null || isCacheInvalidate(quote.getLastUpdate())) {
-			getQuoteForCache(stock, quote);
+			//getQuoteForCache(stock, quote);
+			getQuoteFromItau(stock, quote);
 			quote = quoteCache.get(stock);
 		}
 
@@ -155,9 +163,55 @@ public class GetQuotation {
 		}
 	}
 
+	private void getQuoteFromItau(String stock, Quote quote) {
+		try {
+			Connection connection = Jsoup.connect(itauQuoteUrl + stock);
+			connection.ignoreHttpErrors(true);
+			connection.timeout(TIMEOUT);
+
+			Document doc = connection.get();
+			Elements classes = doc.getElementsByClass("preco");
+			String preco = classes.get(0).getElementsByTag("strong").text().trim();
+			preco = preco.replace(".", "");
+			preco = preco.replace(",", ".");
+			Double lastQuote = Double.valueOf(preco);
+
+			if (quote == null) quote = new Quote();
+			quote.setDate(new Date());
+			quote.setLastUpdate(new Date());
+
+			quote.setOpen(lastQuote); //Opean value
+			quote.setLow(lastQuote); //Min value
+			quote.setHigh(lastQuote); //Max value
+			quote.setClose(lastQuote); //Last value 
+			quote.setStock(stock);
+
+			quoteCache.put(stock, quote);
+
+		} catch (Exception e) {
+			if (quote == null) quote = new Quote();
+			quote.setDate(new Date());
+			quote.setLastUpdate(new Date());
+
+			quote.setOpen(0); //Opean value
+			quote.setLow(0); //Min value
+			quote.setHigh(0); //Max value
+			quote.setClose(0); //Last value 
+			quote.setStock(stock);
+
+			quoteCache.put(stock, quote);
+			log.error("Erro ao pegar cotação do Itau. Stock: " + stock, e);
+		}
+
+	}
+
 	private void getQuoteForCache(String stock, Quote quote) {
 		try {
-			Document doc = Jsoup.connect(cmaQuoteUrl + stock).get();
+			Connection connection = Jsoup.connect(cmaQuoteUrl + stock);
+			connection.ignoreHttpErrors(true);
+			connection.timeout(TIMEOUT);
+
+			Document doc = connection.get();
 			String[] lines = doc.body().text().split(" ");
 			if (lines.length < 2) {
 				return;
@@ -179,6 +233,7 @@ public class GetQuotation {
 			quoteCache.put(stock, quote);
 		} catch (IOException | ParseException e) {
 			log.error(e);
+			getQuoteFromItau(stock, quote);
 		}
 
 	}
@@ -193,7 +248,10 @@ public class GetQuotation {
 	public JSONObject getJsonData(String stock) {
 
 		try {
-			Document doc = Jsoup.connect(cmaQuoteUrl + stock).get();
+			Connection connection = Jsoup.connect(cmaQuoteUrl + stock);
+			connection.ignoreHttpErrors(true);
+			connection.timeout(TIMEOUT);
+			Document doc = connection.get();
 			String[] lines = doc.body().text().split(" ");
 			if (lines.length < 2) {
 				return null;
@@ -253,7 +311,10 @@ public class GetQuotation {
 		List<Quote> result = new ArrayList<Quote>();
 		
 		try {
-			Document doc = Jsoup.connect(cmaQuoteUrl + stock).get();
+			Connection connection = Jsoup.connect(cmaQuoteUrl + stock);
+			connection.ignoreHttpErrors(true);
+			connection.timeout(TIMEOUT);
+			Document doc = connection.get();
 			String[] lines = doc.body().text().split(" ");
 			if (lines.length < 2) {
 				return result;

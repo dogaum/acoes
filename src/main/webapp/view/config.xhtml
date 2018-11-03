@@ -358,6 +358,52 @@
 				    </div>
 				  </div>
                 </div>
+				<!-- Parameters -->
+                <div class="col-lg-12">
+				  <div class="panel panel-primary">
+				    <div class="panel-heading">
+				      <h4 class="panel-title">
+				        <a data-toggle="collapse" href="#collapseParameters" class="panel-title">
+				          <h:outputText value="#{msg['app.config.parameters.title']}"/>
+				        </a>
+				      </h4>
+				    </div>
+				    <div id="collapseParameters" class="panel-collapse collapse out">
+				      <div class="panel-body">
+				      	<p:outputPanel id="parametersContent" deferred="true">
+                       	    <h:commandLink title="#{msg['app.label.export.xls']}">
+						        <i class="fa fa-fw fa-file-excel-o"></i>
+						        <p:dataExporter type="xlsx" target="parametros" fileName="parametros" pageOnly="false"/>
+						    </h:commandLink>
+							<p:dataTable id="parametros" widgetVar="parameterTable" var="parameterItem" value="#{configView.parameters}" style="margin-left:27px" rowKey="#{parameterItem.id}"
+								rows="10" paginator="true" emptyMessage="#{msg['pf.datatable.noresults']}"
+								paginatorPosition="bottom" editable="true"
+								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+	
+								<p:ajax event="rowEdit" listener="#{configView.editParameter}" update=":form:parametersContent" />
+	
+							    <p:column headerText="#{msg['app.config.parameters.key']}" sortBy="#{parameterItem.key}"
+							     	filterable="true" filterBy="#{parameterItem.key}" >
+							     	<p:outputLabel value="#{parameterItem.key}"/>
+							    </p:column>
+
+							    <p:column headerText="#{msg['app.config.parameters.value']}" sortBy="#{parameterItem.value}"
+							     	filterable="true" filterBy="#{parameterItem.value}">
+						           <p:cellEditor>
+						               <f:facet name="output"><p:outputLabel value="#{parameterItem.value}" /></f:facet>
+						               <f:facet name="input"><p:inputText value="#{parameterItem.value}"/></f:facet>
+						            </p:cellEditor>
+							    </p:column>
+
+							    <p:column style="width:38px">
+							        <p:rowEditor />
+							    </p:column>
+							</p:dataTable>
+				      	</p:outputPanel>
+				      </div>
+				    </div>
+				  </div>
+                </div>
             </div>
 
 	        <p:dialog widgetVar="addStockTypeDlg" modal="true" position="center" header="#{msg['app.config.stockType.add.dlg.header']}" width="530" showEffect="fade" hideEffect="fade" closeOnEscape="true">

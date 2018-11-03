@@ -3,8 +3,7 @@ package br.com.dabage.investments.security;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -24,7 +23,7 @@ import br.com.dabage.investments.user.UserTO;
 @Component
 public class MongoUserDetailsService implements UserDetailsService {
 
-    @Resource
+    @Autowired
     private UserRepository userRepository;
     
     private User userdetails;

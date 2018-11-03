@@ -31,6 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import br.com.dabage.investments.company.IncomeCompanyTO;
+import br.com.dabage.investments.company.InsertFIITickers;
 import br.com.dabage.investments.config.ConfigService;
 import br.com.dabage.investments.mail.SendMailSSL;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
@@ -71,19 +72,24 @@ public class CheckNewsTest {
 		fail("Not yet implemented");
 	}
 
+	@Autowired
+	public InsertFIITickers insertFIITickers;
+
 	@Test
 	public void testRun() {
 		String query = "fii";
-		int qtyNews = checkNews.run(query, NewsFilterType.DAY, null, null, 1);
+		String sDate = "2018-10-26";
+		String fDate = "2018-10-26";
+		int qtyNews = checkNews.run(query, NewsFilterType.INTERVAL, sDate, fDate, 2);
 		System.out.println(qtyNews);
 	}
 
 	@Test
 	public void testCheckIncome() {
 		String query = "aviso aos cotistas";
-		String sDate = "2017-11-03";
-		String fDate = "2017-11-03";
-		int qtyNews = checkNews.run(query, NewsFilterType.INTERVAL, sDate, fDate, 1);
+		String sDate = "2018-06-29";
+		String fDate = "2018-06-29";
+		int qtyNews = checkNews.run(query, NewsFilterType.INTERVAL, sDate, fDate, 10);
 		System.out.println(qtyNews);
 	}
 
@@ -277,5 +283,21 @@ public class CheckNewsTest {
 	@Test
 	public void testPortfolioIR() {
 		configService.calculatePortfolioIR(2017);
+	}
+
+	@Test
+	public void testInsertNewCompanies() {
+		insertFIITickers.run();
+	}
+
+	@Test
+	public void testGetIdNoticia() {
+		String header = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&idNoticia=760407&header=201810290905PROVENTOS+DOS+EMISSORES+COTADOS+NA+FORMA+%5cEX%5c%3a+29%2f10%2f2018760407&tk=02491c76bfb3aab4ef1522f9137adb91&WT.ac=PROVENTOS+DOS+EMISSORES+COTADOS+NA+FORMA+%5cEX%5c%3a+29%2f10%2f2018";
+		String idNoticia = "";
+		int initialIndex = header.indexOf("idNoticia=");
+		int finalIndex = header.indexOf("&header");
+		idNoticia = header.substring(initialIndex +10, finalIndex);
+
+		System.out.println(idNoticia);
 	}
 }

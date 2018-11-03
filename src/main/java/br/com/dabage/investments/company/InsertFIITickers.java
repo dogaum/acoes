@@ -57,10 +57,18 @@ public class InsertFIITickers {
 					
 					CompanyTO obj = companyRepository.findByTicker(tickerFull);
 					if (obj == null) {
-						CompanyTO company = new CompanyTO(tickerFull, name.text(), fullName.text());
-						company.setStockType(stockType);
-						System.out.println(company);
-						companyRepository.save(company);
+						if (!tickerFull.endsWith("B")) {
+							tickerFull += "B";
+							obj = companyRepository.findByTicker(tickerFull);
+							
+							if (obj == null) {
+								CompanyTO company = new CompanyTO(tickerFull, name.text(), fullName.text());
+								company.setStockType(stockType);
+								company.setCategory("FII");
+								log.info("New FII: " + company);
+								companyRepository.save(company);								
+							}
+						}
 					}
 				}
 			} catch (IOException e) {

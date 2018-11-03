@@ -56,13 +56,13 @@
 						        <i class="fa fa-fw fa-file-excel-o"></i>
 						        <p:dataExporter type="xlsx" target="itemTable" fileName="rendimentos" pageOnly="false"/>
 						    </h:commandLink>
-						    <p:commandLink title="#{msg['app.incomes.reload.title']}" action="#{incomeView.resetIncomes}" update=":form:panelNewIncome">
+						    <p:commandLink title="#{msg['app.incomes.reload.title']}" action="#{incomeView.resetIncomes}" update=":form:itemTable">
 						        <i class="fa fa-fw fa-undo"></i>
 						    </p:commandLink>
 		                </f:facet>
 	                	<f:facet name="right">
 						    <p:commandLink id="reNewIncome" onclick="PF('addIncomeReDlg').show()" actionListener="#{incomeView.prepareIncome}"
-						    				update=":form:panelNewIncome">
+						    				update=":form:panelNewIncome, :form:itemTable">
 						        <i class="fa fa-fw fa-usd"></i>
 						        <h:outputText value="#{msg['app.incomes.income.add']}" />
 						    </p:commandLink>
@@ -102,59 +102,26 @@
 						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
 						        </h:outputText>
 						    </p:column>
+						    <p:column headerText="#{msg['app.incomes.percent.avg24']}" sortBy="#{income.percentAvg24}" style="text-align:right" width="80">
+						        <h:outputText value="#{income.percentAvg24}">
+						        	<f:convertNumber type="percent" minFractionDigits="2"/>
+						        </h:outputText>
+						    </p:column>
+
 						    <p:column headerText="#{msg['app.incomes.avg12']}" style="text-align:center" width="80">
 						        <h:outputText value="#{income.avg12}">
 						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
 						        </h:outputText>
 						    </p:column>
-	
-						    <p:column headerText="#{incomeView.incomeLabel.lbl12}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value12}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+							    <p:column headerText="#{msg['app.incomes.percent.avg12']}" sortBy="#{income.percentAvg12}" style="text-align:right" width="80">
+						        <h:outputText value="#{income.percentAvg12}">
+						        	<f:convertNumber type="percent" minFractionDigits="2"/>
 						        </h:outputText>
 						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl11}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value11}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl10}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value10}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl9}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value9}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl8}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value8}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl7}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value7}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl6}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value6}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl5}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value5}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl4}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value4}">
-						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
-						        </h:outputText>
-						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl3}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value3}">
+
+							<!-- Months -->
+						    <p:column headerText="#{incomeView.incomeLabel.lbl1}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value1}">
 						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
 						        </h:outputText>
 						    </p:column>
@@ -163,8 +130,53 @@
 						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
 						        </h:outputText>
 						    </p:column>
-						    <p:column headerText="#{incomeView.incomeLabel.lbl1}" style="text-align:center" width="80">
-						        <h:outputText value="#{income.value1}">
+						    <p:column headerText="#{incomeView.incomeLabel.lbl3}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value3}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{incomeView.incomeLabel.lbl4}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value4}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{incomeView.incomeLabel.lbl5}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value5}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{incomeView.incomeLabel.lbl6}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value6}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{incomeView.incomeLabel.lbl7}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value7}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{incomeView.incomeLabel.lbl8}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value8}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{incomeView.incomeLabel.lbl9}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value9}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{incomeView.incomeLabel.lbl10}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value10}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{incomeView.incomeLabel.lbl11}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value11}">
+						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+						        </h:outputText>
+						    </p:column>
+						    <p:column headerText="#{incomeView.incomeLabel.lbl12}" style="text-align:center" width="80">
+						        <h:outputText value="#{income.value12}">
 						        	<f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
 						        </h:outputText>
 						    </p:column>

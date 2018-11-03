@@ -16,4 +16,5 @@ public interface NewsRepository extends MongoRepository<NewsTO, BigInteger> {
 
 	NewsTO findByNewsHeaderAndNewsDate(String newsHeader, String newsDate);
 
+	NewsTO findByIdNoticia(String idNoticia);
 }

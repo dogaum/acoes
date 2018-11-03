@@ -35,6 +35,7 @@ import br.com.dabage.investments.carteira.SectorChartVO;
 import br.com.dabage.investments.company.CompanyService;
 import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.config.ConfigService;
+import br.com.dabage.investments.config.IncomeService;
 import br.com.dabage.investments.home.IncomeVO;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
@@ -43,7 +44,6 @@ import br.com.dabage.investments.repositories.IncomeCompanyRepository;
 import br.com.dabage.investments.repositories.IncomeRepository;
 import br.com.dabage.investments.repositories.NegotiationRepository;
 import br.com.dabage.investments.repositories.PortfolioItemRepository;
-import br.com.dabage.investments.repositories.UserRepository;
 import br.com.dabage.investments.user.UserTO;
 
 @Controller(value="carteiraView")
@@ -111,6 +111,9 @@ public class CarteiraView extends BasicView implements Serializable {
 
 	@Autowired
 	ConfigService configService;
+
+	@Autowired
+	IncomeService incomeService;
 
 	@PostConstruct
 	public void prepare() {

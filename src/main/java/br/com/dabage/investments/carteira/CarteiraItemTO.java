@@ -8,6 +8,10 @@ import br.com.dabage.investments.company.IncomeCompanyTO;
 
 public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 
+	public CarteiraItemTO() {
+		
+	}
+
 	public CarteiraItemTO(String stock) {
 		this.stock = stock;
 		avgValue = 0D;
@@ -62,6 +66,8 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 	private IncomeCompanyTO lastIncomeCompany;
 
 	private CompanyTO company;
+
+	public Double percentAvg12;
 
 	public void addNegotiation(NegotiationTO neg) {
 		// Add to the list
@@ -251,6 +257,14 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 
 	public void setCompany(CompanyTO company) {
 		this.company = company;
+	}
+
+	public Double getPercentAvg12() {
+		return percentAvg12;
+	}
+
+	public void setPercentAvg12(Double percentAvg12) {
+		this.percentAvg12 = percentAvg12;
 	}
 
 	public Double getpVp() {

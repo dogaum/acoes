@@ -27,7 +27,11 @@ public class IncomeTotal implements Serializable, Comparable<IncomeTotal>  {
 
 	public Double avg24;
 
+	public Double percentAvg24;
+
 	public Double avg12;
+
+	public Double percentAvg12;
 
 	public Double value1;
 
@@ -225,6 +229,22 @@ public class IncomeTotal implements Serializable, Comparable<IncomeTotal>  {
 
 	public void setCompany(CompanyTO company) {
 		this.company = company;
+	}
+
+	public Double getPercentAvg24() {
+		return percentAvg24;
+	}
+
+	public void setPercentAvg24(Double percentAvg24) {
+		this.percentAvg24 = percentAvg24;
+	}
+
+	public Double getPercentAvg12() {
+		return percentAvg12;
+	}
+
+	public void setPercentAvg12(Double percentAvg12) {
+		this.percentAvg12 = percentAvg12;
 	}
 
 	public Double getpVp() {

@@ -65,6 +65,26 @@ public class CheckNews {
 
 	static DateFormat dateFormatSearch = new SimpleDateFormat("yyyy-MM-dd");
 
+	public Document getDocument(String url) {
+		Connection connection = Jsoup.connect(url);
+		connection.ignoreHttpErrors(true);
+		connection.timeout(600000);
+		connection.header("Accept-Language", "pt-BR,pt;q=0.8");
+		connection.header("Accept-Encoding", "gzip,deflate,sdch");
+		connection.userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36");
+		connection.maxBodySize(0);
+
+		Document doc = null;
+		try {
+			doc = connection.get();
+		} catch (IOException e) {
+			System.out.println("Erro ao consultar a URL: " + url);
+			log.error("Erro ao consultar a URL: " + url);
+			e.printStackTrace();
+		}
+		return doc;
+	}
+
 	public void run2() {
 		String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
 
@@ -86,12 +106,8 @@ public class CheckNews {
 			int pages = 20;
 			for (int i = 1; i < pages; i++) {
 				try {
-					Connection connection = Jsoup.connect(endFII + i);
-					connection.ignoreHttpErrors(true);
-					connection.timeout(30000);
+					Document doc = getDocument(endFII + i);
 
-					Document doc = connection.get();
-					
 					Element pagina = doc.getElementById("linksNoticias");
 					if (pagina != null) {
 						Elements links = pagina.getElementsByTag("li");
@@ -99,7 +115,7 @@ public class CheckNews {
 							String href = link.getElementsByTag("a").get(0).attr("href");
 							String newsName = link.text();
 
-							doc = Jsoup.connect(prefix + href).get();
+							doc = this.getDocument(prefix + href);
 							Element news = doc.getElementById("contentNoticia");
 
 							NewsTO newsBean = new NewsTO();
@@ -119,6 +135,7 @@ public class CheckNews {
 
 				} catch (Exception e) {
 					log.error(e);
+					e.printStackTrace();
 				}
 			}
 		
@@ -151,11 +168,7 @@ public class CheckNews {
 		for (int i = pages; i >= 1; i--) {
 			String finalUrl = endFII.toString() + "&pg=" + i;
 			try {
-				Connection connection = Jsoup.connect(finalUrl);
-				connection.ignoreHttpErrors(true);
-				connection.timeout(30000);
-
-				Document doc = connection.get();
+				Document doc = this.getDocument(finalUrl);
 				Element pagina = doc.getElementById("linksNoticias");
 				if (pagina != null) {
 					Elements links = pagina.getElementsByTag("li");
@@ -164,11 +177,13 @@ public class CheckNews {
 							String href = link.getElementsByTag("a").get(0).attr("href");
 							String newsName = link.text();
 
-							connection = Jsoup.connect(prefix + href);
-							connection.ignoreHttpErrors(true);
-							connection.timeout(30000);
-							doc = connection.get();
+							doc = this.getDocument(prefix + href);
 							Element news = doc.getElementById("contentNoticia");
+							while (news == null) {
+								Thread.sleep(10 * 1000);
+								doc = this.getDocument(prefix + href);
+								news = doc.getElementById("contentNoticia");
+							}
 
 							NewsTO newsBean = new NewsTO();
 							newsBean.setNewsHeader(newsName.substring(19));
@@ -180,14 +195,26 @@ public class CheckNews {
 
 							if (insertNews(newsBean) && newsBean.getNewsHeader().toLowerCase().contains("fii")) {
 								qtyNews++;
-								Double income = checkIncome(newsBean);
+								Double income = null;
+										
+								try {
+									income = checkIncome(newsBean);	
+								} catch (Exception e) {
+									log.error("Erro ao verificar o Aviso aos cotistas " + newsName);
+									log.error(e);
+									e.printStackTrace();									
+								}
+								newsRepository.save(newsBean);
 
 								try {
 									checkInformeMensal(newsBean);	
 								} catch (Exception e) {
+									log.error("Erro ao verificar o Informe mensal. " + newsName);
+									log.error(e);
 									e.printStackTrace();
 								}
 
+								newsRepository.save(newsBean);
 								SendMailSSL.send(
 										newsName,
 										getQuotationsByPrefix(newsBean.getTicker(),
@@ -197,8 +224,11 @@ public class CheckNews {
 												+ newsBean.getNewLink(),
 										newsBean.getAttached(),
 										"dogaum@gmail.com");
+								newsBean.setEmailSent(true);
+								newsRepository.save(newsBean);
 							}
 						} catch (Exception e) {
+							log.error(e);
 							e.printStackTrace();
 						}
 
@@ -207,6 +237,7 @@ public class CheckNews {
 
 			} catch (Exception e) {
 				log.error(e);
+				e.printStackTrace();
 			}
 		}
 		
@@ -214,15 +245,47 @@ public class CheckNews {
 	}
 
 	private boolean insertNews(NewsTO newsTO) {
-		NewsTO obj = newsRepository.findByNewsHeaderAndNewsDate(newsTO.getNewsHeader(), newsTO.getNewsDate());
+		String idNoticia = extracIdNoticia(newsTO.getNewsHref());
+		newsTO.setIdNoticia(idNoticia);
+		NewsTO obj = newsRepository.findByIdNoticia(idNoticia);
+
+		//NewsTO obj = newsRepository.findByNewsHeaderAndNewsDate(newsTO.getNewsHeader(), newsTO.getNewsDate());
 		if (obj == null) {
-			newsRepository.save(newsTO);
 			return true;
+		} else {
+			newsTO = obj;
 		}
 
 		return false;
 	}
 
+	private boolean isEmailSent(NewsTO newsTO) {
+		String idNoticia = extracIdNoticia(newsTO.getNewsHref());
+		newsTO.setIdNoticia(idNoticia);
+		NewsTO obj = newsRepository.findByIdNoticia(idNoticia);
+
+		if (obj == null) {
+			return false;
+		} else {
+			newsTO = obj;
+		}
+
+		if (obj.getEmailSent() == null || !obj.getEmailSent()) {
+			return false;
+		}
+
+		return true;
+	}
+	
+	private String extracIdNoticia(String header) {
+		String idNoticia = "";
+		int initialIndex = header.indexOf("idNoticia=");
+		int finalIndex = header.indexOf("&header");
+		idNoticia = header.substring(initialIndex +10, finalIndex);
+
+		return idNoticia;
+	}
+	
 	private String getDateFromNews(String newsHeader) {
 		String dateStr = newsHeader.substring(0, 16);
 		return dateStr;
@@ -259,7 +322,7 @@ public class CheckNews {
 		}
 		
 		String ticker = company.getTicker();
-		Double lastQuote = getQuotation.getLastQuote(ticker);
+		Double lastQuote = getQuotation.getLastQuoteCache(ticker);
 		if (lastQuote != null) {
 			result.append(ticker);
 			result.append(" : ");
@@ -337,38 +400,43 @@ public class CheckNews {
 			int indexIni = newsTO.getNews().indexOf("http");
 			int indexFin = newsTO.getNews().lastIndexOf("flnk");
 			String link = newsTO.getNews().substring(indexIni, indexFin-1);
-			link = link.replaceFirst("https", "http");
+			// http was discontinued, only https
+			//link = link.replaceFirst("https", "http");
 			link = link.replaceAll("visualizarDocumento", "exibirDocumento");
 
 			newsTO.setNewLink(link);
-			Connection connection = Jsoup.connect(link);
-			connection.ignoreHttpErrors(true);
-			connection.timeout(30000);
+			Document doc = this.getDocument(link);
 
-			Document doc = null;
-			try {
-				//File file = new File("/tmp/Rendimento.html");
-				doc = connection.get();
-				//FileUtils.write(file, doc.html(), "UTF-8");
-				//newsTO.setAttached(file);
-			} catch (IOException e1) {
+			CompanyTO company = companyRepository.findByTicker(newsTO.getTicker() + "11");
+			if (company == null) {
+				company = companyRepository.findByTicker(newsTO.getTicker() + "11B");
 			}
 
-			IncomeHtmlParser htmlParser = new IncomeHtmlParser(doc);
-			income = htmlParser.getValue();
-			
-			if (income != null) {
-				CompanyTO company = companyRepository.findByTicker(newsTO.getTicker() + "11");
-				if (company == null) {
-					company = companyRepository.findByTicker(newsTO.getTicker() + "11B");
-				}
+			if (doc == null) {
+				income = 0D;	
+			} else {
+				IncomeHtmlParser htmlParser = new IncomeHtmlParser(doc);
+				income = htmlParser.getValue();
 
+				// Update company information
+				company.setCnpj(htmlParser.getFundCnpj());
+				company.setAdmName(htmlParser.getAdmName());
+				company.setAdmCnpj(htmlParser.getAdmCnpj());
+				company.setResponsible(htmlParser.getResponsible());
+				company.setPhone(htmlParser.getPhone());
+				company.setIsin(htmlParser.getIsin());
+				companyRepository.save(company);
+			}
+
+			if (income != null) {
 				IncomeCompanyTO incomeTO = new IncomeCompanyTO();
 				Calendar cal = Calendar.getInstance();
 				Date incomeDate;
 				try {
 					incomeDate = dateFormat.parse(newsTO.getNewsDate());
 				} catch (ParseException e) {
+					log.error(e);
+					e.printStackTrace();
 					incomeDate = new Date();
 				}
 				cal.setTime(incomeDate);
@@ -385,14 +453,6 @@ public class CheckNews {
 					incomeCompanyRepository.save(incomeTO);	
 				}
 
-				// Update company information
-				company.setCnpj(htmlParser.getFundCnpj());
-				company.setAdmName(htmlParser.getAdmName());
-				company.setAdmCnpj(htmlParser.getAdmCnpj());
-				company.setResponsible(htmlParser.getResponsible());
-				company.setPhone(htmlParser.getPhone());
-				company.setIsin(htmlParser.getIsin());
-				companyRepository.save(company);
 			}
 		} else {
 			// get attachment
@@ -402,7 +462,7 @@ public class CheckNews {
 				int indexIni = newsTO.getNews().indexOf("http");
 				int indexFin = newsTO.getNews().lastIndexOf("flnk");
 				linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
-				linkPdf = linkPdf.replaceFirst("https", "http");
+				//linkPdf = linkPdf.replaceFirst("https", "http");
 				linkPdf = linkPdf.replaceAll("visualizarDocumento", "exibirDocumento");
 
 				newsTO.setNewLink(linkPdf);
@@ -418,16 +478,17 @@ public class CheckNews {
 				} catch (IOException e) {
 					// Não é PDF, é HTML
 					// Pegar o html e enviar por email
-					Connection connection = Jsoup.connect(linkPdf);
-					connection.ignoreHttpErrors(true);
-					connection.timeout(30000);
 
 					try {
 						File file = new File("/tmp/Anexo.html");
-						Document doc = connection.get();
-						FileUtils.write(file, doc.html(), "UTF-8");
-						newsTO.setAttached(file);
+						Document doc = this.getDocument(linkPdf);
+						if (doc != null) {
+							FileUtils.write(file, doc.html(), "UTF-8");
+							newsTO.setAttached(file);							
+						}
 					} catch (IOException e1) {
+						log.error(e);
+						e.printStackTrace();
 					}
 				}
 			}
@@ -489,22 +550,14 @@ public class CheckNews {
 		StringBuffer buffer = new StringBuffer();
 		try {
 			String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
-			Connection connection = Jsoup.connect(endFII);
-			connection.ignoreHttpErrors(true);
-			connection.timeout(30000);
-
-			Document doc = connection.get();
+			Document doc = this.getDocument(endFII);
 			Element pagina = doc.getElementById("linksNoticias");
 			if (pagina != null) {
 				Elements links = pagina.getElementsByTag("li");
 				for (Element link : links) {
 					String href = link.getElementsByTag("a").get(0).attr("href");
 					String newsName = link.text();
-
-					connection = Jsoup.connect(prefix + href);
-					connection.ignoreHttpErrors(true);
-					connection.timeout(30000);
-					doc = connection.get();
+					doc = this.getDocument(prefix + href);
 					Element news = doc.getElementById("contentNoticia");
 
 					NewsTO newsBean = new NewsTO();
@@ -513,7 +566,7 @@ public class CheckNews {
 					newsBean.setNews(news.text());
 					newsBean.setNewsHref(prefix + href);
 					
-					if (!insertNews(newsBean)) {
+					if (!insertNews(newsBean) && isEmailSent(newsBean)) {
 						continue;
 					}
 
@@ -567,6 +620,8 @@ public class CheckNews {
 								incomeDate = dateFormat.parse(incomeDateStr);
 								paymentDate = dateFormat.parse(paymentDateStr);
 							} catch (ParseException e) {
+								log.error(e);
+								e.printStackTrace();
 								incomeDate = new Date();
 							}
 							cal.setTime(incomeDate);
@@ -590,19 +645,26 @@ public class CheckNews {
 								incomeCompanyRepository.save(incomeTO);	
 							}
 						} catch (Exception e) {
+							log.error(e);
+							e.printStackTrace();
 							// Continue processing
 						}
 					}
-					
+					newsRepository.save(newsBean);
+
 					if (!buffer.toString().isEmpty()) {
 						// Send Email
 						SendMailSSL.send("Proventos Ex-" + dateFormat.format(new Date()), buffer.toString(), null, "dogaum@gmail.com");
+						newsBean.setEmailSent(true);
+						newsRepository.save(newsBean);
 					}
+
 				}
 			}
 
 		} catch (Exception e) {
 			log.error(e);
+			e.printStackTrace();
 			SendMailSSL.send("Erro: Proventos Ex-" + dateFormat.format(new Date()), buffer.toString() + e.getMessage(), null, "dogaum@gmail.com");
 		}
 	}
@@ -623,20 +685,14 @@ public class CheckNews {
 			int indexIni = newsTO.getNews().indexOf("http");
 			int indexFin = newsTO.getNews().lastIndexOf("flnk");
 			String link = newsTO.getNews().substring(indexIni, indexFin-1);
-			link = link.replaceFirst("https", "http");
+			//link = link.replaceFirst("https", "http");
 			link = link.replaceAll("visualizarDocumento", "exibirDocumento");
 
 			newsTO.setNewLink(link);
-			Connection connection = Jsoup.connect(link);
-			connection.ignoreHttpErrors(true);
-			connection.timeout(30000);
-
-			Document doc = null;
-			try {
-				doc = connection.get();
-			} catch (IOException e1) {
+			Document doc = this.getDocument(link);
+			if (doc == null) {
+				return;
 			}
-
 			InformeMensalParser htmlParser = new InformeMensalParser(doc);
 			System.out.println("Fundo: " + newsTO.getTicker());
 			System.out.println("Data: " + DateUtils.formatDateToStr(htmlParser.getInfoDate()));

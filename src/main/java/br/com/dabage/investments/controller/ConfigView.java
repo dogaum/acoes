@@ -17,13 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 
-import br.com.dabage.investments.carteira.IncomeTO;
 import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.config.ConfigService;
+import br.com.dabage.investments.config.ConfigTO;
 import br.com.dabage.investments.config.StockTypeTO;
 import br.com.dabage.investments.home.HomeService;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CompanyRepository;
+import br.com.dabage.investments.repositories.ConfigRepository;
 import br.com.dabage.investments.repositories.RoleRepository;
 import br.com.dabage.investments.repositories.StockTypeRepository;
 import br.com.dabage.investments.user.RoleTO;
@@ -57,6 +58,9 @@ public class ConfigView extends BasicView implements Serializable {
 	@Autowired
 	ConfigService configService;
 
+	@Autowired
+	ConfigRepository configRepository;
+
 	private List<StockTypeTO> stockTypes = new ArrayList<StockTypeTO>();
 
 	private StockTypeTO stockType;
@@ -69,6 +73,8 @@ public class ConfigView extends BasicView implements Serializable {
 
 	private List<CompanyTO> companies;
 
+	private List<ConfigTO> parameters;
+
 	public String init() {
 		// Stock Types
 		stockTypes = stockTypeRepository.findByRemoveDateNull();
@@ -78,6 +84,9 @@ public class ConfigView extends BasicView implements Serializable {
 
 		// All Companies
 		companies = companyRepository.findAll();
+
+		// All Parameters
+		parameters = configRepository.findAll();
 
 		prepareRoles();
         return "config";
@@ -298,6 +307,17 @@ public class ConfigView extends BasicView implements Serializable {
 		companyRepository.save(company);
 	}
 
+	/**
+	 * Save the Config/Parameter edition
+	 * @param event
+	 */
+	public void editParameter(RowEditEvent event) {
+
+		ConfigTO parameter = (ConfigTO) event.getObject();
+
+		configRepository.save(parameter);
+	}
+
 	public List<StockTypeTO> getStockTypes() {
 		return stockTypes;
 	}
@@ -344,6 +364,14 @@ public class ConfigView extends BasicView implements Serializable {
 
 	public void setCompanies(List<CompanyTO> companies) {
 		this.companies = companies;
+	}
+
+	public List<ConfigTO> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(List<ConfigTO> parameters) {
+		this.parameters = parameters;
 	}
 
 }

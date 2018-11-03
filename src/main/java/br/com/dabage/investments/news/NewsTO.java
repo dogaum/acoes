@@ -20,7 +20,6 @@ public class NewsTO extends AbstractDocument implements SelectableDataModel<News
 	/** */
 	private static final long serialVersionUID = -9113576166532046448L;
 
-	//@TextIndexed
 	@Indexed
 	private String newsHeader;
 
@@ -34,6 +33,10 @@ public class NewsTO extends AbstractDocument implements SelectableDataModel<News
 	private String news;
 
 	private String newsHref;
+
+	private String idNoticia;
+
+	private Boolean emailSent;
 
 	@Transient
 	private File attached;
@@ -103,6 +106,22 @@ public class NewsTO extends AbstractDocument implements SelectableDataModel<News
 
 	public void setNewLink(String newLink) {
 		this.newLink = newLink;
+	}
+
+	public String getIdNoticia() {
+		return idNoticia;
+	}
+
+	public void setIdNoticia(String idNoticia) {
+		this.idNoticia = idNoticia;
+	}
+
+	public Boolean getEmailSent() {
+		return emailSent;
+	}
+
+	public void setEmailSent(Boolean emailSent) {
+		this.emailSent = emailSent;
 	}
 
 	@Override

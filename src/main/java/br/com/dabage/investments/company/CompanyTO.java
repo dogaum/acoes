@@ -47,6 +47,7 @@ public class CompanyTO extends AbstractDocument {
 	private Long qtdCotas;
 	private Double ativo;
 	private Double totalDisponibilidade;
+	private Double lastQuote;
 
 	@Transient
 	private Map<String, List<IncomeVO>> lastIncomes;
@@ -211,10 +212,18 @@ public class CompanyTO extends AbstractDocument {
 		this.totalDisponibilidade = totalDisponibilidade;
 	}
 
+	public Double getLastQuote() {
+		return lastQuote;
+	}
+
+	public void setLastQuote(Double lastQuote) {
+		this.lastQuote = lastQuote;
+	}
+
 	@Override
 	public String toString() {
 		return "CompanyBean [prefix=" + prefix + ", ticker=" + ticker
-				+ ", name=" + name + ", fullName=" + fullName+ ", Setor=" + setor + "]";
+				+ ", name=" + name + ", fullName=" + fullName + ", Category=" + category + ", Setor=" + setor + "]";
 	}
 
 }

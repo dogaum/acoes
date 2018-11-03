@@ -6,15 +6,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.data.mongodb.core.query.Query;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import br.com.dabage.investments.company.IncomeCompanyTO;
+import br.com.dabage.investments.company.IncomeTotal;
+import br.com.dabage.investments.config.IncomeService;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
 import br.com.dabage.investments.repositories.CompanyRepository;
@@ -49,6 +50,9 @@ public class PortfolioService {
 
 	@Autowired
 	CompanyRepository companyRepository;
+
+	@Autowired
+	IncomeService incomeService;
 
 	/**
 	 * Rerturn all sell negotiations from a portfolio
@@ -195,7 +199,11 @@ public class PortfolioService {
 			}
 
 			carteira.setTotalPortfolio(carteira.getTotalPortfolio() + item.getTotalValue());
-			item.setActualValue(getQuotation.getLastQuoteCache(item.getStock()));
+			Double lasQuotation = getQuotation.getLastQuoteCache(item.getStock());
+			if (lasQuotation == null || lasQuotation.doubleValue() == 0.0) {
+				lasQuotation = (item.getCompany().getLastQuote() == null) ? 0D : item.getCompany().getLastQuote();
+			}
+			item.setActualValue(lasQuotation);
 			List<IncomeCompanyTO> lastIncomeCompanies = incomeCompanyRepository.findTopByStockOrderByIncomeDateDesc(item.getStock());
 			if (lastIncomeCompanies != null && !lastIncomeCompanies.isEmpty()) {
 				IncomeCompanyTO lastIncomeCompany = lastIncomeCompanies.get(0);
@@ -216,6 +224,13 @@ public class PortfolioService {
 			carteira.setTotalCalculateResult(carteira.getTotalCalculateResult() + item.getTotalCalculateResult());
 			if (item.getQuantity() != null && item.getLastIncomeCompany() != null) {
 				carteira.setTotalLastIncome(carteira.getTotalLastIncome() + (item.getQuantity() * item.getLastIncomeCompany().getValue()));	
+			}
+
+			IncomeTotal incomeHistory = incomeService.getIncomeHistory(item.getStock());
+			if (incomeHistory.getAvg12() != null && item.getActualValue() != null) {
+				Double percent12 = 0D;
+				percent12 = (incomeHistory.getAvg12() / item.getActualValue());
+				item.setPercentAvg12(percent12);
 			}
 
 		}

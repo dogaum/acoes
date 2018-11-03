@@ -23,7 +23,7 @@ public class CheckNewCompaniesJob {
 	@Autowired
 	public InsertTickers insertTickers;
 
-	@Scheduled(fixedDelay=86400000, initialDelay=3000000)
+	@Scheduled(fixedDelay=86400000, initialDelay=3000)
 	public void execute() {
 		Calendar cal = Calendar.getInstance();
 		if (DateUtils.isWorkingDay(cal)) {

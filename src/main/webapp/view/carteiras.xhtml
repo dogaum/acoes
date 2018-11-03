@@ -252,6 +252,12 @@
 								        </h:outputText>
 								    </p:column>
 
+								    <p:column headerText="#{msg['app.incomes.percent.avg12']}" sortBy="#{item.percentAvg12}" style="text-align:right">
+								        <h:outputText value="#{item.percentAvg12}">
+								        	<f:convertNumber type="percent" minFractionDigits="2"/>
+								        </h:outputText>
+								    </p:column>
+
 								    <p:column headerText="#{msg['app.portfolio.dy.am.a']}" sortBy="#{item.actualDY}" style="text-align:right">
 								        <h:outputText value="#{item.actualDY}" title="#{item.actualDY * 12 * 100} %">
 								        	<f:convertNumber type="percent" minFractionDigits="2"/>
@@ -328,6 +334,7 @@
 											        </h:outputText>
 											    </f:facet>
 										    </p:column>
+										    <p:column style="text-align:right"/>
 										    <p:column style="text-align:right">
 											    <f:facet name="footer">
 											        <h:outputText value="#{carteiraView.selectedCarteira.totalActualDY}">
@@ -496,7 +503,7 @@
 							<p:dataTable id="operacoes" widgetVar="negItemTable" var="negItem" value="#{carteiraView.selectedCarteiraItem.negotiations}" style="margin-left:27px" rowKey="#{negItem.id}"
 										 editable="true" paginator="true" rows="10" rowsPerPageTemplate="10,20" reflow="true" sortBy="#{negItem.stock}"
                          				 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                         				 emptyMessage="app.portfolio.empty">
+                         				 emptyMessage="#{msg['app.portfolio.empty']}">
 	
 								<p:ajax event="rowEdit" listener="#{carteiraView.editNegotiation}" update=":form:portfolioDetail" />
 	
@@ -591,7 +598,7 @@
 							<p:dataTable id="rendimento" widgetVar="incItemTable" var="incItem" value="#{carteiraView.selectedCarteiraItem.incomes}" style="margin-left:27px" rowKey="#{incItem.id}"
 										 editable="true" paginator="true" rows="10" rowsPerPageTemplate="10,20" reflow="true" sortBy="#{incItem.stock}"
                          				 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                         				 emptyMessage="app.portfolio.empty">
+                         				 emptyMessage="#{msg['app.portfolio.empty']}">
 
 								<p:ajax event="rowEdit" listener="#{carteiraView.editIncome}" update=":form:portfolioDetail" />
 
