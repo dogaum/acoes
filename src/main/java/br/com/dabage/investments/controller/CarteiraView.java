@@ -183,12 +183,9 @@ public class CarteiraView extends BasicView implements Serializable {
 			}
 			// Ordering carteira itens for charts
 			orderCarteiraItens();
-			emptyPosition = true;
-		} else if (carteiraItens != null) {
-			emptyPosition = false;
 		}
 	}
-	
+
 	/**
 	 * Apresentar detalhes de uma carteira
 	 */
@@ -241,10 +238,13 @@ public class CarteiraView extends BasicView implements Serializable {
 		// Sector Chart
 		sectorPreCharList = new ArrayList<SectorChartVO>();
 		sectorPosCharList = new ArrayList<SectorChartVO>();
+		int count = 0;
 		for (CarteiraItemTO carteiraItemTO : carteiraItens) {
 			if (carteiraItemTO.getQuantity() == null || carteiraItemTO.getQuantity().equals(0L)) {
 				continue;
 			}
+			count++;
+			carteiraItemTO.setCount(count);
 			String sector = "Outros";
 			if (carteiraItemTO.getCompany().getSetor() != null) {
 				sector = carteiraItemTO.getCompany().getSetor();

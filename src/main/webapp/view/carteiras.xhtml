@@ -156,6 +156,7 @@
 										
 										<p:commandLink id="clSP"
 										 				actionListener="#{carteiraView.selectCarteira}" update=":form">
+										 		<f:param name="emptyPosition" value="true" />
 										 		<h:outputText value="#{(carteiraView.emptyPosition) ? msg['app.portfolio.btn.showAll'] : msg['app.portfolio.btn.hideAll']}" />
 										</p:commandLink>
 										
@@ -196,6 +197,10 @@
 
 								<p:dataTable id="carteira" var="item" value="#{carteiraView.carteiraItens}" emptyMessage="#{msg['pf.datatable.noresults']}"
 										 	reflow="true" selectionMode="single" rowKey="#{item.stock}" selection="#{carteiraView.selectedCarteiraItem}">
+
+								    <p:column headerText="#" style="text-align:right" width="30">
+								        <h:outputText value="#{item.count}" />
+								    </p:column>
 
 								    <p:column headerText="#{msg['app.portfolio.symbol']}" sortBy="#{item.stock}" style="text-align:center">
 			                    		<p:commandLink update=":form:panelPosCompanyDlg" oncomplete="PF('posCompanyDlg').show()" actionListener="#{carteiraView.selectCompany}">
@@ -247,13 +252,13 @@
 								    </p:column>
 
 								    <p:column headerText="#{msg['app.portfolio.dy.am.c']}" sortBy="#{item.buyDY}" style="text-align:right">
-								        <h:outputText value="#{item.buyDY}">
+								        <h:outputText value="#{item.buyDY}" title="#{item.buyDY * 12 * 100} %">
 								        	<f:convertNumber type="percent" minFractionDigits="2"/>
 								        </h:outputText>
 								    </p:column>
 
 								    <p:column headerText="#{msg['app.incomes.percent.avg12']}" sortBy="#{item.percentAvg12}" style="text-align:right">
-								        <h:outputText value="#{item.percentAvg12}">
+								        <h:outputText value="#{item.percentAvg12}" title="#{item.percentAvg12 * 12 * 100} %">
 								        	<f:convertNumber type="percent" minFractionDigits="2"/>
 								        </h:outputText>
 								    </p:column>
@@ -313,6 +318,7 @@
 								    </p:column>
 									<p:columnGroup type="footer">
 							            <p:row>
+							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>
 							                <p:column style="text-align:right"/>

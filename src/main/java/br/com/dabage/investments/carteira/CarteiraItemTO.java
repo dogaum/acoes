@@ -69,6 +69,8 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 
 	public Double percentAvg12;
 
+	private Integer count;
+
 	public void addNegotiation(NegotiationTO neg) {
 		// Add to the list
 		negotiations.add(neg);
@@ -274,6 +276,14 @@ public class CarteiraItemTO implements Comparable<CarteiraItemTO> {
 			}
 		}
 		return pVp;
+	}
+
+	public Integer getCount() {
+		return count;
+	}
+
+	public void setCount(Integer count) {
+		this.count = count;
 	}
 
 	@Override

@@ -12,8 +12,8 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 
 import javax.annotation.Resource;
@@ -27,18 +27,25 @@ import org.jsoup.select.Elements;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import br.com.dabage.investments.company.IncomeCompanyTO;
-import br.com.dabage.investments.company.InsertFIITickers;
-import br.com.dabage.investments.config.ConfigService;
-import br.com.dabage.investments.mail.SendMailSSL;
-import br.com.dabage.investments.repositories.IncomeCompanyRepository;
-import br.com.dabage.investments.utils.DateUtils;
-
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+
+import br.com.dabage.investments.company.IncomeCompanyTO;
+import br.com.dabage.investments.company.InsertFIITickers;
+import br.com.dabage.investments.company.InsertTickers;
+import br.com.dabage.investments.config.ConfigService;
+import br.com.dabage.investments.mail.SendMailSSL;
+import br.com.dabage.investments.quote.GetQuotation;
+import br.com.dabage.investments.repositories.IncomeCompanyRepository;
+import br.com.dabage.investments.repositories.IncomeRepository;
+import br.com.dabage.investments.repositories.RoleRepository;
+import br.com.dabage.investments.repositories.UserRepository;
+import br.com.dabage.investments.user.UserTO;
+import br.com.dabage.investments.utils.DateUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(inheritLocations=true, locations = { "classpath:mongo-config.xml", "classpath:mvc-dispatcher-servlet.xml" })
@@ -66,14 +73,21 @@ public class CheckNewsTest {
 
 	@Autowired
 	private ConfigService configService;
-	
-	@Test
-	public void testRun2() {
-		fail("Not yet implemented");
-	}
+
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private RoleRepository roleRepository;
 
 	@Autowired
 	public InsertFIITickers insertFIITickers;
+
+	@Autowired
+	public InsertTickers insertTickers;
+	
+	@Autowired
+	private GetQuotation getQuotation;
 
 	@Test
 	public void testRun() {
@@ -288,6 +302,7 @@ public class CheckNewsTest {
 	@Test
 	public void testInsertNewCompanies() {
 		insertFIITickers.run();
+		//insertTickers.run();
 	}
 
 	@Test
@@ -299,5 +314,87 @@ public class CheckNewsTest {
 		idNoticia = header.substring(initialIndex +10, finalIndex);
 
 		System.out.println(idNoticia);
+	}
+
+	@Test
+	@Rollback(false)
+	public void testRun2() {
+		UserTO user = userRepository.findByEmail("dogaum@gmail.com");
+		System.out.println(user);
+	}
+
+	@Test
+	public void testIncomeCompaniesByDate() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.MONTH, 9);
+		cal.set(Calendar.DAY_OF_MONTH, 31);
+
+		cal.clear(Calendar.HOUR_OF_DAY);
+		cal.clear(Calendar.MINUTE);
+		cal.clear(Calendar.SECOND);
+		cal.clear(Calendar.MILLISECOND);
+
+		System.out.println(DateUtils.formatDateToStr(cal.getTime()));
+
+		//Collection<IncomeCompanyTO> incomes = incomeCompanyRepository.findByIncomeDate(cal.getTime());
+		Collection<IncomeCompanyTO> incomes = incomeCompanyRepository.findByYearMonth(201810);
+		System.out.println("Encontrados: " + incomes.size());
+		for (IncomeCompanyTO icTO : incomes) {
+			String ticker = icTO.getStock();
+			Double income = icTO.getValue();
+
+			String paymentDate = "";
+			if (icTO.getPaymentDate() != null) {
+				paymentDate = DateUtils.formatDateToStr(icTO.getPaymentDate());
+			}
+
+			String announcementDate = "";
+			if (icTO.getIncomeDate() != null) {
+				announcementDate = DateUtils.formatDateToStr(icTO.getIncomeDate());
+			}
+
+			String quote = "";
+			Double lastQuote = getQuotation.getLastQuoteCache(ticker);
+			if (lastQuote != null && lastQuote > 0) {
+				quote = numberFormat.format(lastQuote);
+			}
+
+			String dyActual = "";
+			String dyAVG = "";
+			if (income != null && income > 0
+					&& lastQuote != null && lastQuote > 0) {
+				dyActual = checkNews.getDYActual(income, lastQuote);
+				dyAVG = checkNews.getDYAvg(ticker, lastQuote);
+			}
+
+			System.out.print(ticker);
+			System.out.print("	");
+			System.out.print(numberFormatIncome.format(income));
+			System.out.print("	");
+			System.out.print(dyActual);
+			System.out.print("	");
+			System.out.print(dyAVG);
+			System.out.print("	");
+			System.out.print(quote);
+			System.out.print("		");
+			System.out.print(announcementDate);
+			System.out.print("	");
+			System.out.print(paymentDate);
+			System.out.println("	");
+		}
+	}
+
+	@Test
+	public void agruparAtivos() {
+		List<IncomeCompanyTO> incomes = incomeCompanyRepository.findByStockOrderByIncomeDateDesc("CTXT11");
+		for (IncomeCompanyTO income : incomes) {
+			//System.out.println(income.getYearMonth() + " " + income.getValue());
+			Double oldValue = income.getValue();
+			if (income.getYearMonth() != 201902) {
+				income.setValue(income.getValue() * 14);
+				incomeCompanyRepository.save(income);
+				System.out.println(income.getYearMonth() + " : " + oldValue + "  >> " + income.getValue());
+			}
+		}
 	}
 }

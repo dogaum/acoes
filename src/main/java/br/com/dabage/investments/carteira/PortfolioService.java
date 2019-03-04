@@ -170,7 +170,7 @@ public class PortfolioService {
 		}
 		carteira.setTotalPortfolioIncome(0D);
 		for (IncomeTO inc : carteira.getIncomes()) {
-			if (inc == null) {
+			if (inc == null || inc.getType().equals(IncomeTypes.AMORTIZATION)) {
 				continue;
 			}
 			CarteiraItemTO item = new CarteiraItemTO(inc.getStock());
@@ -227,10 +227,12 @@ public class PortfolioService {
 			}
 
 			IncomeTotal incomeHistory = incomeService.getIncomeHistory(item.getStock());
-			if (incomeHistory.getAvg12() != null && item.getActualValue() != null) {
+			if (incomeHistory.getAvg12() != null && incomeHistory.getAvg12() > 0 && item.getActualValue() != null) {
 				Double percent12 = 0D;
 				percent12 = (incomeHistory.getAvg12() / item.getActualValue());
 				item.setPercentAvg12(percent12);
+			} else {
+				item.setPercentAvg12(0D);
 			}
 
 		}
@@ -254,8 +256,10 @@ public class PortfolioService {
 		}
 
 		// Last Income
-		IncomeTO lastIncome = incomeRepository.findFirstByOrderByIncomeDateDescAddDateDesc().get(0);
-		carteira.setLastIncome(lastIncome);
+		if (!carteira.getIncomes().isEmpty()) {
+			IncomeTO lastIncome = carteira.getIncomes().get(carteira.getIncomes().size() - 1);
+			carteira.setLastIncome(lastIncome);			
+		}
 
 		Collections.sort(itens);
 		carteira.setItens(itens);

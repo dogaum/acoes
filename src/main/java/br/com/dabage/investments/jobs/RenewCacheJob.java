@@ -16,7 +16,7 @@ import br.com.dabage.investments.utils.DateUtils;
 public class RenewCacheJob {
 
 	private Logger log = Logger.getLogger(RenewCacheJob.class);
-	
+
 	@Resource
 	public GetQuotation getQuotation;
 
@@ -24,7 +24,7 @@ public class RenewCacheJob {
 	public void execute() {
 		Calendar cal = Calendar.getInstance();
 		if (DateUtils.isWorkingDay(cal)
-				&& (cal.get(Calendar.HOUR_OF_DAY) > 9 && cal.get(Calendar.HOUR_OF_DAY) < 19)) {
+				&& (cal.get(Calendar.HOUR_OF_DAY) > 10 && cal.get(Calendar.HOUR_OF_DAY) < 18)) {
 			log.info("Executing " + RenewCacheJob.class.getSimpleName() + " on " + new Date());
 			getQuotation.renewCache();			
 		} else {

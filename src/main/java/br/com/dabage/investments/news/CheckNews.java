@@ -356,13 +356,13 @@ public class CheckNews {
 				if (incomeBefore != null) {
 					Double incBefore = incomeBefore.getValue();
 					Double incActual = incomeActual.getValue();
-					lastIncomeFormatted += ("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+					lastIncomeFormatted += (DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
 					lastIncomeFormatted += (": R$ " + numberFormatIncome.format(incActual));
 					Double dy = (((incActual / incBefore) -1 ) * 100);
 					lastIncomeFormatted += (" " + percentFormat.format(dy) + "%");
 					lastIncomeFormatted += ("\n");
 				} else {
-					lastIncomeFormatted += ("Rendimento " + DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+					lastIncomeFormatted += (DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
 					lastIncomeFormatted += (": R$ " + numberFormatIncome.format(incomeActual.getValue()));
 					lastIncomeFormatted += ("\n");
 				}
@@ -372,7 +372,7 @@ public class CheckNews {
 			hist.append("\n");
 
 			result.append(lastIncomeFormatted);
-			result.append("\n\n");
+			result.append("\n");
 
 			if (lastQuote != null) {
 				result.append("DY: ");
@@ -384,13 +384,74 @@ public class CheckNews {
 				Double dyAvg = ((avg / avgCount) / lastQuote) * 100;
 				result.append(numberFormat.format(dyAvg) + " % a.m.");
 				result.append(" / " + numberFormat.format(dyAvg * 12) + " % a.a.");
-				result.append("\n\n");
+				result.append("\n");
 			}
 			result.append(hist.toString());
 		}
 
 		result.append("\n");
 		return result.toString();
+	}
+
+	/**
+	 * Get This(Last) D.Y.
+	 * @param income
+	 * @param lastQuote
+	 * @return
+	 */
+	public String getDYActual(Double income, Double lastQuote) {
+		Double dy = (income / lastQuote) * 100;
+
+		return numberFormat.format(dy);
+	}
+
+	/**
+	 * Get AVG D.Y.
+	 * @param ticker
+	 * @param lastQuote
+	 * @return
+	 */
+	public String getDYAvg(String ticker, Double lastQuote) {
+		ArrayList<IncomeCompanyTO> list = new ArrayList<IncomeCompanyTO>();
+		int count = -13;
+		int avgCount = 0;
+		Double avg = 0D;
+		while (count <= 0) {
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.MONTH, count);
+			IncomeCompanyTO incomeCompany = incomeCompanyRepository.findByStockAndYearMonth(ticker, DateUtils.getYearMonth(cal.getTime()));
+			if (incomeCompany != null) {
+				avgCount++;
+				list.add(incomeCompany);
+			}
+			count++;
+		}
+		StringBuffer hist = new StringBuffer();
+		hist.append("\n Historico: \n");
+		IncomeCompanyTO incomeBefore = null;
+		String lastIncomeFormatted = "";
+		for (IncomeCompanyTO incomeActual : list) {
+			lastIncomeFormatted = "";
+			avg += incomeActual.getValue();
+			if (incomeBefore != null) {
+				Double incBefore = incomeBefore.getValue();
+				Double incActual = incomeActual.getValue();
+				lastIncomeFormatted += (DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+				lastIncomeFormatted += (": R$ " + numberFormatIncome.format(incActual));
+				Double dy = (((incActual / incBefore) -1 ) * 100);
+				lastIncomeFormatted += (" " + percentFormat.format(dy) + "%");
+				lastIncomeFormatted += ("\n");
+			} else {
+				lastIncomeFormatted += (DateUtils.formatToMonthYear(incomeActual.getYearMonth()));
+				lastIncomeFormatted += (": R$ " + numberFormatIncome.format(incomeActual.getValue()));
+				lastIncomeFormatted += ("\n");
+			}
+			hist.append(lastIncomeFormatted);
+			incomeBefore = incomeActual;
+		}
+
+		Double dyAvg = ((avg / avgCount) / lastQuote) * 100;
+		return numberFormat.format(dyAvg);
 	}
 
 	public Double checkIncome(NewsTO newsTO) {

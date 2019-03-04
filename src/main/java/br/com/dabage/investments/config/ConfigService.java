@@ -88,6 +88,7 @@ public class ConfigService {
 							item = new PortfolioItemTO(negotiationTO.getIdCarteira(), negotiationTO.getStock());
 						}
 						item.addNegotiation(negotiationTO);
+						// Save negotiation because it´s recalculated
 						negotiationRepository.save(negotiationTO);
 						portfolioItemRepository.save(item);
 					} else if (obj.getData() instanceof IncomeTO) {

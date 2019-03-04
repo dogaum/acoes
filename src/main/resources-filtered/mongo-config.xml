@@ -7,8 +7,8 @@
 
         
         <!-- MongoBD Database configuration host and port -->
-        <mongo:mongo-client id="mongo" credentials="admin:1AITjmHDZC2U@admin" host="cluster0-shard-00-00-hhsrz.mongodb.net" port="27017"
-        					replica-set="cluster0-shard-00-00-hhsrz.mongodb.net:27017,cluster0-shard-00-01-hhsrz.mongodb.net:27017,cluster0-shard-00-02-hhsrz.mongodb.net:27017">
+        <mongo:mongo-client id="mongo" credentials="${MONGODB.DB.CREDENTIALS}" host="${MONGODB.DB.HOST}" port="${MONGODB.DB.PORT}"
+        	replica-set="${MONGODB.DB.REPLICA.SET}">
     		<mongo:client-options write-concern="NORMAL"
     							  max-connection-idle-time="3000000"
     							  min-connections-per-host="1"
@@ -16,7 +16,7 @@
     							  read-preference="PRIMARY"
     							  connect-timeout="30000"
     							  socket-timeout="30000"
-    							  ssl="true" />
+    							  ssl="${MONGODB.DB.SSL}" />
 		</mongo:mongo-client>
 
         <!-- Define the mongoDbFactory with your database Name  -->

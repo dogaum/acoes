@@ -44,7 +44,7 @@ public class GetQuotation {
 
 	static Map<String, Quote> quoteCache;
 
-	static final int TIMEOUT = 1500;
+	static final int TIMEOUT = 2500;
 
 	public String getLastQuotation(String stock) {
 	

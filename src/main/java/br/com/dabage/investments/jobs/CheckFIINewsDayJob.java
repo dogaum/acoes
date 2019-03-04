@@ -13,26 +13,25 @@ import br.com.dabage.investments.news.NewsFilterType;
 import br.com.dabage.investments.utils.DateUtils;
 
 @Component
-public class CheckFIINewsJob {
+public class CheckFIINewsDayJob {
 
 	@Autowired
 	public CheckNews checkNews;
 
-	private Logger log = Logger.getLogger(CheckFIINewsJob.class);
+	private Logger log = Logger.getLogger(CheckFIINewsDayJob.class);
 
-	@Scheduled(fixedDelay=45000)
+	@Scheduled(cron="0 0 22 * * *")
 	public void execute() {
 		Calendar cal = Calendar.getInstance();
-		if (DateUtils.isWorkingDay(cal)
-				&& (cal.get(Calendar.HOUR_OF_DAY) >= 8 && cal.get(Calendar.HOUR_OF_DAY) <= 22)) {
-			log.info("Executing " + CheckFIINewsJob.class.getSimpleName() + " on " + new Date());
+		if (DateUtils.isWorkingDay(cal)) {
+			log.info("Executing " + CheckFIINewsDayJob.class.getSimpleName() + " on " + new Date());
 
 			String query = "fii";
-			int qtyNews = checkNews.run(query, NewsFilterType.DAY, null, null, 1);
+			int qtyNews = checkNews.run(query, NewsFilterType.DAY, null, null, 20);
 			log.info(qtyNews + " news found on " + new Date());			
 		}
 		else {
-			log.info("Job " + CheckFIINewsJob.class.getSimpleName() + " is out of date.");
+			log.info("Job " + CheckFIINewsDayJob.class.getSimpleName() + " is out of date.");
 		}
 	}
 }

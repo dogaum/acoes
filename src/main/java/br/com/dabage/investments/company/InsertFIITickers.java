@@ -54,7 +54,7 @@ public class InsertFIITickers {
 					} else {
 						tickerFull += "11B";
 					}
-					
+					System.out.println(tickerFull);
 					CompanyTO obj = companyRepository.findByTicker(tickerFull);
 					if (obj == null) {
 						if (!tickerFull.endsWith("B")) {

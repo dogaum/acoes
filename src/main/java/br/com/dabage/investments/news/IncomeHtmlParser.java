@@ -89,11 +89,11 @@ public class IncomeHtmlParser {
 		Element tr14 = trs1.get(4);
 		Elements tds140 = tr14.getElementsByTag("td");
 		this.paymentDate = DateUtils.parseStrToDate(tds140.get(1).text());
-		
+
 		Element tr15 = trs1.get(5);
 		Elements tds150 = tr15.getElementsByTag("td");
 		try {
-			this.value = (Double) numberFormat.parse((tds150.get(1).text()));
+			this.value = numberFormat.parse((tds150.get(1).text())).doubleValue();
 		} catch (ParseException e) {
 		}
 
