@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 
+import br.com.dabage.investments.company.CompanyService;
 import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.config.ConfigService;
 import br.com.dabage.investments.config.ConfigTO;
@@ -61,6 +62,9 @@ public class ConfigView extends BasicView implements Serializable {
 	@Autowired
 	ConfigRepository configRepository;
 
+	@Autowired
+	CompanyService companyService;
+	
 	private List<StockTypeTO> stockTypes = new ArrayList<StockTypeTO>();
 
 	private StockTypeTO stockType;
@@ -75,6 +79,10 @@ public class ConfigView extends BasicView implements Serializable {
 
 	private List<ConfigTO> parameters;
 
+	private String oldTicker;
+
+	private String newTicker;
+
 	public String init() {
 		// Stock Types
 		stockTypes = stockTypeRepository.findByRemoveDateNull();
@@ -87,6 +95,10 @@ public class ConfigView extends BasicView implements Serializable {
 
 		// All Parameters
 		parameters = configRepository.findAll();
+
+		//
+		oldTicker = "";
+		newTicker = "";
 
 		prepareRoles();
         return "config";
@@ -318,6 +330,29 @@ public class ConfigView extends BasicView implements Serializable {
 		configRepository.save(parameter);
 	}
 
+	/**
+	 * Change Negotiation Code on B3
+	 * @param event
+	 */
+	public void changeNegotiationCode(ActionEvent event) {
+		if (oldTicker.isEmpty()) {
+			addWarnMessage("Infome o Codigo Antigo da Acao/Fundo.");
+			return;
+		}
+
+		if (newTicker.isEmpty()) {
+			addWarnMessage("Infome o Codigo Antigo da Acao/Fundo.");
+			return;
+		}
+
+		companyService.changeTicker(oldTicker, newTicker);
+
+		oldTicker = "";
+		newTicker = "";
+
+		addInfoMessage("Codigo alterado com sucesso.");
+	}
+	
 	public List<StockTypeTO> getStockTypes() {
 		return stockTypes;
 	}
@@ -372,6 +407,22 @@ public class ConfigView extends BasicView implements Serializable {
 
 	public void setParameters(List<ConfigTO> parameters) {
 		this.parameters = parameters;
+	}
+
+	public String getOldTicker() {
+		return oldTicker;
+	}
+
+	public void setOldTicker(String oldTicker) {
+		this.oldTicker = oldTicker;
+	}
+
+	public String getNewTicker() {
+		return newTicker;
+	}
+
+	public void setNewTicker(String newTicker) {
+		this.newTicker = newTicker;
 	}
 
 }

@@ -1,7 +1,5 @@
 package br.com.dabage.investments.news;
 
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -34,14 +32,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
+import br.com.dabage.investments.carteira.IncomeTO;
+import br.com.dabage.investments.carteira.NegotiationTO;
+import br.com.dabage.investments.carteira.PortfolioItemTO;
+import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.company.IncomeCompanyTO;
 import br.com.dabage.investments.company.InsertFIITickers;
 import br.com.dabage.investments.company.InsertTickers;
 import br.com.dabage.investments.config.ConfigService;
 import br.com.dabage.investments.mail.SendMailSSL;
 import br.com.dabage.investments.quote.GetQuotation;
+import br.com.dabage.investments.repositories.CompanyRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
 import br.com.dabage.investments.repositories.IncomeRepository;
+import br.com.dabage.investments.repositories.NegotiationRepository;
+import br.com.dabage.investments.repositories.NewsRepository;
+import br.com.dabage.investments.repositories.PortfolioItemRepository;
 import br.com.dabage.investments.repositories.RoleRepository;
 import br.com.dabage.investments.repositories.UserRepository;
 import br.com.dabage.investments.user.UserTO;
@@ -89,6 +95,21 @@ public class CheckNewsTest {
 	@Autowired
 	private GetQuotation getQuotation;
 
+	@Autowired
+	private NewsRepository newsRepository;
+
+	@Autowired
+	private CompanyRepository companyRepository;
+
+	@Autowired
+	private NegotiationRepository negotiationRepository;
+
+	@Autowired
+	private IncomeRepository incomeRepository;
+
+	@Autowired
+	private PortfolioItemRepository portfolioItemRepository;
+	
 	@Test
 	public void testRun() {
 		String query = "fii";
@@ -110,9 +131,9 @@ public class CheckNewsTest {
 	@Test
 	public void testCheckInformeMensal() {
 		String query = "informe mensal";
-		String sDate = "2018-02-01";
-		String fDate = "2018-02-18";
-		checkNews.run(query, NewsFilterType.INTERVAL, sDate, fDate, 9);
+		String sDate = "2019-07-01";
+		String fDate = "2019-08-31";
+		checkNews.runInformeMensal(query, NewsFilterType.INTERVAL, sDate, fDate, 12);
 	}
 	
 	@Test
@@ -198,7 +219,9 @@ public class CheckNewsTest {
 
 	@Test
 	public void testCheckIncomesByInterval() {
-		fail("Not yet implemented");
+		Calendar initialDate = Calendar.getInstance();
+		initialDate.add(Calendar.DAY_OF_MONTH, -1);
+		checkNews.checkIncomesByInterval(initialDate.getTime(), initialDate.getTime());
 	}
 
 	private int run(String query, NewsFilterType ft, String sDate, String fDate) {
@@ -396,5 +419,89 @@ public class CheckNewsTest {
 				System.out.println(income.getYearMonth() + " : " + oldValue + "  >> " + income.getValue());
 			}
 		}
+	}
+
+	@Test
+	public void splitAtivos() {
+		String ticker = "RBVA11";
+		int qty = 10;
+
+		List<IncomeCompanyTO> incomes = incomeCompanyRepository.findByStockOrderByIncomeDateDesc(ticker);
+		for (IncomeCompanyTO income : incomes) {
+			//System.out.println(income.getYearMonth() + " " + income.getValue());
+			Double oldValue = income.getValue();
+			if (income.getValue() > 5D) {
+				income.setValue(income.getValue() / qty);
+				incomeCompanyRepository.save(income);
+				System.out.println(income.getYearMonth() + " : " + oldValue + "  >> " + income.getValue());
+			}
+		}
+	}
+
+	@Test
+	public void alterarTicker() {
+		String de = "HGFF11B";
+		String para = "HGFF11";
+
+		String prefixDe = de.substring(0, 4);
+		String prefixPara = para.substring(0, 4);
+
+		// News
+		List<NewsTO> news = newsRepository.findByTickerIgnoreCase(prefixDe);
+		for (NewsTO newsTO : news) {
+			newsTO.setTicker(prefixPara);
+			newsRepository.save(newsTO);
+		}
+
+		System.out.println("NewsTO alterado.");
+		
+		// Company
+		CompanyTO company = companyRepository.findByPrefix(prefixDe).get(0);
+		company.setPrefix(prefixPara);
+		company.setTicker(para);
+		company = companyRepository.save(company);
+
+		System.out.println("CompanyTO alterado.");
+		
+		// IncomeCompany
+		List<IncomeCompanyTO> incomesCompany = incomeCompanyRepository.findByIdCompany(company.getId());
+		for (IncomeCompanyTO incomeCompanyTO : incomesCompany) {
+			incomeCompanyTO.setStock(para);
+			incomeCompanyRepository.save(incomeCompanyTO);
+		}
+
+		System.out.println("IncomeCompanyTO alterado.");
+		
+		//Negotiations
+		List<NegotiationTO> negotiations = negotiationRepository.findByStockOrderByDtNegotiationAsc(de);
+		if (negotiations != null) {
+			for (NegotiationTO negotiationTO : negotiations) {
+				negotiationTO.setStock(para);
+				negotiationRepository.save(negotiationTO);
+			}
+		}
+
+		System.out.println("NegotiationTO alterado.");
+
+		// Incomes
+		List<IncomeTO> incomes = incomeRepository.findByStockOrderByIncomeDateAsc(de);
+		if (incomes != null) {
+			for (IncomeTO incomeTO : incomes) {
+				incomeTO.setStock(para);
+				incomeRepository.save(incomeTO);
+			}
+		}
+
+		System.out.println("IncomeTO alterado.");
+
+		// Portifolio Item
+		List<PortfolioItemTO> portfolioItems = portfolioItemRepository.findByStock(de);
+		if (portfolioItems != null) {
+			for (PortfolioItemTO portfolioItemTO : portfolioItems) {
+				portfolioItemTO.setStock(para);
+				portfolioItemRepository.save(portfolioItemTO);
+			}
+		}
+		System.out.println("PortfolioItemTO alterado.");
 	}
 }

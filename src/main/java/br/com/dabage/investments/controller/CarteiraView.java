@@ -183,7 +183,10 @@ public class CarteiraView extends BasicView implements Serializable {
 			}
 			// Ordering carteira itens for charts
 			orderCarteiraItens();
+		} else {
+			selectCarteira();
 		}
+		emptyPosition = !emptyPosition;
 	}
 
 	/**
@@ -202,7 +205,6 @@ public class CarteiraView extends BasicView implements Serializable {
 
 			// Ordering carteira itens for charts
 			orderCarteiraItens();
-			hideEmptyPosition();
 		}
 	}
 
@@ -272,6 +274,20 @@ public class CarteiraView extends BasicView implements Serializable {
 				sectorPosCharList.add(sectorPos);
 			}
 		}
+
+		Collections.sort(sectorPreCharList, new Comparator<SectorChartVO>() {
+			@Override
+			public int compare(SectorChartVO o1, SectorChartVO o2) {
+				return o2.getValue().compareTo(o1.getValue());
+			}
+		});
+
+		Collections.sort(sectorPosCharList, new Comparator<SectorChartVO>() {
+			@Override
+			public int compare(SectorChartVO o1, SectorChartVO o2) {
+				return o2.getValue().compareTo(o1.getValue());
+			}
+		});
 	}
 
 	/**

@@ -155,8 +155,7 @@
 										<br/>
 										
 										<p:commandLink id="clSP"
-										 				actionListener="#{carteiraView.selectCarteira}" update=":form">
-										 		<f:param name="emptyPosition" value="true" />
+										 				actionListener="#{carteiraView.hideEmptyPosition}" update=":form">
 										 		<h:outputText value="#{(carteiraView.emptyPosition) ? msg['app.portfolio.btn.showAll'] : msg['app.portfolio.btn.hideAll']}" />
 										</p:commandLink>
 										

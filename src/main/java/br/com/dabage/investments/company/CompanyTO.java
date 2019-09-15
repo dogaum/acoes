@@ -1,5 +1,6 @@
 package br.com.dabage.investments.company;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,7 @@ public class CompanyTO extends AbstractDocument {
 	private Double ativo;
 	private Double totalDisponibilidade;
 	private Double lastQuote;
+	private Date lastUpdate;
 
 	@Transient
 	private Map<String, List<IncomeVO>> lastIncomes;
@@ -218,6 +220,14 @@ public class CompanyTO extends AbstractDocument {
 
 	public void setLastQuote(Double lastQuote) {
 		this.lastQuote = lastQuote;
+	}
+
+	public Date getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(Date lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 
 	@Override

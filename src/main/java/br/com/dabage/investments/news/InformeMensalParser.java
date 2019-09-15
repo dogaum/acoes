@@ -7,6 +7,7 @@ import java.util.Date;
 
 import org.jsoup.nodes.Document;
 
+import br.com.dabage.investments.company.InformeMensalTO;
 import br.com.dabage.investments.utils.DateUtils;
 import br.com.dabage.investments.utils.HtmlParserUtils;
 
@@ -17,6 +18,11 @@ import br.com.dabage.investments.utils.HtmlParserUtils;
 public class InformeMensalParser {
 
 	private Document doc;
+
+	// Table 1
+	private String mesCompetencia;
+	private String adm;
+	private String cnpjAdm;
 
 	// Table 2 
 	private Date infoDate;
@@ -48,8 +54,43 @@ public class InformeMensalParser {
 		parseHtmlContent();
 	}
 
+	public InformeMensalTO getObject() {
+		InformeMensalTO result = new InformeMensalTO();
+		result.setAtivo(ativo);
+		result.setInfoDate(infoDate);
+		result.setOutrosValoresAPagar(outrosValoresAPagar);
+		result.setPatrimonioLiquido(patrimonioLiquido);
+		result.setQtdCotas(qtdCotas);
+		result.setQtdCotistas(qtdCotistas);
+		result.setReceberAluguel(receberAluguel);
+		result.setReceberOutros(receberOutros);
+		result.setReceberVenda(receberVenda);
+		result.setRendimentosADistribuir(rendimentosADistribuir);
+		result.setTaxaAdmAPagar(taxaAdmAPagar);
+		result.setTaxaPerformanceAPagar(taxaPerformanceAPagar);
+		result.setTotalAReceber(totalAReceber);
+		result.setTotalDisponibilidade(totalDisponibilidade);
+		result.setTotalInvestido(totalInvestido);
+		result.setTotalPassivo(totalPassivo);
+		result.setVp(vp);
+
+		result.setMesCompetencia(mesCompetencia);
+		result.setAdm(adm);
+		result.setCnpjAdm(cnpjAdm);
+
+		return result;
+	}
+	
 	void parseHtmlContent() {
 		// Table 1 - Ignorar por enqto
+		String mesCompetencia = HtmlParserUtils.getValue(doc, 1, 11, 2);
+		this.setMesCompetencia(mesCompetencia);
+
+		String admStr = HtmlParserUtils.getValue(doc, 1, 8, 2);
+		this.setAdm(admStr);
+
+		String cnpjAdmStr = HtmlParserUtils.getValue(doc, 1, 8, 4);
+		this.setCnpjAdm(cnpjAdmStr);
 
 		// Table 2
 		// Info Date
@@ -251,6 +292,30 @@ public class InformeMensalParser {
 
 	public void setTotalPassivo(Double totalPassivo) {
 		this.totalPassivo = totalPassivo;
+	}
+
+	public String getMesCompetencia() {
+		return mesCompetencia;
+	}
+
+	public void setMesCompetencia(String mesCompetencia) {
+		this.mesCompetencia = mesCompetencia;
+	}
+
+	public String getAdm() {
+		return adm;
+	}
+
+	public void setAdm(String adm) {
+		this.adm = adm;
+	}
+
+	public String getCnpjAdm() {
+		return cnpjAdm;
+	}
+
+	public void setCnpjAdm(String cnpjAdm) {
+		this.cnpjAdm = cnpjAdm;
 	}
 
 }

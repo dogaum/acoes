@@ -14,10 +14,19 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.dabage.investments.carteira.IncomeTO;
+import br.com.dabage.investments.carteira.NegotiationTO;
+import br.com.dabage.investments.carteira.PortfolioItemTO;
 import br.com.dabage.investments.home.IncomeVO;
+import br.com.dabage.investments.news.NewsTO;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CarteiraRepository;
+import br.com.dabage.investments.repositories.CompanyRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
+import br.com.dabage.investments.repositories.IncomeRepository;
+import br.com.dabage.investments.repositories.NegotiationRepository;
+import br.com.dabage.investments.repositories.NewsRepository;
+import br.com.dabage.investments.repositories.PortfolioItemRepository;
 import br.com.dabage.investments.utils.DateUtils;
 
 @Service
@@ -33,6 +42,21 @@ public class CompanyService {
 
 	@Autowired
 	GetQuotation getQuotation;
+
+	@Autowired
+	private NewsRepository newsRepository;
+
+	@Autowired
+	private CompanyRepository companyRepository;
+
+	@Autowired
+	private NegotiationRepository negotiationRepository;
+
+	@Autowired
+	private IncomeRepository incomeRepository;
+
+	@Autowired
+	private PortfolioItemRepository portfolioItemRepository;
 
 	private static final DateFormat formatMonthYear = new SimpleDateFormat("MM/yyyy");
 
@@ -177,5 +201,74 @@ public class CompanyService {
 			fieldLabel.set(incomeLabel, label);
 		} catch (Exception e) {
 		}
+	}
+
+	/**
+	 * Change de Ticker code
+	 * @param oldTicker ex: FIXX11
+	 * @param newTicker ex: RBFF11
+	 */
+	public void changeTicker(String oldTicker, String newTicker) {
+		String prefixDe = oldTicker.substring(0, 4);
+		String prefixPara = newTicker.substring(0, 4);
+
+		// News
+		List<NewsTO> news = newsRepository.findByTickerIgnoreCase(prefixDe);
+		for (NewsTO newsTO : news) {
+			newsTO.setTicker(prefixPara);
+			newsRepository.save(newsTO);
+		}
+
+		log.info("NewsTO alterado.");
+		
+		// Company
+		CompanyTO company = companyRepository.findByPrefix(prefixDe).get(0);
+		company.setPrefix(prefixPara);
+		company.setTicker(newTicker);
+		company = companyRepository.save(company);
+
+		log.info("CompanyTO alterado.");
+		
+		// IncomeCompany
+		List<IncomeCompanyTO> incomesCompany = incomeCompanyRepository.findByIdCompany(company.getId());
+		for (IncomeCompanyTO incomeCompanyTO : incomesCompany) {
+			incomeCompanyTO.setStock(newTicker);
+			incomeCompanyRepository.save(incomeCompanyTO);
+		}
+
+		log.info("IncomeCompanyTO alterado.");
+		
+		//Negotiations
+		List<NegotiationTO> negotiations = negotiationRepository.findByStockOrderByDtNegotiationAsc(oldTicker);
+		if (negotiations != null) {
+			for (NegotiationTO negotiationTO : negotiations) {
+				negotiationTO.setStock(newTicker);
+				negotiationRepository.save(negotiationTO);
+			}
+		}
+
+		log.info("NegotiationTO alterado.");
+
+		// Incomes
+		List<IncomeTO> incomes = incomeRepository.findByStockOrderByIncomeDateAsc(oldTicker);
+		if (incomes != null) {
+			for (IncomeTO incomeTO : incomes) {
+				incomeTO.setStock(newTicker);
+				incomeRepository.save(incomeTO);
+			}
+		}
+
+		log.info("IncomeTO alterado.");
+
+		// Portifolio Item
+		List<PortfolioItemTO> portfolioItems = portfolioItemRepository.findByStock(oldTicker);
+		if (portfolioItems != null) {
+			for (PortfolioItemTO portfolioItemTO : portfolioItems) {
+				portfolioItemTO.setStock(newTicker);
+				portfolioItemRepository.save(portfolioItemTO);
+			}
+		}
+
+		log.info("PortfolioItemTO alterado.");
 	}
 }

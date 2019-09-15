@@ -55,13 +55,20 @@ public class InsertFIITickers {
 						tickerFull += "11B";
 					}
 					System.out.println(tickerFull);
+
 					CompanyTO obj = companyRepository.findByTicker(tickerFull);
 					if (obj == null) {
 						if (!tickerFull.endsWith("B")) {
-							tickerFull += "B";
-							obj = companyRepository.findByTicker(tickerFull);
+							obj = companyRepository.findByTicker(tickerFull + "B");
 							
 							if (obj == null) {
+								
+								if (tickerFull.equals("AGCX11") 
+										|| tickerFull.equals("AEFI11")
+										|| tickerFull.equals("HGJHX11")) {
+									continue;
+								}
+
 								CompanyTO company = new CompanyTO(tickerFull, name.text(), fullName.text());
 								company.setStockType(stockType);
 								company.setCategory("FII");

@@ -27,16 +27,18 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.itextpdf.text.pdf.PdfReader;
+
 import br.com.dabage.investments.company.CompanyTO;
 import br.com.dabage.investments.company.IncomeCompanyTO;
+import br.com.dabage.investments.company.InformeMensalTO;
 import br.com.dabage.investments.mail.SendMailSSL;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CompanyRepository;
 import br.com.dabage.investments.repositories.IncomeCompanyRepository;
+import br.com.dabage.investments.repositories.InformeMensalRepository;
 import br.com.dabage.investments.repositories.NewsRepository;
 import br.com.dabage.investments.utils.DateUtils;
-
-import com.itextpdf.text.pdf.PdfReader;
 
 @Component
 public class CheckNews {
@@ -55,6 +57,9 @@ public class CheckNews {
 	@Resource
 	private IncomeCompanyRepository incomeCompanyRepository;
 
+	@Resource
+	private InformeMensalRepository informeMensalRepository;
+	
 	static DecimalFormat percentFormat = new DecimalFormat ("#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR")));
 	
 	static NumberFormat numberFormat = new DecimalFormat ("#,##0.00", new DecimalFormatSymbols (new Locale ("pt", "BR")));
@@ -206,8 +211,10 @@ public class CheckNews {
 								}
 								newsRepository.save(newsBean);
 
+								Double vp = 0D;
+								
 								try {
-									checkInformeMensal(newsBean);	
+									vp = checkInformeMensal(newsBean);	
 								} catch (Exception e) {
 									log.error("Erro ao verificar o Informe mensal. " + newsName);
 									log.error(e);
@@ -217,8 +224,7 @@ public class CheckNews {
 								newsRepository.save(newsBean);
 								SendMailSSL.send(
 										newsName,
-										getQuotationsByPrefix(newsBean.getTicker(),
-												income)
+										getQuotationsByPrefix(newsBean.getTicker(), income, vp)
 												+ news.text()
 												+ "\n\n"
 												+ newsBean.getNewLink(),
@@ -247,7 +253,14 @@ public class CheckNews {
 	private boolean insertNews(NewsTO newsTO) {
 		String idNoticia = extracIdNoticia(newsTO.getNewsHref());
 		newsTO.setIdNoticia(idNoticia);
-		NewsTO obj = newsRepository.findByIdNoticia(idNoticia);
+
+		NewsTO obj = null;
+		try {
+			obj = newsRepository.findByIdNoticia(idNoticia);
+		} catch (Exception e) {
+			// Encontrou inserido duas vezes.
+			return false;
+		}
 
 		//NewsTO obj = newsRepository.findByNewsHeaderAndNewsDate(newsTO.getNewsHeader(), newsTO.getNewsDate());
 		if (obj == null) {
@@ -306,7 +319,7 @@ public class CheckNews {
 		return ticker;
 	}
 
-	private String getQuotationsByPrefix(String prefix, Double income) {
+	private String getQuotationsByPrefix(String prefix, Double income, Double vp) {
 		StringBuffer result = new StringBuffer();
 		percentFormat.setPositivePrefix("+");
 		percentFormat.setNegativePrefix("-");
@@ -327,6 +340,12 @@ public class CheckNews {
 			result.append(ticker);
 			result.append(" : ");
 			result.append("R$ " + numberFormat.format(lastQuote));
+			result.append("\n");
+		}
+
+		if (vp != null) {
+			result.append("VP: ");
+			result.append("R$ " + numberFormat.format(vp));
 			result.append("\n");
 		}
 
@@ -456,13 +475,14 @@ public class CheckNews {
 
 	public Double checkIncome(NewsTO newsTO) {
 		Double income = null;
-		if (newsTO.getNewsHeader().toLowerCase().contains("aviso aos cotistas")) {
+		if (newsTO.getNewsHeader().toLowerCase().contains("aviso aos cotistas")
+				&& newsTO.getNewsHeader().toUpperCase().contains("(N)")) {
 
 			int indexIni = newsTO.getNews().indexOf("http");
 			int indexFin = newsTO.getNews().lastIndexOf("flnk");
 			String link = newsTO.getNews().substring(indexIni, indexFin-1);
 			// http was discontinued, only https
-			//link = link.replaceFirst("https", "http");
+			link = link.replaceFirst("https", "http");
 			link = link.replaceAll("visualizarDocumento", "exibirDocumento");
 
 			newsTO.setNewLink(link);
@@ -523,7 +543,7 @@ public class CheckNews {
 				int indexIni = newsTO.getNews().indexOf("http");
 				int indexFin = newsTO.getNews().lastIndexOf("flnk");
 				linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
-				//linkPdf = linkPdf.replaceFirst("https", "http");
+				linkPdf = linkPdf.replaceFirst("https", "http");
 				linkPdf = linkPdf.replaceAll("visualizarDocumento", "exibirDocumento");
 
 				newsTO.setNewLink(linkPdf);
@@ -670,7 +690,7 @@ public class CheckNews {
 							buffer.append(paymentDateStr);
 							buffer.append("\n\n");
 	
-							buffer.append(getQuotationsByPrefix(ticker.substring(0, 4), incomeValue));
+							buffer.append(getQuotationsByPrefix(ticker.substring(0, 4), incomeValue, cmp.getVp()));
 							buffer.append("========================= \n");
 	
 							IncomeCompanyTO incomeTO = new IncomeCompanyTO();
@@ -711,13 +731,12 @@ public class CheckNews {
 							// Continue processing
 						}
 					}
+					newsBean.setEmailSent(true);
 					newsRepository.save(newsBean);
 
 					if (!buffer.toString().isEmpty()) {
 						// Send Email
 						SendMailSSL.send("Proventos Ex-" + dateFormat.format(new Date()), buffer.toString(), null, "dogaum@gmail.com");
-						newsBean.setEmailSent(true);
-						newsRepository.save(newsBean);
 					}
 
 				}
@@ -730,29 +749,30 @@ public class CheckNews {
 		}
 	}
 
-	public void checkInformeMensal(NewsTO newsTO) {
+	public Double checkInformeMensal(NewsTO newsTO) {
+
+		CompanyTO company = companyRepository.findByTicker(newsTO.getTicker() + "11");
+		if (company == null) {
+			company = companyRepository.findByTicker(newsTO.getTicker() + "11B");
+		}
+
+		if (company == null) {
+			return 0D;
+		}
+
 		if (newsTO.getNewsHeader().toLowerCase().contains("informe mensal")
 				&& !newsTO.getNewsHeader().toLowerCase().contains("(C)")) {
-
-			CompanyTO company = companyRepository.findByTicker(newsTO.getTicker() + "11");
-			if (company == null) {
-				company = companyRepository.findByTicker(newsTO.getTicker() + "11B");
-			}
-
-			if (company == null) {
-				return;
-			}
 
 			int indexIni = newsTO.getNews().indexOf("http");
 			int indexFin = newsTO.getNews().lastIndexOf("flnk");
 			String link = newsTO.getNews().substring(indexIni, indexFin-1);
-			//link = link.replaceFirst("https", "http");
+			link = link.replaceFirst("https", "http");
 			link = link.replaceAll("visualizarDocumento", "exibirDocumento");
 
 			newsTO.setNewLink(link);
 			Document doc = this.getDocument(link);
 			if (doc == null) {
-				return;
+				return company.getVp();
 			}
 			InformeMensalParser htmlParser = new InformeMensalParser(doc);
 			System.out.println("Fundo: " + newsTO.getTicker());
@@ -775,12 +795,111 @@ public class CheckNews {
 			System.out.println("Total Passivo: " + htmlParser.getTotalPassivo());
 			System.out.println();
 
+			InformeMensalTO old = null;
+			if (newsTO.getNewsHeader().toLowerCase().contains("(R)")) {
+				old = informeMensalRepository.findByTickerAndMesCompetencia(company.getTicker(), htmlParser.getMesCompetencia());
+				informeMensalRepository.deleteById(old.getId());
+			}
+
 			company.setQtdCotas(htmlParser.getQtdCotas());
 			company.setQtdCotistas(htmlParser.getQtdCotistas());
 			company.setAtivo(htmlParser.getAtivo());
 			company.setVp(htmlParser.getVp());
 			company.setTotalDisponibilidade(htmlParser.getTotalDisponibilidade());
-			companyRepository.save(company);
+
+			if (company.getLastUpdate() == null || company.getLastUpdate().before(htmlParser.getInfoDate())) {
+				company.setLastUpdate(htmlParser.getInfoDate());
+				companyRepository.save(company);
+			}
+
+			InformeMensalTO informeMensalTO = htmlParser.getObject();
+			informeMensalTO.setTicker(company.getTicker());
+			informeMensalRepository.save(informeMensalTO);
+			
+			return htmlParser.getVp();
 		}
+
+		return company.getVp();
+	}
+
+	public int runInformeMensal(String query, NewsFilterType ft, String sDate, String fDate, int pages) {
+
+		int qtyNews = 0;
+		StringBuffer endFII = new StringBuffer();
+		endFII.append("http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br");
+		// Query
+		endFII.append("&q=");
+		endFII.append(query);
+		// Filter type
+		endFII.append("&tipoFiltro=");
+		endFII.append(ft.getKey());
+
+		if (ft.equals(NewsFilterType.INTERVAL)) {
+			endFII.append("&periodoDe=");
+			endFII.append(sDate);
+			endFII.append("&periodoAte=");
+			endFII.append(fDate);
+		}
+
+		String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
+
+		for (int i = pages; i >= 1; i--) {
+			String finalUrl = endFII.toString() + "&pg=" + i;
+			try {
+				Document doc = this.getDocument(finalUrl);
+				Element pagina = doc.getElementById("linksNoticias");
+				if (pagina != null) {
+					Elements links = pagina.getElementsByTag("li");
+					int el = 0;
+					for (Element link : links) {
+						el++;
+						System.out.println("Página " + i + "/" + pages + ". " + el + "/"+ links.size() + " Links");
+						try {
+							String href = link.getElementsByTag("a").get(0).attr("href");
+							String newsName = link.text();
+
+							doc = this.getDocument(prefix + href);
+							Element news = doc.getElementById("contentNoticia");
+							while (news == null) {
+								Thread.sleep(10 * 1000);
+								doc = this.getDocument(prefix + href);
+								news = doc.getElementById("contentNoticia");
+							}
+
+							NewsTO newsBean = new NewsTO();
+							newsBean.setNewsHeader(newsName.substring(19));
+							newsBean.setNewsDate(getDateFromNews(newsName));
+							newsBean.setStockType(getStockType(newsBean.getNewsHeader()));
+							newsBean.setTicker(getStockTicker(newsBean.getNewsHeader()));
+							newsBean.setNews(news.text());
+							newsBean.setNewsHref(prefix + href);
+
+							if (newsBean.getNewsHeader().toLowerCase().contains("fii")) {
+								qtyNews++;
+
+								try {
+									checkInformeMensal(newsBean);	
+								} catch (Exception e) {
+									log.error("Erro ao verificar o Informe mensal. " + newsName);
+									log.error(e);
+									e.printStackTrace();
+								}
+
+							}
+						} catch (Exception e) {
+							log.error(e);
+							e.printStackTrace();
+						}
+
+					}
+				}
+
+			} catch (Exception e) {
+				log.error(e);
+				e.printStackTrace();
+			}
+		}
+		
+		return qtyNews;
 	}
 }
