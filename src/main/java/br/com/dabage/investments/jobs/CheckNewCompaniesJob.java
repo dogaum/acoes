@@ -28,7 +28,7 @@ public class CheckNewCompaniesJob {
 		Calendar cal = Calendar.getInstance();
 		if (DateUtils.isWorkingDay(cal)) {
 			log.info("Executing " + CheckNewCompaniesJob.class.getSimpleName() + " on " + new Date());
-			insertFIITickers.run();
+			//insertFIITickers.run();
 			//insertTickers.run();			
 		} else {
 			log.info("Job " + CheckNewCompaniesJob.class.getSimpleName() + " is out of date.");
