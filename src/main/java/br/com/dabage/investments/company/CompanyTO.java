@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -28,9 +27,7 @@ public class CompanyTO extends AbstractDocument {
 		this.prefix = ticker.substring(0, 4);
 	}
 
-	@Indexed
 	private String prefix;
-	@Indexed
 	private String ticker;
 	private String name;
 	private String fullName;

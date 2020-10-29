@@ -2,7 +2,6 @@ package br.com.dabage.investments.company;
 
 import java.util.Date;
 
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import br.com.dabage.investments.repositories.AbstractDocument;
@@ -15,7 +14,6 @@ public class InformeMensalTO extends AbstractDocument {
 
 	public InformeMensalTO() { }
 
-	@Indexed
 	private String ticker;
 
 	// Table 1

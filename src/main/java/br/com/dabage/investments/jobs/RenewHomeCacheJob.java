@@ -3,7 +3,8 @@ package br.com.dabage.investments.jobs;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import br.com.dabage.investments.utils.DateUtils;
 
 @Component
 public class RenewHomeCacheJob {
-	private Logger log = Logger.getLogger(RenewHomeCacheJob.class);
+	private Logger log = LogManager.getLogger(RenewHomeCacheJob.class);
 
 	@Autowired
 	public HomeService homeService;
@@ -23,8 +24,14 @@ public class RenewHomeCacheJob {
 	@Autowired
 	public CheckNews checkNews;
 
-	@Scheduled(cron="0 1 * * * *")
+	@Scheduled(initialDelay=0, fixedRate=1*60*60*1000)
 	public void execute() {
+		
+		if (homeService.isCacheEmpty()) {
+			homeService.loadHomeCache();
+			return;
+		}
+
 		Calendar cal = Calendar.getInstance();
 		if (DateUtils.isWorkingDay(cal)) {
 			log.info("Executing " + RenewHomeCacheJob.class.getSimpleName() + " on " + new Date());

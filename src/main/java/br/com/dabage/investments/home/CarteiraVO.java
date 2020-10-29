@@ -18,6 +18,8 @@ public class CarteiraVO implements Serializable {
 	private Double totalPortfolio;
 
 	private Double totalPortfolioActual;
+
+	private Double totalPortfolioPercent;
 	
 	private Double totalPortfolioIncome;
 
@@ -132,6 +134,14 @@ public class CarteiraVO implements Serializable {
 
 	public void setIncomes(Map<String, List<IncomeVO>> incomes) {
 		this.incomes = incomes;
+	}
+
+	public Double getTotalPortfolioPercent() {
+		return totalPortfolioPercent;
+	}
+
+	public void setTotalPortfolioPercent(Double totalPortfolioPercent) {
+		this.totalPortfolioPercent = totalPortfolioPercent;
 	}
 
 }

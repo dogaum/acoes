@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ import br.com.dabage.investments.utils.DateUtils;
 
 @Service
 public class HomeService {
+
+	private Logger log = LogManager.getLogger(HomeService.class);
 
 	@Autowired
 	CarteiraRepository carteiraRepository;
@@ -42,13 +46,15 @@ public class HomeService {
 	/**
 	 * Initialize all home
 	 */
-	public void loadHomeCache() {
+	public synchronized void loadHomeCache() {
+		log.info("Loading Home Cache - Start");
 		homeCache = new HashMap<UserTO, HomeVO>();
 		List<UserTO> users = userRepository.findAll();
 		for (UserTO user : users) {
 			HomeVO home = loadHomeByUser(user);
 			homeCache.put(user, home);
 		}
+		log.info("Loading Home Cache - End");
 	}
 
 	public HomeVO loadHomeByUser(UserTO user) {
@@ -73,6 +79,11 @@ public class HomeService {
 			carteiraVO.setTotalCalculateResult(carteira.getTotalCalculateResult());
 			carteiraVO.setTotalPortfolio(carteira.getTotalPortfolio());
 			carteiraVO.setTotalPortfolioActual(carteira.getTotalPortfolioActual());
+			carteiraVO.setTotalPortfolioPercent(0D);
+			if (carteira.getTotalPortfolio() != 0D && carteira.getTotalPortfolioActual() != 0D) {
+				carteiraVO.setTotalPortfolioPercent((carteira.getTotalPortfolioActual() / carteira.getTotalPortfolio()) -1);
+			}
+			
 			carteiraVO.setTotalPortfolioActualPlusIncome(carteira.getTotalPortfolioActualPlusIncome());
 			carteiraVO.setTotalPortfolioIncome(carteira.getTotalPortfolioIncome());
 
@@ -108,6 +119,10 @@ public class HomeService {
 		}
 		home.setTotalCarteiras(totalCarteiras);
 		home.setTotalActualCarteiras(totalActualCarteiras);
+		home.setTotalPercentCarteiras(0D);
+		if (totalCarteiras != 0D && totalActualCarteiras != 0D) {
+			home.setTotalPercentCarteiras((totalActualCarteiras / totalCarteiras) - 1);
+		}
 
 		return home;
 	}
@@ -168,5 +183,13 @@ public class HomeService {
 		}
 
 		return result;
+	}
+
+	/**
+	 * 
+	 * @return Boolean
+	 */
+	public Boolean isCacheEmpty() {
+		return (homeCache == null);
 	}
 }

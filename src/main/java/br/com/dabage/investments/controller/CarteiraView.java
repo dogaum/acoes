@@ -142,7 +142,7 @@ public class CarteiraView extends BasicView implements Serializable {
 				selectedCarteira = carteiras.get(firstCarteiraRing);				
 			}
 
-			selectCarteira();
+			this.selectCarteira();
 			selectedCarteiraItemTotalValue = 0D;
 		}
 		return "carteiras";
@@ -164,29 +164,36 @@ public class CarteiraView extends BasicView implements Serializable {
 	 * Show or not empty positions
 	 */
 	public void showEmptyPosition() {
-		if (carteiraItens != null) {
-			hideEmptyPosition();
+		
+		if (emptyPosition && carteiraItens != null) {
+			return;
 		}
+
+		this.selectCarteira();
+
+		emptyPosition = true;
 	}
 
 	/**
 	 * Hid empty positions
 	 */
 	public void hideEmptyPosition() {
-		if (carteiraItens != null && !emptyPosition) {
-			Iterator<CarteiraItemTO> iteItens = carteiraItens.iterator();
-			while (iteItens.hasNext()) {
-				CarteiraItemTO item = iteItens.next();
-				if (item.getQuantity().equals(0L)) {
-					iteItens.remove();
-				}
-			}
-			// Ordering carteira itens for charts
-			orderCarteiraItens();
-		} else {
-			selectCarteira();
+		if (carteiraItens == null) {
+			this.selectCarteira();
 		}
-		emptyPosition = !emptyPosition;
+
+		Iterator<CarteiraItemTO> iteItens = carteiraItens.iterator();
+		while (iteItens.hasNext()) {
+			CarteiraItemTO item = iteItens.next();
+			if (item.getQuantity().equals(0L)) {
+				iteItens.remove();
+			}
+		}
+
+		// Ordering carteira itens for charts
+		orderCarteiraItens();
+
+		emptyPosition = false;
 	}
 
 	/**
@@ -205,6 +212,10 @@ public class CarteiraView extends BasicView implements Serializable {
 
 			// Ordering carteira itens for charts
 			orderCarteiraItens();
+
+			if (!emptyPosition) {
+				this.hideEmptyPosition();
+			}
 		}
 	}
 
@@ -429,7 +440,7 @@ public class CarteiraView extends BasicView implements Serializable {
 		negotiationRepository.delete(negotiation);
 		selectedCarteira.getNegotiations().remove(negotiation);
 		carteiraRepository.save(selectedCarteira);
-		selectCarteira();
+		this.selectCarteira();
 	}
 
 	public void deleteIncome(ActionEvent event) {
@@ -441,7 +452,7 @@ public class CarteiraView extends BasicView implements Serializable {
 		incomeRepository.delete(inc);
 		selectedCarteira.getIncomes().remove(inc);
 		carteiraRepository.save(selectedCarteira);
-		selectCarteira();
+		this.selectCarteira();
 	}
 	
 	/**
@@ -510,6 +521,20 @@ public class CarteiraView extends BasicView implements Serializable {
 		selectedCompany = company;
 	}
 
+	/**
+	 * Hid empty positions
+	 */
+	public void renewPortfolioQuotes() {
+		if (carteiraItens == null) {
+			return;
+		}
+
+		for (CarteiraItemTO carteiraItemTO : carteiraItens) {
+			carteiraItemTO.setActualValue(getQuotation.getLastQuoteCache(carteiraItemTO.getStock(), true));
+		}
+
+	}
+	
 	public void clicked() {
     }
 

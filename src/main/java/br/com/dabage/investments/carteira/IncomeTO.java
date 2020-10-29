@@ -3,7 +3,6 @@ package br.com.dabage.investments.carteira;
 import java.math.BigInteger;
 import java.util.Date;
 
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import br.com.dabage.investments.repositories.AbstractDocument;
@@ -14,7 +13,6 @@ public class IncomeTO extends AbstractDocument {
 	/** */
 	private static final long serialVersionUID = 4935084307003225955L;
 
-	@Indexed
 	private String stock;
 
 	private Double value;
@@ -25,7 +23,6 @@ public class IncomeTO extends AbstractDocument {
 
 	private Date addDate;
 
-	@Indexed
 	private BigInteger idCarteira;
 
 	public String getStock() {

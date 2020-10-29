@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.faces.bean.RequestScoped;
 import javax.faces.event.ActionEvent;
 
@@ -13,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.TextCriteria;
-import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Controller;
 
 import br.com.dabage.investments.news.NewsTO;
@@ -29,13 +26,13 @@ public class NewsView extends BasicView implements Serializable {
 	/** */
 	private static final long serialVersionUID = -2524943863550149439L;
 
-	@Resource
+	@Autowired
 	CompanyRepository companyRepository;
 
-	@Resource
+	@Autowired
 	GetQuotation getQuotation;
 
-	@Resource
+	@Autowired
 	NewsRepository newsRepository;
 
 	@Autowired

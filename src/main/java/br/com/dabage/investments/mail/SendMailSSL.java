@@ -15,13 +15,14 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SendMailSSL {
 
-	private static Logger log = Logger.getLogger(SendMailSSL.class);
+	private static Logger log = LogManager.getLogger(SendMailSSL.class);
 
 	public static void send(String subject, String textContent, File file, String email) {
 		Properties props = new Properties();
@@ -36,7 +37,7 @@ public class SendMailSSL {
 		Session session = Session.getDefaultInstance(props,
 			new javax.mail.Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication("dogaum","T1@o0783");
+					return new PasswordAuthentication("dogaum","T1@o0780");
 				}
 			});
  

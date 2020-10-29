@@ -3,6 +3,7 @@ package br.com.dabage.investments.news;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.security.cert.CertificateException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -14,10 +15,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -40,9 +49,9 @@ import br.com.dabage.investments.repositories.NewsRepository;
 import br.com.dabage.investments.utils.DateUtils;
 
 @Component
-public class CheckNews {
+public class CheckNewsB3 {
 
-	private Logger log = LogManager.getLogger(CheckNews.class);
+	private Logger log = LogManager.getLogger(CheckNewsB3.class);
 
 	@Autowired
 	private GetQuotation getQuotation;
@@ -69,7 +78,62 @@ public class CheckNews {
 
 	static DateFormat dateFormatSearch = new SimpleDateFormat("yyyy-MM-dd");
 
+	static DateFormat dateFormatNews = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+	static DateFormat dateFormatNewsSave = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
 	public Document getDocument(String url) {
+
+		try {
+		    /*
+		     *  fix for
+		     *    Exception in thread "main" javax.net.ssl.SSLHandshakeException:
+		     *       sun.security.validator.ValidatorException:
+		     *           PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException:
+		     *               unable to find valid certification path to requested target
+		     */
+		    TrustManager[] trustAllCerts = new TrustManager[] {
+		       new X509TrustManager() {
+		          public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+		            return null;
+		          }
+
+				@Override
+				public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
+						throws CertificateException {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+						throws CertificateException {
+					// TODO Auto-generated method stub
+					
+				}
+
+		       }
+		    };
+
+		    SSLContext sc = SSLContext.getInstance("SSL");
+		    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+		    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+		    // Create all-trusting host name verifier
+		    HostnameVerifier allHostsValid = new HostnameVerifier() {
+		        public boolean verify(String hostname, SSLSession session) {
+		          return true;
+		        }
+		    };
+		    // Install the all-trusting host verifier
+		    HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+		    /*
+		     * end of the fix
+		     */
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		Connection connection = Jsoup.connect(url);
 		connection.ignoreHttpErrors(true);
 		connection.timeout(600000);
@@ -89,173 +153,111 @@ public class CheckNews {
 		return doc;
 	}
 
-	public void run2() {
-		String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
+	/**
+	 * 
+	 * @param query texto a ser consultado
+	 * @param sDate Data Inicial
+	 * @param fDate Data final
+	 * @return
+	 */
+	public int run(String query, String sDate, String fDate) {
 
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, 2015);
-		cal.set(Calendar.MONTH, 5);
-
-		while(cal.getTime().before(new Date())) {
-			String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=fii&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
-
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-			String INICIO = dateFormatSearch.format(cal.getTime());
-			endFII = endFII.replaceFirst("INICIO", INICIO);
-
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-			String FIM = dateFormatSearch.format(cal.getTime());
-			endFII = endFII.replaceFirst("FIM", FIM);
-
-			int pages = 20;
-			for (int i = 1; i < pages; i++) {
-				try {
-					Document doc = getDocument(endFII + i);
-
-					Element pagina = doc.getElementById("linksNoticias");
-					if (pagina != null) {
-						Elements links = pagina.getElementsByTag("li");
-						for (Element link : links) {
-							String href = link.getElementsByTag("a").get(0).attr("href");
-							String newsName = link.text();
-
-							doc = this.getDocument(prefix + href);
-							Element news = doc.getElementById("contentNoticia");
-
-							NewsTO newsBean = new NewsTO();
-							newsBean.setNewsHeader(newsName.substring(19));
-							newsBean.setNewsDate(getDateFromNews(newsName));
-							newsBean.setStockType(getStockType(newsBean.getNewsHeader()));
-							newsBean.setTicker(getStockTicker(newsBean.getNewsHeader()));
-							newsBean.setNews(news.text());
-							newsBean.setNewsHref(prefix + href);
-
-							Double income = checkIncome(newsBean);
-							if (income == null) {
-								log.error("Nao encontrou: " + newsBean.getTicker());
-							}
-						}
-					}
-
-				} catch (Exception e) {
-					log.error(e);
-					e.printStackTrace();
-				}
-			}
-		
-			cal.add(Calendar.MONTH, 1);
-		}
-
-	}
-	
-	public int run(String query, NewsFilterType ft, String sDate, String fDate, int pages) {
+		String url = "https://sistemasweb.b3.com.br/PlantaoNoticias/Noticias/ListarTitulosNoticias?agencia=18&palavra="+ query + "&dataInicial=" + sDate + "&dataFinal=" + fDate;
 
 		int qtyNews = 0;
-		StringBuffer endFII = new StringBuffer();
-		endFII.append("http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br");
-		// Query
-		endFII.append("&q=");
-		endFII.append(query);
-		// Filter type
-		endFII.append("&tipoFiltro=");
-		endFII.append(ft.getKey());
 
-		if (ft.equals(NewsFilterType.INTERVAL)) {
-			endFII.append("&periodoDe=");
-			endFII.append(sDate);
-			endFII.append("&periodoAte=");
-			endFII.append(fDate);
-		}
+		Document doc = this.getDocument(url);
+		String result = doc.body().text();
 
-		String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
+		try {
 
-		for (int i = pages; i >= 1; i--) {
-			String finalUrl = endFII.toString() + "&pg=" + i;
-			try {
-				Document doc = this.getDocument(finalUrl);
-				Element pagina = doc.getElementById("linksNoticias");
-				if (pagina != null) {
-					Elements links = pagina.getElementsByTag("li");
-					for (Element link : links) {
-						try {
-							String href = link.getElementsByTag("a").get(0).attr("href");
-							String newsName = link.text();
+			JSONArray arr = new JSONArray(result);
+			String idNoticia = "";
+			String dateTimeNoticia = "";
+			String headline = "";
+			for(int i = 0; i < arr.length(); i++){
+				idNoticia = arr.getJSONObject(i).getJSONObject("NwsMsg").getString("id");
+				dateTimeNoticia = arr.getJSONObject(i).getJSONObject("NwsMsg").getString("dateTime");
+				headline = arr.getJSONObject(i).getJSONObject("NwsMsg").getString("headline");
+				String urlItem = String.format("https://sistemasweb.b3.com.br/PlantaoNoticias/Noticias/Detail?idNoticia=%s&agencia=18&dataNoticia=%s", idNoticia, dateTimeNoticia);
+	
+				Document docItem = this.getDocument(urlItem);;
+				String bodyItem = docItem.getElementById("conteudoDetalhe").getAllElements().text();
+				int indexIni = bodyItem.indexOf("http");
+				int indexFin = bodyItem.lastIndexOf("flnk");
+				String linkPdf = bodyItem.substring(indexIni, indexFin-1);
+				linkPdf = linkPdf.replaceFirst("https", "http");
+				linkPdf = linkPdf.replaceAll("visualizarDocumento", "exibirDocumento");
 
-							doc = this.getDocument(prefix + href);
-							Element news = doc.getElementById("contentNoticia");
-							while (news == null) {
-								Thread.sleep(10 * 1000);
-								doc = this.getDocument(prefix + href);
-								news = doc.getElementById("contentNoticia");
-							}
+				try {
 
-							NewsTO newsBean = new NewsTO();
-							newsBean.setNewsHeader(newsName.substring(19));
-							newsBean.setNewsDate(getDateFromNews(newsName));
-							newsBean.setStockType(getStockType(newsBean.getNewsHeader()));
-							newsBean.setTicker(getStockTicker(newsBean.getNewsHeader()));
-							newsBean.setNews(news.text());
-							newsBean.setNewsHref(prefix + href);
+					NewsTO newsBean = new NewsTO();
+					newsBean.setNewsHeader(headline);
+					newsBean.setNewsDate(dateTimeNoticia);
+					newsBean.setStockType(getStockType(newsBean.getNewsHeader()));
+					newsBean.setTicker(getStockTicker(newsBean.getNewsHeader()));
+					newsBean.setNews(bodyItem);
+					newsBean.setNewsHref(linkPdf);
+					newsBean.setIdNoticia(idNoticia);
 
-							if (insertNews(newsBean) && newsBean.getNewsHeader().toLowerCase().contains("fii")) {
-								qtyNews++;
-								Double income = null;
-										
-								try {
-									income = checkIncome(newsBean);	
-								} catch (Exception e) {
-									log.error("Erro ao verificar o Aviso aos cotistas " + newsName);
-									log.error(e);
-									e.printStackTrace();									
-								}
-								newsRepository.save(newsBean);
-
-								Double vp = 0D;
+					if ((insertNews(newsBean) || !isEmailSent(newsBean)) && newsBean.getNewsHeader().toLowerCase().contains("fii")) {
+						qtyNews++;
+						Double income = null;
 								
-								try {
-									vp = checkInformeMensal(newsBean);	
-								} catch (Exception e) {
-									log.error("Erro ao verificar o Informe mensal. " + newsName);
-									log.error(e);
-									e.printStackTrace();
-								}
-
-								newsRepository.save(newsBean);
-								SendMailSSL.send(
-										newsName,
-										getQuotationsByPrefix(newsBean.getTicker(), income, vp)
-												+ news.text()
-												+ "\n\n"
-												+ newsBean.getNewLink(),
-										newsBean.getAttached(),
-										"dogaum@gmail.com");
-								newsBean.setEmailSent(true);
-								newsRepository.save(newsBean);
-							}
+						try {
+							income = checkIncome(newsBean);	
 						} catch (Exception e) {
+							log.error("Erro ao verificar o Aviso aos cotistas " + headline);
+							log.error(e);
+							e.printStackTrace();									
+						}
+						newsRepository.save(newsBean);
+
+						Double vp = 0D;
+						
+						try {
+							vp = checkInformeMensal(newsBean);	
+						} catch (Exception e) {
+							log.error("Erro ao verificar o Informe mensal. " + headline);
 							log.error(e);
 							e.printStackTrace();
 						}
 
-					}
-				}
+						newsRepository.save(newsBean);
 
-			} catch (Exception e) {
-				log.error(e);
-				e.printStackTrace();
+						if (newsBean.getNewsHeader().toLowerCase().contains("rentabilidade")
+							|| newsBean.getNewsHeader().toLowerCase().contains("perfil")
+							|| newsBean.getNewsHeader().toLowerCase().contains("regulamento")) {
+							continue;
+						}
+
+						SendMailSSL.send(
+								headline,
+								getQuotationsByPrefix(newsBean.getTicker(), income, vp)
+										+ bodyItem
+										+ "\n\n"
+										+ newsBean.getNewLink(),
+								newsBean.getAttached(),
+								"dogaum@gmail.com");
+						newsBean.setEmailSent(true);
+						newsRepository.save(newsBean);
+					}
+				} catch (Exception e) {
+					log.error(e);
+					e.printStackTrace();
+				}
+				
 			}
+		} catch (Exception e ) {
+
 		}
-		
 		return qtyNews;
 	}
 
 	private boolean insertNews(NewsTO newsTO) {
-		String idNoticia = extracIdNoticia(newsTO.getNewsHref());
-		newsTO.setIdNoticia(idNoticia);
-
 		NewsTO obj = null;
 		try {
-			obj = newsRepository.findByIdNoticia(idNoticia);
+			obj = newsRepository.findByIdNoticia(newsTO.getIdNoticia());
 		} catch (Exception e) {
 			// Encontrou inserido duas vezes.
 			return false;
@@ -272,9 +274,13 @@ public class CheckNews {
 	}
 
 	private boolean isEmailSent(NewsTO newsTO) {
-		String idNoticia = extracIdNoticia(newsTO.getNewsHref());
-		newsTO.setIdNoticia(idNoticia);
-		NewsTO obj = newsRepository.findByIdNoticia(idNoticia);
+		NewsTO obj = null;
+		try {
+			obj = newsRepository.findByIdNoticia(newsTO.getIdNoticia());
+		} catch (Exception e) {
+			// Encontrou inserido duas vezes.
+			return true;
+		}
 
 		if (obj == null) {
 			return false;
@@ -289,20 +295,6 @@ public class CheckNews {
 		return true;
 	}
 	
-	private String extracIdNoticia(String header) {
-		String idNoticia = "";
-		int initialIndex = header.indexOf("idNoticia=");
-		int finalIndex = header.indexOf("&header");
-		idNoticia = header.substring(initialIndex +10, finalIndex);
-
-		return idNoticia;
-	}
-	
-	private String getDateFromNews(String newsHeader) {
-		String dateStr = newsHeader.substring(0, 16);
-		return dateStr;
-	}
-
 	private String getStockType(String newsHeader) {
 		if (newsHeader.substring(0, 3).equals("FII")) {
 			return "FII";
@@ -314,7 +306,10 @@ public class CheckNews {
 		String ticker = "";
 		int initialIndex = newsHeader.indexOf("(");
 		ticker = newsHeader.substring(initialIndex+1, initialIndex + 5);
-
+		if (ticker.length() != 4) {
+			int newIndex = newsHeader.indexOf("(", initialIndex + 5);
+			ticker = newsHeader.substring(newIndex+1, newIndex + 5);
+		}
 		return ticker;
 	}
 
@@ -334,7 +329,7 @@ public class CheckNews {
 		}
 		
 		String ticker = company.getTicker();
-		Double lastQuote = getQuotation.getLastQuoteCache(ticker, false);
+		Double lastQuote = getQuotation.getLastQuoteCache(ticker, true);
 		if (lastQuote != null) {
 			result.append(ticker);
 			result.append(" : ");
@@ -346,6 +341,14 @@ public class CheckNews {
 			result.append("VP: ");
 			result.append("R$ " + numberFormat.format(vp));
 			result.append("\n");
+			
+			if (lastQuote != null) {
+				Double pvp = lastQuote / vp;
+				result.append("P/VP: ");
+				result.append(numberFormat.format(pvp));
+				result.append("\n");
+			}
+
 		}
 
 		if (income != null) {
@@ -477,15 +480,8 @@ public class CheckNews {
 		if (newsTO.getNewsHeader().toLowerCase().contains("aviso aos cotistas")
 				&& newsTO.getNewsHeader().toUpperCase().contains("(N)")) {
 
-			int indexIni = newsTO.getNews().indexOf("http");
-			int indexFin = newsTO.getNews().lastIndexOf("flnk");
-			String link = newsTO.getNews().substring(indexIni, indexFin-1);
-			// http was discontinued, only https
-			link = link.replaceFirst("https", "http");
-			link = link.replaceAll("visualizarDocumento", "exibirDocumento");
-
-			newsTO.setNewLink(link);
-			Document doc = this.getDocument(link);
+			newsTO.setNewLink(newsTO.getNewsHref());
+			Document doc = this.getDocument(newsTO.getNewsHref());
 
 			CompanyTO company = companyRepository.findByTicker(newsTO.getTicker() + "11");
 			if (company == null) {
@@ -513,7 +509,7 @@ public class CheckNews {
 				Calendar cal = Calendar.getInstance();
 				Date incomeDate;
 				try {
-					incomeDate = dateFormat.parse(newsTO.getNewsDate());
+					incomeDate = dateFormatNews.parse(newsTO.getNewsDate());
 				} catch (ParseException e) {
 					log.error(e);
 					e.printStackTrace();
@@ -536,218 +532,175 @@ public class CheckNews {
 			}
 		} else {
 			// get attachment
-			String linkPdf = null;
-			if (newsTO.getNews().contains("https")) {
+			String linkPdf = newsTO.getNewsHref();
+			newsTO.setNewLink(newsTO.getNewsHref());
 
-				int indexIni = newsTO.getNews().indexOf("http");
-				int indexFin = newsTO.getNews().lastIndexOf("flnk");
-				linkPdf = newsTO.getNews().substring(indexIni, indexFin-1);
-				linkPdf = linkPdf.replaceFirst("https", "http");
-				linkPdf = linkPdf.replaceAll("visualizarDocumento", "exibirDocumento");
+			PdfReader reader;
+			try {
+				reader = new PdfReader(linkPdf);
+				URL url = new URL(linkPdf);
+				File file = new File("/tmp/Anexo.pdf");
+				FileUtils.copyURLToFile(url, file);
+				newsTO.setAttached(file);
+				reader.close();
+			} catch (IOException e) {
+				// Não é PDF, é HTML
+				// Pegar o html e enviar por email
 
-				newsTO.setNewLink(linkPdf);
-
-				PdfReader reader;
 				try {
-					reader = new PdfReader(linkPdf);
-					URL url = new URL(linkPdf);
-					File file = new File("/tmp/Anexo.pdf");
-					FileUtils.copyURLToFile(url, file);
-					newsTO.setAttached(file);
-					reader.close();
-				} catch (IOException e) {
-					// Não é PDF, é HTML
-					// Pegar o html e enviar por email
-
-					try {
-						File file = new File("/tmp/Anexo.html");
-						Document doc = this.getDocument(linkPdf);
-						if (doc != null) {
-							FileUtils.write(file, doc.html(), "UTF-8");
-							newsTO.setAttached(file);							
-						}
-					} catch (IOException e1) {
-						log.error(e);
-						e.printStackTrace();
+					File file = new File("/tmp/Anexo.html");
+					Document doc = this.getDocument(linkPdf);
+					if (doc != null) {
+						FileUtils.write(file, doc.html(), "UTF-8");
+						newsTO.setAttached(file);							
 					}
+				} catch (IOException e1) {
+					log.error(e);
+					e.printStackTrace();
 				}
 			}
+
 		}
 
 		return income;
 	}
 
-	public void checkIncomes() {
-
-		String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=proventos%20dos%20emissores&tipoFiltro=0";
-
-		checkIncomes(endFII);
-
-	}
-
-	public void checkIncomesTemp() {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, 2015);
-		cal.set(Calendar.MONTH, 5);
-
-		Calendar calNow = Calendar.getInstance();
-		calNow.add(Calendar.MONTH, 1);
-		
-		while(cal.getTime().before(calNow.getTime())) {
-			String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=proventos%20dos%20emissores&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-			String INICIO = dateFormatSearch.format(cal.getTime());
-			endFII = endFII.replaceFirst("INICIO", INICIO);
-
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-			String FIM = dateFormatSearch.format(cal.getTime());
-			endFII = endFII.replaceFirst("FIM", FIM);
-
-			int pages = 3;
-			for (int i = 1; i < pages; i++) {
-				checkIncomes(endFII + i);
-			}
-
-			cal.add(Calendar.MONTH, 1);
-		}
-	}
-
-	public void checkIncomesByInterval(Date initialDate, Date finalDate) {
-		String endFII = "http://www2.bmfbovespa.com.br/Agencia-Noticias/ListarNoticias.aspx?idioma=pt-br&q=proventos%20dos%20emissores&tipoFiltro=3&periodoDe=INICIO&periodoAte=FIM&pg=";
-		String INICIO = dateFormatSearch.format(initialDate);
-		endFII = endFII.replaceFirst("INICIO", INICIO);
-
-		String FIM = dateFormatSearch.format(finalDate);
-		endFII = endFII.replaceFirst("FIM", FIM);
-
-		int pages = 3;
-		for (int i = 1; i < pages; i++) {
-			checkIncomes(endFII + i);
-		}
-	}
-
-	private void checkIncomes(String endFII) {
+	private void getIncomesByNews(NewsTO newsBean) {
+		String[] companies = newsBean.getNews().split("EMPRESA: ");
 		StringBuffer buffer = new StringBuffer();
-		try {
-			String prefix = "http://www2.bmfbovespa.com.br/Agencia-Noticias/";
-			Document doc = this.getDocument(endFII);
-			Element pagina = doc.getElementById("linksNoticias");
-			if (pagina != null) {
-				Elements links = pagina.getElementsByTag("li");
-				for (Element link : links) {
-					String href = link.getElementsByTag("a").get(0).attr("href");
-					String newsName = link.text();
-					doc = this.getDocument(prefix + href);
-					Element news = doc.getElementById("contentNoticia");
+		for (int i = 1; i < companies.length; i++) {
+			try {
+				String company = companies[i];
 
-					NewsTO newsBean = new NewsTO();
-					newsBean.setNewsHeader(newsName.substring(19));
-					newsBean.setNewsDate(getDateFromNews(newsName));
-					newsBean.setNews(news.text());
-					newsBean.setNewsHref(prefix + href);
-					
-					if (!insertNews(newsBean) && isEmailSent(newsBean)) {
-						continue;
-					}
-
-					String total = news.text();
-					String[] companies = total.split("EMPRESA: ");
-					buffer = new StringBuffer();
-					for (int i = 1; i < companies.length; i++) {
-						try {
-							String company = companies[i];
-	
-							if (!company.contains("RENDIMENTO")) {
-								continue;
-							}
-	
-							String[] lines = company.split("\r");
-							String ticker = lines[3].substring(14, 21).trim();
-							CompanyTO cmp = companyRepository.findByTicker(ticker);
-							// Company does not exist
-							if (cmp == null) {
-								continue;
-							}						
-							buffer.append(ticker);
-							buffer.append("\n");
-	
-							String incomeDateStr = lines[3].substring(60, 70);
-							buffer.append(incomeDateStr);
-							buffer.append("\n");						
-	
-							if (lines[4].trim().length() < 23) {
-								continue;
-							}
-	
-							String income = lines[4].trim().substring(10, 23);
-							buffer.append(income);
-							buffer.append("\n");						
-	
-							Double incomeValue = new Double(income.replace(".", "").replace(",", "."));
-	
-							String paymentDateStr = lines[5].trim().substring(10, 20); 
-							buffer.append(paymentDateStr);
-							buffer.append("\n\n");
-	
-							buffer.append(getQuotationsByPrefix(ticker.substring(0, 4), incomeValue, cmp.getVp()));
-							buffer.append("========================= \n");
-	
-							IncomeCompanyTO incomeTO = new IncomeCompanyTO();
-							Calendar cal = Calendar.getInstance();
-							Date incomeDate = null;
-							Date paymentDate = null;
-							try {
-								incomeDate = dateFormat.parse(incomeDateStr);
-								paymentDate = dateFormat.parse(paymentDateStr);
-							} catch (ParseException e) {
-								log.error(e);
-								e.printStackTrace();
-								incomeDate = new Date();
-							}
-							cal.setTime(incomeDate);
-	
-							incomeTO.setIncomeDate(cal.getTime());
-							incomeTO.setPaymentDate(paymentDate);
-							incomeTO.setValue(incomeValue);
-							incomeTO.setIdCompany(cmp.getId());
-							incomeTO.setStock(ticker);
-							int month = cal.get(Calendar.MONTH) + 1;
-							String yearMonth = cal.get(Calendar.YEAR) + StringUtils.leftPad(month + "", 2, "0") ;
-							incomeTO.setYearMonth(Integer.parseInt(yearMonth));
-	
-							IncomeCompanyTO incTemp = incomeCompanyRepository.findByStockAndYearMonth(ticker, incomeTO.getYearMonth());
-							if (incTemp != null) {
-								incTemp.setPaymentDate(incomeTO.getPaymentDate());
-								incTemp.setIncomeDate(incomeTO.getIncomeDate());
-								incTemp.setValue(incomeTO.getValue());
-								incomeCompanyRepository.save(incTemp);
-							} else {
-								incomeCompanyRepository.save(incomeTO);	
-							}
-						} catch (Exception e) {
-							log.error(e);
-							e.printStackTrace();
-							// Continue processing
-						}
-					}
-					newsBean.setEmailSent(true);
-					newsRepository.save(newsBean);
-
-					if (!buffer.toString().isEmpty()) {
-						// Send Email
-						SendMailSSL.send("Proventos Ex-" + dateFormat.format(new Date()), buffer.toString(), null, "dogaum@gmail.com");
-					}
-
+				if (!company.contains("RENDIMENTO")) {
+					continue;
 				}
-			}
 
-		} catch (Exception e) {
-			log.error(e);
-			e.printStackTrace();
-			SendMailSSL.send("Erro: Proventos Ex-" + dateFormat.format(new Date()), buffer.toString() + e.getMessage(), null, "dogaum@gmail.com");
+				String[] lines = company.split("\r");
+				String ticker = lines[3].substring(14, 21).trim();
+				CompanyTO cmp = companyRepository.findByTicker(ticker);
+				// Company does not exist
+				if (cmp == null) {
+					continue;
+				}						
+				buffer.append(ticker);
+				buffer.append("\n");
+
+				String incomeDateStr = lines[3].substring(60, 70);
+				buffer.append(incomeDateStr);
+				buffer.append("\n");						
+
+				if (lines[4].trim().length() < 23) {
+					continue;
+				}
+
+				String income = lines[4].trim().substring(10, 23);
+				buffer.append(income);
+				buffer.append("\n");						
+
+				Double incomeValue = new Double(income.replace(".", "").replace(",", "."));
+
+				String paymentDateStr = lines[5].trim().substring(10, 20); 
+				buffer.append(paymentDateStr);
+				buffer.append("\n\n");
+
+				buffer.append(getQuotationsByPrefix(ticker.substring(0, 4), incomeValue, cmp.getVp()));
+				buffer.append("========================= \n");
+
+				IncomeCompanyTO incomeTO = new IncomeCompanyTO();
+				Calendar cal = Calendar.getInstance();
+				Date incomeDate = null;
+				Date paymentDate = null;
+				try {
+					incomeDate = dateFormat.parse(incomeDateStr);
+					paymentDate = dateFormat.parse(paymentDateStr);
+				} catch (ParseException e) {
+					log.error(e);
+					e.printStackTrace();
+					incomeDate = new Date();
+				}
+				cal.setTime(incomeDate);
+
+				incomeTO.setIncomeDate(cal.getTime());
+				incomeTO.setPaymentDate(paymentDate);
+				incomeTO.setValue(incomeValue);
+				incomeTO.setIdCompany(cmp.getId());
+				incomeTO.setStock(ticker);
+				int month = cal.get(Calendar.MONTH) + 1;
+				String yearMonth = cal.get(Calendar.YEAR) + StringUtils.leftPad(month + "", 2, "0") ;
+				incomeTO.setYearMonth(Integer.parseInt(yearMonth));
+
+				IncomeCompanyTO incTemp = incomeCompanyRepository.findByStockAndYearMonth(ticker, incomeTO.getYearMonth());
+				if (incTemp != null) {
+					incTemp.setPaymentDate(incomeTO.getPaymentDate());
+					incTemp.setIncomeDate(incomeTO.getIncomeDate());
+					incTemp.setValue(incomeTO.getValue());
+					incomeCompanyRepository.save(incTemp);
+				} else {
+					incomeCompanyRepository.save(incomeTO);	
+				}
+			} catch (Exception e) {
+				log.error(e);
+				e.printStackTrace();
+				// Continue processing
+			}
 		}
+
+		if (!buffer.toString().isEmpty()) {
+			// Send Email
+			SendMailSSL.send("Proventos Ex-" + dateFormat.format(new Date()), buffer.toString(), null, "dogaum@gmail.com");
+		}
+
+		newsBean.setEmailSent(true);
+		newsRepository.save(newsBean);
 	}
 
+	public void checkIncomes(String sDate, String fDate) {
+
+		String bodyItem = null;
+
+		String url = "https://sistemasweb.b3.com.br/PlantaoNoticias/Noticias/ListarTitulosNoticias?agencia=18&palavra=proventos" + "&dataInicial=" + sDate + "&dataFinal=" + fDate;
+
+		Document doc = this.getDocument(url);
+		String result = doc.body().text();
+		String headline = null;
+
+		try {
+
+			JSONArray arr = new JSONArray(result);
+			String idNoticia = "";
+			String dateTimeNoticia = "";
+			for(int i = 0; i < arr.length(); i++) {
+				idNoticia = arr.getJSONObject(i).getJSONObject("NwsMsg").getString("id");
+				dateTimeNoticia = arr.getJSONObject(i).getJSONObject("NwsMsg").getString("dateTime");
+				headline = arr.getJSONObject(i).getJSONObject("NwsMsg").getString("headline");
+				String urlItem = String.format("https://sistemasweb.b3.com.br/PlantaoNoticias/Noticias/Detail?idNoticia=%s&agencia=18&dataNoticia=%s", idNoticia, dateTimeNoticia);
+	
+				Document docItem = this.getDocument(urlItem);;
+				bodyItem = docItem.getElementById("conteudoDetalhe").getAllElements().text();
+
+				NewsTO newsBean = new NewsTO();
+				newsBean.setNewsHeader(headline);
+				Date newsDate = dateFormatSearch.parse(dateTimeNoticia);
+				newsBean.setNewsDate(dateFormatNewsSave.format(newsDate));
+				newsBean.setStockType(getStockType(newsBean.getNewsHeader()));
+				newsBean.setTicker(getStockTicker(newsBean.getNewsHeader()));
+				newsBean.setNews(bodyItem);
+				newsBean.setNewsHref(null);
+				newsBean.setIdNoticia(idNoticia);
+
+				if (insertNews(newsBean) && !isEmailSent(newsBean)) {
+					this.getIncomesByNews(newsBean);
+					break;
+				}
+
+			}
+		} catch (Exception e ) {
+			log.error("Erro ao pegar proventos.", e);
+		}
+
+	}
+	
 	public Double checkInformeMensal(NewsTO newsTO) {
 
 		CompanyTO company = companyRepository.findByTicker(newsTO.getTicker() + "11");
@@ -762,14 +715,8 @@ public class CheckNews {
 		if (newsTO.getNewsHeader().toLowerCase().contains("informe mensal")
 				&& !newsTO.getNewsHeader().toLowerCase().contains("(C)")) {
 
-			int indexIni = newsTO.getNews().indexOf("http");
-			int indexFin = newsTO.getNews().lastIndexOf("flnk");
-			String link = newsTO.getNews().substring(indexIni, indexFin-1);
-			link = link.replaceFirst("https", "http");
-			link = link.replaceAll("visualizarDocumento", "exibirDocumento");
-
-			newsTO.setNewLink(link);
-			Document doc = this.getDocument(link);
+			newsTO.setNewLink(newsTO.getNewsHref());
+			Document doc = this.getDocument(newsTO.getNewsHref());
 			if (doc == null) {
 				return company.getVp();
 			}
@@ -867,7 +814,7 @@ public class CheckNews {
 
 							NewsTO newsBean = new NewsTO();
 							newsBean.setNewsHeader(newsName.substring(19));
-							newsBean.setNewsDate(getDateFromNews(newsName));
+							//TODO newsBean.setNewsDate(getDateFromNews(newsName));
 							newsBean.setStockType(getStockType(newsBean.getNewsHeader()));
 							newsBean.setTicker(getStockTicker(newsBean.getNewsHeader()));
 							newsBean.setNews(news.text());

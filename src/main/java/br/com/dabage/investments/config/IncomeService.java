@@ -9,9 +9,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +26,12 @@ import br.com.dabage.investments.utils.DateUtils;
 @Service
 public class IncomeService {
 
-	private Logger log = Logger.getLogger(IncomeService.class);
+	private Logger log = LogManager.getLogger(IncomeService.class);
 
-    @Resource
+	@Autowired
     IncomeCompanyRepository incomeCompanyRepository;
 
-    @Resource
+	@Autowired
     CompanyRepository companyRepository;
 
 	@Autowired
@@ -54,7 +53,7 @@ public class IncomeService {
 	 * Calculate results
 	 */
 	public void calcIncomesHistory() {
-		log.info("Calculating incomes history.");
+		log.info("Calculating incomes history - start");
 		incomes = new ArrayList<IncomeTotal>();
 		List<IncomeTotal> temp = new ArrayList<IncomeTotal>();
 		incomeLabel= new IncomeLabel();
@@ -120,7 +119,7 @@ public class IncomeService {
 				inc.setAvg24(avg24 / count);
 			}
 
-			inc.setLastQuote(getQuotation.getLastQuoteCache(inc.getStock()));
+			inc.setLastQuote(getQuotation.getLastQuoteCache(inc.getStock(), false));
 			Double value = 0D;
 			if (inc.getValue1() != null) {
 				value = inc.getValue1();
@@ -153,6 +152,7 @@ public class IncomeService {
 			incomes.add(inc);
 		}
 		Collections.sort(incomes);
+		log.info("Calculating incomes history - end");
 	}
 
 	/**

@@ -15,7 +15,6 @@ public class NegotiationTO extends AbstractDocument implements Comparable<Negoti
 	/** */
 	private static final long serialVersionUID = 2954251960346356186L;
 
-	@Indexed
 	private String stock;
 
 	private Double value;
@@ -45,7 +44,6 @@ public class NegotiationTO extends AbstractDocument implements Comparable<Negoti
 	/** Result Value of de Sell */
 	private Double calculateValue;
 
-	@Indexed
 	private BigInteger idCarteira;
 
 	private StockTypeTO stockType;

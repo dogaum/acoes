@@ -28,4 +28,6 @@ public interface NegotiationRepository extends MongoRepository<NegotiationTO, Bi
 	List<NegotiationTO> findByIdCarteiraAndDtNegotiationLessThanEqual(BigInteger idCarteira, Date to);
 
 	List<NegotiationTO> findByStockOrderByDtNegotiationAsc(String stock);
+
+	NegotiationTO findTopByIdCarteiraOrderByDtNegotiationDesc(BigInteger idCarteira);
 }

@@ -121,7 +121,13 @@
 										        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
 										        </h:outputText>
 										    </p:column>
-		
+
+										    <p:column headerText="#{msg['app.home.portfolio.total.percent']}" style="text-align:right" priority="4">
+										        <h:outputText value="#{result.totalPortfolioPercent}">
+										        	<f:convertNumber type="percent" minFractionDigits="2"/>
+										        </h:outputText>
+										    </p:column>
+
 											<p:columnGroup type="footer">
 									            <p:row>
 									                <p:column style="text-align:right" footerText="#{msg['app.home.portfolio.total.amount']}:" />
@@ -136,6 +142,13 @@
 											            <f:facet name="footer">
 													        <h:outputText value="#{homeView.home.totalActualCarteiras}">
 													        	<f:convertNumber type="currency" currencySymbol="#{msg['currencySymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+													        </h:outputText>
+											            </f:facet>
+									                </p:column>
+									                <p:column style="text-align:right">
+											            <f:facet name="footer">
+													        <h:outputText value="#{homeView.home.totalPercentCarteiras}">
+													        	<f:convertNumber type="percent" minFractionDigits="2"/>
 													        </h:outputText>
 											            </f:facet>
 									                </p:column>

@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import br.com.dabage.investments.config.StockTypeTO;
@@ -18,12 +20,12 @@ import br.com.dabage.investments.repositories.StockTypeRepository;
 @Component
 public class InsertFIITickers {
 
-	private Logger log = Logger.getLogger(InsertFIITickers.class);
+	private Logger log = LogManager.getLogger(InsertFIITickers.class);
 
-	@Resource
+	@Autowired
 	CompanyRepository companyRepository;
 
-	@Resource
+	@Autowired
 	StockTypeRepository stockTypeRepository;
 	
 	/**

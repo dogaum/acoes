@@ -199,7 +199,7 @@ public class PortfolioService {
 			}
 
 			carteira.setTotalPortfolio(carteira.getTotalPortfolio() + item.getTotalValue());
-			Double lasQuotation = getQuotation.getLastQuoteCache(item.getStock());
+			Double lasQuotation = getQuotation.getLastQuoteCache(item.getStock(), false);
 			if (lasQuotation == null || lasQuotation.doubleValue() == 0.0) {
 				lasQuotation = (item.getCompany().getLastQuote() == null) ? 0D : item.getCompany().getLastQuote();
 			}
@@ -251,13 +251,13 @@ public class PortfolioService {
 
 		// Last Negotitation
 		if (!carteira.getNegotiations().isEmpty()) {
-			NegotiationTO lastNegotiation = carteira.getNegotiations().get(carteira.getNegotiations().size() - 1);
+			NegotiationTO lastNegotiation = negotiationRepository.findTopByIdCarteiraOrderByDtNegotiationDesc(carteira.getId());
 			carteira.setLastNegotiation(lastNegotiation);				
 		}
 
 		// Last Income
 		if (!carteira.getIncomes().isEmpty()) {
-			IncomeTO lastIncome = carteira.getIncomes().get(carteira.getIncomes().size() - 1);
+			IncomeTO lastIncome = incomeRepository.findTopByIdCarteiraOrderByIncomeDateDesc(carteira.getId());
 			carteira.setLastIncome(lastIncome);			
 		}
 
@@ -273,7 +273,7 @@ public class PortfolioService {
 			if (filter.getStock() != null && !filter.getStock().isEmpty()) {
 				negotiations = negotiationRepository.findByStockOrderByDtNegotiationAsc(filter.getStock());
 			} else {
-				negotiations = negotiationRepository.findAll(new Sort(Sort.Direction.ASC, "dtNegotiation"));
+				negotiations = negotiationRepository.findAll(Sort.by(Sort.Direction.ASC, "dtNegotiation"));
 			}
 
 			for (NegotiationTO negotiationTO : negotiations) {
@@ -294,7 +294,7 @@ public class PortfolioService {
 			if (filter.getStock() != null && !filter.getStock().isEmpty()) {
 				incomes = incomeRepository.findByStockOrderByIncomeDateAsc(filter.getStock());
 			} else {
-				incomes = incomeRepository.findAll(new Sort(Sort.Direction.ASC, "incomeDate"));
+				incomes = incomeRepository.findAll(Sort.by(Sort.Direction.ASC, "incomeDate"));
 			}
 			
 			for (IncomeTO incomeTO : incomes) {
@@ -332,9 +332,9 @@ public class PortfolioService {
 			}
 
 			if (!filter.isSort()) {
-				query.with(new Sort(Sort.Direction.ASC, "dtNegotiation"));
+				query.with(Sort.by(Sort.Direction.ASC, "dtNegotiation"));
 			} else {
-				query.with(new Sort(Sort.Direction.DESC, "dtNegotiation"));
+				query.with(Sort.by(Sort.Direction.DESC, "dtNegotiation"));
 			}
 
 			List<NegotiationTO> negotiations = template.find(query, NegotiationTO.class);
@@ -358,6 +358,9 @@ public class PortfolioService {
 				st.setAmount(amount);
 				st.setStatementType(negotiationTO.getNegotiationType().name());
 
+				Double lasQuotation = getQuotation.getLastQuoteCache(negotiationTO.getStock(), false);
+				st.setQuote(lasQuotation);
+
 				result.add(st);
 			}
 		} else {
@@ -374,9 +377,9 @@ public class PortfolioService {
 			}
 
 			if (!filter.isSort()) {
-				query.with(new Sort(Sort.Direction.ASC, "incomeDate"));
+				query.with(Sort.by(Sort.Direction.ASC, "incomeDate"));
 			} else {
-				query.with(new Sort(Sort.Direction.DESC, "incomeDate"));
+				query.with(Sort.by(Sort.Direction.DESC, "incomeDate"));
 			}
 
 			List<IncomeTO> incomes = template.find(query, IncomeTO.class);

@@ -153,16 +153,26 @@
 										<h:outputText value="#{carteiraView.selectedCarteira.lastIncome.stock}"/>
 										
 										<br/>
-										
-										<p:commandLink id="clSP"
+
+										<p:commandLink id="clSPHide" rendered="#{carteiraView.emptyPosition}"
 										 				actionListener="#{carteiraView.hideEmptyPosition}" update=":form">
-										 		<h:outputText value="#{(carteiraView.emptyPosition) ? msg['app.portfolio.btn.showAll'] : msg['app.portfolio.btn.hideAll']}" />
+										 		<h:outputText value="#{msg['app.portfolio.btn.hideAll']}" />
 										</p:commandLink>
-										
+
+										<p:commandLink id="clSPShow" rendered="#{!carteiraView.emptyPosition}"
+										 				actionListener="#{carteiraView.showEmptyPosition}" update=":form">
+										 		<h:outputText value="#{msg['app.portfolio.btn.showAll']}" />
+										</p:commandLink>
+
 			                       	    <h:commandLink title="#{msg['app.label.export.xls']}">
 									        <i class="fa fa-fw fa-file-excel-o"></i>
 									        <p:dataExporter type="xlsx" target="carteira" fileName="carteira" pageOnly="false"/>
 									    </h:commandLink>
+
+										<p:commandLink id="clSPRenewQuote" actionListener="#{carteiraView.renewPortfolioQuotes}" update=":form"
+														title="#{msg['app.label.refresh.quotes']}">
+										 		<i class="fa fa-fw fa-refresh"></i>
+										</p:commandLink>
                             		</div>
                             	</div>
 
@@ -241,13 +251,35 @@
 								        </h:outputText>
 								    </p:column>
 
-								    <p:column headerText="#{msg['app.portfolio.lastIncome.s']}" style="text-align:right">
-			                    		<p:commandLink update=":form:panelNewIncome" oncomplete="PF('addIncomeDlg').show()" actionListener="#{carteiraView.prepareIncome}">
+								    <p:column headerText="#{msg['app.portfolio.lastIncome.s']}" sortBy="#{item.lastIncomeCompany.incomeDate}" style="text-align:center"
+								    		 	width="80">
+			                    		<p:commandLink id="idColLastIncome" update=":form:panelNewIncome" oncomplete="PF('addIncomeDlg').show()" actionListener="#{carteiraView.prepareIncome}">
 			                    			<f:param name="stock" value="#{item.stock}" />
-									        <h:outputText value="#{item.lastIncomeCompany.value}" title="#{msg['app.portfolio.lastIncome']}" style="font-weight: bold;">
-									        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+									        <h:outputText value="#{item.lastIncomeCompany.incomeDate}" title="#{msg['app.portfolio.lastIncome']}" style="font-weight: bold;">
+									        	<f:convertDateTime locale="#{msg['locale']}"/>
 									        </h:outputText>
 			                    		</p:commandLink>
+										<p:tooltip id="toolTipColLI" for="idColLastIncome" showEffect="clip" position="top">
+									        <p:outputLabel value="#{msg['app.portfolio.lastIncome.fd']}:"/>
+									        <h:outputText value="#{item.lastIncomeCompany.incomeDate}">
+									        	<f:convertDateTime locale="#{msg['locale']}"/>
+									        </h:outputText>
+									        <br/>
+									        <p:outputLabel value="#{msg['app.portfolio.lastIncome.pd']}:"/>
+									        <h:outputText value="#{item.lastIncomeCompany.paymentDate}">
+									        	<f:convertDateTime locale="#{msg['locale']}"/>
+									        </h:outputText>
+									        <br/>
+									        <p:outputLabel value="#{msg['app.portfolio.lastIncome.li']}:"/>
+									        <h:outputText value="#{item.lastIncomeCompany.value}" style="font-weight: bold;">
+									        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+									        </h:outputText>
+									        <br/>
+									        <p:outputLabel value="#{msg['app.portfolio.lastIncome.t']}:"/>
+									        <h:outputText value="#{item.lastIncomeCompany.value * item.quantity}" style="font-weight: bold;">
+									        	<f:convertNumber type="number" currencySymbol="#{msg['currencySymbol']}" minFractionDigits="2" maxFractionDigits="6" locale="#{msg['locale']}"/>
+									        </h:outputText>
+										</p:tooltip>
 								    </p:column>
 
 								    <p:column headerText="#{msg['app.portfolio.dy.am.c']}" sortBy="#{item.buyDY}" style="text-align:right">

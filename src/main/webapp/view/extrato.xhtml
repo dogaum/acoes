@@ -127,6 +127,21 @@
 										<f:convertNumber type="currency" maxFractionDigits="2" locale="#{msg['locale']}"/>
 									</h:outputText>
 								</p:column>
+								<p:column headerText="#{msg['app.statement.lbl.quote']}" width="90" sortBy="#{statement.quote}">
+									<h:outputText value="#{statement.quote}">
+										<f:convertNumber type="currency" maxFractionDigits="2" locale="#{msg['locale']}"/>
+									</h:outputText>
+								</p:column>
+								<p:column headerText="#{msg['app.statement.lbl.performance']}" width="90">
+							        <h:outputText id="colQuoteStatement" value="#{ statement.statementType eq 'Compra' ? ((statement.quote / statement.value) -1) : (((statement.quote / statement.value) -1) * -1)}">
+							        	<f:convertNumber type="percent" currencySymbol="#{msg['percentSymbol']}" maxFractionDigits="2" locale="#{msg['locale']}"/>
+							        </h:outputText>
+									<p:tooltip id="toolTipColQuote" for="colQuoteStatement" showEffect="clip" position="top">
+								        <h:outputText value="#{ statement.statementType eq 'Compra' ? (((statement.quote - statement.value) * statement.quantity) - statement.costs) : (((statement.value - statement.quote) * statement.quantity) - statement.costs)}">
+								        	<f:convertNumber type="currency" maxFractionDigits="2" locale="#{msg['locale']}"/>
+								        </h:outputText>
+									</p:tooltip>
+								</p:column>
 								<p:column headerText="#{msg['app.statement.lbl.costs']}" width="90" sortBy="#{statement.costs}">
 									<h:outputText value="#{statement.costs}">
 										<f:convertNumber type="currency" maxFractionDigits="2" locale="#{msg['locale']}"/>

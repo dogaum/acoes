@@ -22,13 +22,11 @@ public class PortfolioItemTO extends AbstractDocument implements Comparable<Port
 		this.stock = stock;
 	}
 
-	@Indexed
 	private BigInteger idCarteira;
 
 	/**
 	 * Acao/FII (Ex: FLRP11B)
 	 */
-	@Indexed
 	private String stock;
 
 	/**

@@ -146,6 +146,13 @@
 						    <p:commandButton id="clSACalcPortfolio" icon="ui-icon-refresh" update=":form:systemActionsContent" action="#{configView.calcPortfolioItems}">
 						        <h:outputText value="#{msg['app.config.system.actions.calc.portfolio']}" />
 						    </p:commandButton>
+
+					      	<h:panelGrid columns="2" cellspacing="5">
+								<p:outputLabel value="#{msg['app.statement.lbl.newsDate']}:" for="newsDate"/>
+								<p:calendar id="newsDate" value="#{configView.newsDate}" pattern="dd/MM/yyyy" mask="true" showOn="button"/>
+								
+								<p:commandButton value="#{msg['btn.update']}" actionListener="#{configView.runNews}" update=":form:systemActionsContent"/>
+					      	</h:panelGrid>
 				      	</p:outputPanel>
 				      </div>
 				    </div>

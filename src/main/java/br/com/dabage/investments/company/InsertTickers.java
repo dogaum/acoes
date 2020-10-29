@@ -2,9 +2,8 @@ package br.com.dabage.investments.company;
 
 import java.io.IOException;
 
-import javax.annotation.Resource;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -19,12 +18,12 @@ import br.com.dabage.investments.repositories.StockTypeRepository;
 @Component
 public class InsertTickers {
 
-	private Logger log = Logger.getLogger(InsertTickers.class);
+	private Logger log = LogManager.getLogger(InsertTickers.class);
 
 	@Autowired
 	CompanyRepository companyRepository;
 
-	@Resource
+	@Autowired
 	StockTypeRepository stockTypeRepository;
 
 	/**

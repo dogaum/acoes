@@ -3,6 +3,8 @@ package br.com.dabage.investments.controller;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +25,7 @@ import br.com.dabage.investments.config.ConfigService;
 import br.com.dabage.investments.config.ConfigTO;
 import br.com.dabage.investments.config.StockTypeTO;
 import br.com.dabage.investments.home.HomeService;
+import br.com.dabage.investments.news.CheckNewsB3;
 import br.com.dabage.investments.quote.GetQuotation;
 import br.com.dabage.investments.repositories.CompanyRepository;
 import br.com.dabage.investments.repositories.ConfigRepository;
@@ -64,7 +67,10 @@ public class ConfigView extends BasicView implements Serializable {
 
 	@Autowired
 	CompanyService companyService;
-	
+
+	@Autowired
+	public CheckNewsB3 checkNewsB3;
+
 	private List<StockTypeTO> stockTypes = new ArrayList<StockTypeTO>();
 
 	private StockTypeTO stockType;
@@ -82,6 +88,8 @@ public class ConfigView extends BasicView implements Serializable {
 	private String oldTicker;
 
 	private String newTicker;
+
+	private Date newsDate;
 
 	public String init() {
 		// Stock Types
@@ -352,7 +360,27 @@ public class ConfigView extends BasicView implements Serializable {
 
 		addInfoMessage("Codigo alterado com sucesso.");
 	}
-	
+
+	/**
+	 * Change Negotiation Code on B3
+	 * @param event
+	 */
+	public void runNews(ActionEvent event) {
+		if (newsDate == null) {
+			addWarnMessage("Infome a Data.");
+			return;
+		}
+
+		DateFormat dateFormatSearch = new SimpleDateFormat("yyyy-MM-dd");
+		String query = "fii";
+		String date = dateFormatSearch.format(newsDate);
+		int qtyNews = checkNewsB3.run(query, date, date);
+
+		newsDate = null;
+
+		addInfoMessage("Noticias atualizado com sucesso. Quantidade: " + qtyNews);
+	}
+
 	public List<StockTypeTO> getStockTypes() {
 		return stockTypes;
 	}
@@ -423,6 +451,14 @@ public class ConfigView extends BasicView implements Serializable {
 
 	public void setNewTicker(String newTicker) {
 		this.newTicker = newTicker;
+	}
+
+	public Date getNewsDate() {
+		return newsDate;
+	}
+
+	public void setNewsDate(Date newsDate) {
+		this.newsDate = newsDate;
 	}
 
 }

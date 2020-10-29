@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javax.annotation.Resource;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -16,7 +16,7 @@ import br.com.dabage.investments.user.UserTO;
 
 public class BasicView implements Serializable {
 
-	@Resource
+	@Autowired
 	UserRepository userRepository;
 	
 	/** */

@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,7 @@ import br.com.dabage.investments.utils.HtmlParserUtils;
 @Service
 public class ConfigService {
 
-	private Logger log = Logger.getLogger(ConfigService.class);
+	private Logger log = LogManager.getLogger(ConfigService.class);
 
 	@Autowired
 	CarteiraRepository carteiraRepository;

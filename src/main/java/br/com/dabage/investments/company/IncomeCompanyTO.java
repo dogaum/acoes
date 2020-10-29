@@ -19,7 +19,6 @@ public class IncomeCompanyTO extends AbstractDocument implements Comparable<Inco
 	/** */
 	private static final long serialVersionUID = 5651773930141591249L;
 
-	@Indexed
 	private String stock;
 
 	private Double value;
@@ -33,7 +32,6 @@ public class IncomeCompanyTO extends AbstractDocument implements Comparable<Inco
 	@Transient
 	private Date yearMonthDate;
 	
-	@Indexed
 	private BigInteger idCompany;
 
 	public String getStock() {

@@ -4,7 +4,6 @@ package br.com.dabage.investments.controller;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.faces.bean.RequestScoped;
 import javax.faces.event.ActionEvent;
 
@@ -37,10 +36,10 @@ public class IncomeView extends BasicView implements Serializable {
 
 	private IncomeCompanyTO incomeCompany;
 
-    @Resource
+	@Autowired
     IncomeCompanyRepository incomeCompanyRepository;
 
-    @Resource
+	@Autowired
     CompanyRepository companyRepository;
 
 	@Autowired

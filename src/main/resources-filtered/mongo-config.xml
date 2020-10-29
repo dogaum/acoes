@@ -9,13 +9,15 @@
         <!-- MongoBD Database configuration host and port -->
         <mongo:mongo-client id="mongo" credentials="${MONGODB.DB.CREDENTIALS}" host="${MONGODB.DB.HOST}" port="${MONGODB.DB.PORT}"
         	replica-set="${MONGODB.DB.REPLICA.SET}">
-    		<mongo:client-options write-concern="NORMAL"
-    							  max-connection-idle-time="3000000"
-    							  min-connections-per-host="1"
-    							  socket-keep-alive="true"
-    							  read-preference="PRIMARY"
-    							  connect-timeout="30000"
-    							  socket-timeout="30000"
+    		<mongo:client-options  connections-per-host="8"
+				                   threads-allowed-to-block-for-connection-multiplier="4"
+				                   max-connection-idle-time="15000"
+				                   min-connections-per-host="1"
+				                   read-preference="PRIMARY"
+				                   connect-timeout="1000"
+				                   max-wait-time="1500"
+				                   socket-keep-alive="true"
+				                   socket-timeout="1500"
     							  ssl="${MONGODB.DB.SSL}" />
 		</mongo:mongo-client>
 
@@ -29,8 +31,10 @@
 		<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 			<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
 		</bean>  
- 		
+
  		<!-- Base package to scan the mongo repositories, where we create de DAOS to access data and domain objects -->
         <mongo:repositories base-package="br.com.dabage.investments.repositories" />
 
+		<bean class=
+		  "org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
 </beans>

@@ -1,6 +1,5 @@
 package br.com.dabage.investments.config;
 
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import br.com.dabage.investments.repositories.AbstractDocument;
@@ -16,7 +15,6 @@ public class ConfigTO extends AbstractDocument {
 	/** */
 	private static final long serialVersionUID = -7777309033480564048L;
 
-	@Indexed
 	private String key;
 
 	private String value;

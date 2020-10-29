@@ -19,6 +19,8 @@ public class StatementVO {
 
 	private Double value;
 
+	private Double quote;
+
 	private Double costs;
 
 	private Double avgPrice;
@@ -99,6 +101,14 @@ public class StatementVO {
 
 	public void setQuantityPortfolio(Long quantityPortfolio) {
 		this.quantityPortfolio = quantityPortfolio;
+	}
+
+	public Double getQuote() {
+		return quote;
+	}
+
+	public void setQuote(Double quote) {
+		this.quote = quote;
 	}
 
 }

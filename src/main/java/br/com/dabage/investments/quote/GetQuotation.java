@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,7 +29,7 @@ import br.com.dabage.investments.utils.DateUtils;
 @Component
 public class GetQuotation {
 
-	private Logger log = Logger.getLogger(GetQuotation.class);
+	private Logger log = LogManager.getLogger(GetQuotation.class);
 
 	static String cmaQuoteUrl = "http://acoes.agronegocios-e.com.br/Grafico//CmaGraf.php?O=12&P=";
 
@@ -84,25 +85,6 @@ public class GetQuotation {
 		return "";
 	}
 
-	public Double getLastQuote(String stock) {
-		
-		try {
-			Document doc = Jsoup.connect(cmaQuoteUrl + stock).get();
-			String[] lines = doc.body().text().split(" ");
-			if (lines.length < 2) {
-				return 0D;
-			}
-			String lastLine = lines[lines.length - 1];
-			String[] lineValues = lastLine.split(",");
-
-			return new Double(lineValues[4]);
-		} catch (IOException e) {
-			log.error(e);
-		}
-
-		return 0D;
-	}
-
 	public void renewCache() {
 		if (quoteCache != null) {
 			for(Quote quote : quoteCache.values()) {
@@ -139,7 +121,7 @@ public class GetQuotation {
 		return true;
 	}
 	
-	public Double getLastQuoteCache(String stock) {
+	public Double getLastQuoteCache(String stock, boolean renew) {
 		if (quoteCache == null) {
 			quoteCache = new HashMap<String, Quote>();
 		}
@@ -150,8 +132,7 @@ public class GetQuotation {
 			quote = quoteCache.get(stock);
 		}
 
-		if (quote == null || isCacheInvalidate(quote.getLastUpdate())) {
-			//getQuoteForCache(stock, quote);
+		if (quote == null || isCacheInvalidate(quote.getLastUpdate()) || renew) {
 			getQuoteFromItau(stock, quote);
 			quote = quoteCache.get(stock);
 		}
@@ -200,40 +181,7 @@ public class GetQuotation {
 			quote.setStock(stock);
 
 			quoteCache.put(stock, quote);
-			log.error("Erro ao pegar cotação do Itau. Stock: " + stock, e);
-		}
-
-	}
-
-	private void getQuoteForCache(String stock, Quote quote) {
-		try {
-			Connection connection = Jsoup.connect(cmaQuoteUrl + stock);
-			connection.ignoreHttpErrors(true);
-			connection.timeout(TIMEOUT);
-
-			Document doc = connection.get();
-			String[] lines = doc.body().text().split(" ");
-			if (lines.length < 2) {
-				return;
-			}
-			String lastLine = lines[lines.length - 1];
-			String[] lineValues = lastLine.split(",");
-
-			Date date = preFormatDate.parse(lineValues[0]); //Date;
-			if (quote == null) quote = new Quote();
-			quote.setDate(date);
-			quote.setLastUpdate(new Date());
-
-			quote.setOpen(Double.valueOf(lineValues[1])); //Opean value
-			quote.setLow(Double.valueOf(lineValues[3])); //Min value
-			quote.setHigh(Double.valueOf(lineValues[2])); //Max value
-			quote.setClose(Double.valueOf(lineValues[4])); //Last value 
-			quote.setStock(stock);
-
-			quoteCache.put(stock, quote);
-		} catch (IOException | ParseException e) {
-			log.error(e);
-			getQuoteFromItau(stock, quote);
+			log.error("Erro ao pegar cotação do Itau. Stock: " + stock);
 		}
 
 	}

@@ -21,6 +21,8 @@ public class HomeVO implements Serializable {
 
 	private Double totalActualCarteiras;
 
+	private Double totalPercentCarteiras;
+
 	public UserTO getUser() {
 		return user;
 	}
@@ -59,6 +61,14 @@ public class HomeVO implements Serializable {
 
 	public void setTotalActualCarteiras(Double totalActualCarteiras) {
 		this.totalActualCarteiras = totalActualCarteiras;
+	}
+
+	public Double getTotalPercentCarteiras() {
+		return totalPercentCarteiras;
+	}
+
+	public void setTotalPercentCarteiras(Double totalPercentCarteiras) {
+		this.totalPercentCarteiras = totalPercentCarteiras;
 	}
 
 }

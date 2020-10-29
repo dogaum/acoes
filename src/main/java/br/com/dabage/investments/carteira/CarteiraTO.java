@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -24,7 +23,6 @@ public class CarteiraTO extends AbstractDocument {
 		this.status = CarteiraStatus.Ativa;
 	}
 
-	@Indexed
 	@DBRef
 	private UserTO user;
 

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
@@ -18,6 +17,7 @@ import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.DateAxis;
 import org.primefaces.model.chart.OhlcChartModel;
 import org.primefaces.model.chart.OhlcChartSeries;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import br.com.dabage.investments.company.CompanyTO;
@@ -36,10 +36,10 @@ public class ChartView extends BasicView implements Serializable {
 
 	static SimpleDateFormat unFormatCompleteDate = new SimpleDateFormat("\"MM/dd/yyyy\"");
 
-	@Resource
+	@Autowired
 	CompanyRepository companyRepository;
 
-	@Resource
+	@Autowired
 	GetQuotation getQuotation;
 
 	private String stock = "";

@@ -2,7 +2,6 @@ package br.com.dabage.investments.config;
 
 import java.util.Date;
 
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import br.com.dabage.investments.repositories.AbstractDocument;
@@ -19,7 +18,6 @@ public class StockTypeTO extends AbstractDocument {
 	private static final long serialVersionUID = -7777309033480564048L;
 
 	/** Nome */
-	@Indexed
 	private String name;
 
 	/** Tributacao em % para operacoes normais. */
