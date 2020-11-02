@@ -91,6 +91,8 @@ public class ConfigView extends BasicView implements Serializable {
 
 	private Date newsDate;
 
+	private CompanyTO company;
+	
 	public String init() {
 		// Stock Types
 		stockTypes = stockTypeRepository.findByRemoveDateNull();
@@ -107,6 +109,8 @@ public class ConfigView extends BasicView implements Serializable {
 		//
 		oldTicker = "";
 		newTicker = "";
+
+		company = new CompanyTO();
 
 		prepareRoles();
         return "config";
@@ -339,7 +343,7 @@ public class ConfigView extends BasicView implements Serializable {
 	}
 
 	/**
-	 * Change Negotiation Code on B3
+	 * Change Negotiation Code
 	 * @param event
 	 */
 	public void changeNegotiationCode(ActionEvent event) {
@@ -359,10 +363,54 @@ public class ConfigView extends BasicView implements Serializable {
 		newTicker = "";
 
 		addInfoMessage("Codigo alterado com sucesso.");
+	};
+
+	/**
+	 * Add Negotiation Code
+	 * @param event
+	 */
+	public void addNegotiationCode(ActionEvent event) {
+		if (company.getTicker() == null || company.getTicker().isEmpty()) {
+			addWarnMessage("Infome o Codigo do Fundo.");
+			return;
+		}
+
+		if (company.getName() == null || company.getName().isEmpty()) {
+			addWarnMessage("Infome o Nome do Fundo.");
+			return;
+		}
+
+		if (company.getFullName() == null || company.getFullName().isEmpty()) {
+			addWarnMessage("Infome o Nome completo do Fundo.");
+			return;
+		}
+
+		if (company.getSetor() == null || company.getSetor().isEmpty()) {
+			addWarnMessage("Infome o Setor do Fundo.");
+			return;
+		}
+
+		String category = "FII";
+		StockTypeTO stockType = stockTypeRepository.findByName(category);
+		company.setStockType(stockType);
+		company.setCategory(category);
+		company.setTicker(company.getTicker().trim().toUpperCase());
+		company.setName(company.getName().trim().toUpperCase());
+		company.setFullName(company.getFullName().trim().toUpperCase());
+		company.setSetor(company.getSetor().trim());
+
+		// save object
+		companyRepository.save(company);
+
+		//add sucess message
+		addInfoMessage(String.format("Codigo %s inserido com sucesso.", company.getTicker()));
+
+		// reset object
+		company = new CompanyTO();
 	}
 
 	/**
-	 * Change Negotiation Code on B3
+	 * Update news from B3
 	 * @param event
 	 */
 	public void runNews(ActionEvent event) {
@@ -459,6 +507,14 @@ public class ConfigView extends BasicView implements Serializable {
 
 	public void setNewsDate(Date newsDate) {
 		this.newsDate = newsDate;
+	}
+
+	public CompanyTO getCompany() {
+		return company;
+	}
+
+	public void setCompany(CompanyTO company) {
+		this.company = company;
 	}
 
 }

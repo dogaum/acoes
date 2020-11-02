@@ -362,10 +362,10 @@ public class CheckNewsTest {
 	public void insertManualFII() {
 		StockTypeTO stockType = stockTypeRepository.findByName("FII");
 		
-		String ticker = "RBRS11";
-		String name = "RIO BRAVO RENDA RESIDENCIAL";
-		String fullName = "RIO BRAVO RENDA RESIDENCIAL";
-		String setor = "Residencial"; //Logístico Escritório Hotéis Varejo Recebíveis Fundos Educacional Desenvolvimento
+		String ticker = "AIEC11";
+		String name = "FII AUTONOMY";
+		String fullName = "AUTONOMY EDIFÍCIOS CORPORATIVOS FUNDO DE INVESTIMENTO IMOBILIÁRIO - FII";
+		String setor = "Escritório"; //Logístico Escritório Hotéis Varejo Recebíveis Fundos Educacional Desenvolvimento
 
 		CompanyTO company = new CompanyTO(ticker, name, fullName);
 		company.setStockType(stockType);

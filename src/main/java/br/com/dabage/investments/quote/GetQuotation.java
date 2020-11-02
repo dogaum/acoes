@@ -181,7 +181,7 @@ public class GetQuotation {
 			quote.setStock(stock);
 
 			quoteCache.put(stock, quote);
-			log.error("Erro ao pegar cotação do Itau. Stock: " + stock);
+			log.error("Erro ao pegar cotacao do Itau. Stock: " + stock);
 		}
 
 	}

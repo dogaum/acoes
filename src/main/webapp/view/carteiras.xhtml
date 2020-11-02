@@ -259,7 +259,7 @@
 									        	<f:convertDateTime locale="#{msg['locale']}"/>
 									        </h:outputText>
 			                    		</p:commandLink>
-										<p:tooltip id="toolTipColLI" for="idColLastIncome" showEffect="clip" position="top">
+										<p:tooltip id="toolTipColLI" for="idColLastIncome" showEffect="clip" position="top" hideDelay="1500">
 									        <p:outputLabel value="#{msg['app.portfolio.lastIncome.fd']}:"/>
 									        <h:outputText value="#{item.lastIncomeCompany.incomeDate}">
 									        	<f:convertDateTime locale="#{msg['locale']}"/>

@@ -40,7 +40,7 @@ public class IncomeService {
 	private static final DateFormat formatMonthYear = new SimpleDateFormat("MM/yyyy");
 
 	/**
-	 * Income´s cache
+	 * Income cache
 	 */
 	private static List<IncomeTotal> incomes = null;
 

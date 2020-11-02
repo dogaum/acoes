@@ -8,7 +8,6 @@ import br.com.dabage.investments.user.RoleTO;
 
 public interface RoleRepository extends MongoRepository<RoleTO, BigInteger> {
 
-	@SuppressWarnings("unchecked")
 	RoleTO save (RoleTO role);
 
 	RoleTO findByName(String name);
